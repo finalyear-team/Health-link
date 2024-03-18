@@ -1,0 +1,495 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  doctor
+  patient
+  admin
+  moderator
+  organization
+}
+
+enum ItemType {
+  post
+  forum
+}
+
+enum AttachmentType {
+  image
+  video
+  file
+}
+
+enum GroupChatRole {
+  member
+  admin
+  owner
+}
+
+enum MessageType {
+  one_to_one
+  group
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum AppointmentStatus {
+  Scheduled
+  Completed
+  Cancelled
+}
+
+enum ConsultancyType {
+  InitialConsultation
+  FollowUp
+  Emergency
+}
+
+enum ScheduleStatus {
+  Active
+  Inactive
+  TemporarilyUnavailable
+}
+
+enum ConsultancyStatus {
+  Scheduled
+  Completed
+  Cancelled
+}
+
+enum Role {
+  member
+  moderator
+  admin
+  guest
+  banned
+}
+
+enum LikeType {
+  forumAnswer
+  post
+}
+
+enum CommentableType {
+  forumAnswer
+  post
+}
+enum FeedbackType {
+  GeneralFeedback
+  ProductReview
+  ServiceReview
+}
+
+model Users {
+  UserID        Int                  @id @default(autoincrement())
+  Username      String
+  Password      String
+  Email         String            @unique
+  Role          String
+  Status        String
+  CreatedAt     DateTime             @default(now())
+  UpdatedAt     DateTime             @updatedAt
+  LastLogin     DateTime?
+  UserDetails   UserDetails?
+  MedicalRecord MedicalRecords[]
+  DoctorDetails DoctorDetails[]
+  UserSessions  UserSessions[]
+  Reviews       DoctorReviews[]
+  Appointments  Appointments[]
+  Consultancy   Consultancy[]
+  Booking       Booking[]
+  SupportGroup  SupportGroupMember[]
+  ForumPost     ForumPost[]
+  ForumAnswer   ForumAnswer[]
+  Comment       Comments[]
+  Like          Likes[]
+  Views         Views[]
+  Prescription  Prescription[]
+  Feedback      UserFeedback[]
+  FeedbackReply Reply[]
+
+
+  @@index([Email], name: "email_index")
+}
+
+model UserDetails {
+  UserDetailID   Int       @id @default(autoincrement())
+  UserID         Int       @unique
+  FirstName      String?
+  LastName       String?
+  DateOfBirth    DateTime?
+  Gender         Gender?
+  Bio            String?   @db.LongText
+  PhoneNumber    String?
+  Address        String?
+  ProfilePicture String?
+  User           Users     @relation(fields: [UserID], references: [UserID])
+}
+
+model MedicalRecords {
+  RecordID      Int      @id @default(autoincrement())
+  UserID        Int
+  DateOfRecord  DateTime @default(now())
+  Diagnosis     Json?
+  TreatmentPlan Json?
+  Medications   Json?
+  Allergies     Json?
+  VitalSigns    Json?
+  Patient       Users    @relation(fields: [UserID], references: [UserID])
+}
+
+model DoctorDetails {
+  DoctorID                  Int              @id @default(autoincrement())
+  UserID                    Int
+  Specialization            String?
+  ConsultationFee           Decimal?
+  EducationalQualifications String?
+  LicenseNumber             String?
+  ExperienceYears           Int?
+  Specialties               String?
+  User                      Users            @relation(fields: [UserID], references: [UserID])
+  Schedules                 DoctorSchedule[]
+  Reviews                   DoctorReviews[]
+  Appointments              Appointments[]
+  Consultancy               Consultancy[]
+  Booking                   Booking[]
+  Blog                      BlogPost[]
+  Post                      Post[]
+  Prescription              Prescription[]
+
+  @@index([Specialization], name: "specialization_index")
+}
+
+model DoctorSchedule {
+  ScheduleID      Int             @id @default(autoincrement())
+  DoctorID        Int
+  ConsultancyType ConsultancyType
+  Date            DateTime
+  AvailableTimes  Json?
+  Duration        Int?
+  Status          ScheduleStatus?
+  Priority        Int?
+  Notes           String?
+  CreatedAt       DateTime        @default(now())
+  UpdatedAt       DateTime        @updatedAt
+  Doctor          DoctorDetails   @relation(fields: [DoctorID], references: [DoctorID])
+}
+
+model Appointments {
+  AppointmentID   Int               @id @default(autoincrement())
+  DoctorID        Int
+  PatientID       Int
+  AppointmentDate DateTime
+  AppointmentTime DateTime
+  Duration        Int
+  Status          AppointmentStatus
+  Notes           String?
+  CreatedAt       DateTime          @default(now())
+  UpdatedAt       DateTime          @updatedAt
+  CancelledBy     String?
+  CancelledReason String?
+  Doctor          DoctorDetails     @relation(fields: [DoctorID], references: [DoctorID])
+  Patient         Users             @relation(fields: [PatientID], references: [UserID])
+  Booking         Booking[]
+
+  @@index([Status], name: "status_index")
+  @@index([DoctorID, PatientID], name: "doctor_patient_index")
+}
+
+model Booking {
+  BookingID       Int           @id @default(autoincrement())
+  CreatedAt       DateTime      @default(now())
+  UpdatedAt       DateTime      @updatedAt
+  Status          String        @default("Pending")
+  PatientID       Int
+  DoctorID        Int
+  AppointmentID   Int?          @unique
+  ReminderSent    Boolean       @default(false)
+  ReminderDate    DateTime?
+  CancelledBy     Int?
+  CancelledReason String?
+  Doctor          DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+  Appointment     Appointments? @relation(fields: [AppointmentID], references: [AppointmentID])
+  Cancelled       Users?        @relation(fields: [CancelledBy], references: [UserID])
+
+  @@index([DoctorID], name: "patient_doctor_index")
+}
+
+model Consultancy {
+  ConsultancyID        Int                    @id @default(autoincrement())
+  DoctorID             Int
+  PatientID            Int
+  ConsultancyDate      DateTime
+  ConsultancyTime      DateTime
+  Duration             Int
+  Status               ConsultancyStatus
+  ConsultancyType      ConsultancyType
+  Notes                String?
+  CreatedAt            DateTime               @default(now())
+  UpdatedAt            DateTime               @updatedAt
+  CancelledBy          String?
+  CancelledReason      String?
+  Doctor               DoctorDetails          @relation(fields: [DoctorID], references: [DoctorID])
+  Patient              Users                  @relation(fields: [PatientID], references: [UserID])
+  CommunicationSession CommunicationSession[]
+
+  @@index([Status], name: "consultancy_status_index")
+}
+
+model CommunicationSession {
+  CommunicationSessionID Int         @id @default(autoincrement())
+  SessionType            String // "video", "chat", "audio"
+  StartTime              DateTime
+  EndTime                DateTime?
+  Status                 String // "scheduled", "in_progress", "completed", "cancelled"
+  CreatedAt              DateTime    @default(now())
+  UpdatedAt              DateTime    @updatedAt
+  ConsultancyID          Int
+  Consultancy            Consultancy @relation(fields: [ConsultancyID], references: [ConsultancyID])
+  Sessions               Session[]
+  SessionID              Int?
+}
+
+model Session {
+  SessionID              Int                  @id @default(autoincrement())
+  Token                  String               @unique
+  ChannelName            String               @unique
+  ExpireTime             DateTime
+  CreatedAt              DateTime             @default(now())
+  UpdatedAt              DateTime             @updatedAt
+  Duration               Int? // Duration of the session in seconds
+  CommunicationSessionID Int
+  CommunicationSession   CommunicationSession @relation(fields: [CommunicationSessionID], references: [CommunicationSessionID])
+  Chat                   ChatMessage[]
+}
+
+model ChatMessage {
+  ChatID     Int      @id @default(autoincrement())
+  Content    String
+  SenderType String // "doctor" or "patient"
+  SenderID   Int
+  MediaUrl   String?
+  SentAt     DateTime @default(now())
+  IsSeen     Boolean  @default(false)
+  SessionID  Int
+  Session    Session  @relation(fields: [SessionID], references: [SessionID])
+}
+
+model SupportGroup {
+  SupportGroupID Int                  @id @default(autoincrement())
+  Name           String
+  Description    String?
+  Disease        String
+  CreatedAt      DateTime             @default(now())
+  UpdatedAt      DateTime             @updatedAt
+  ProfilePic     String? // URL or path to the group's profile picture
+  Members        SupportGroupMember[]
+  ChatMessage    SupportChatMessage[]
+}
+
+model SupportGroupMember {
+  SupportGroupMemberID Int          @id @default(autoincrement())
+  UserID               Int
+  SupportGroupID       Int
+  Role                 Role         @default(member)
+  JoinedAt             DateTime     @default(now())
+  CreatedAt            DateTime     @default(now())
+  UpdatedAt            DateTime     @updatedAt
+  User                 Users        @relation(fields: [UserID], references: [UserID])
+  SupportGroup         SupportGroup @relation(fields: [SupportGroupID], references: [SupportGroupID])
+}
+
+model SupportChatMessage {
+  ChatMessageID  Int          @id @default(autoincrement())
+  Content        String
+  SenderType     String // "Patient" or "SupportGroupAdmin" or similar
+  SenderID       Int
+  MediaUrl       String?
+  SentAt         DateTime     @default(now())
+  IsSeen         Boolean      @default(false)
+  SupportGroupID Int
+  SupportGroup   SupportGroup @relation(fields: [SupportGroupID], references: [SupportGroupID])
+}
+
+model DoctorReviews {
+  ReviewID   Int           @id @default(autoincrement())
+  DoctorID   Int
+  ReviewerID Int
+  Rating     Int?
+  ReviewText String?
+  ReviewDate DateTime      @default(now())
+  Doctor     DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+  Reviewer   Users         @relation(fields: [ReviewerID], references: [UserID])
+
+  @@index([DoctorID], name: "doctor_review_index")
+}
+
+model BlogPost {
+  BlogID      Int           @id @default(autoincrement())
+  Title       String
+  Content     String
+  CreatedAt   DateTime      @default(now())
+  UpdatedAt   DateTime      @updatedAt
+  IsPublished Boolean       @default(false)
+  DoctorID    Int
+  Doctor      DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+}
+
+model ForumPost {
+  ForumPostID Int           @id @default(autoincrement())
+  Content     String
+  CreatedAt   DateTime      @default(now())
+  UpdatedAt   DateTime      @updatedAt
+  UserID      Int
+  User        Users         @relation(fields: [UserID], references: [UserID])
+  Answers     ForumAnswer[]
+}
+
+model ForumAnswer {
+  ForumAnswerID Int       @id @default(autoincrement())
+  Content       String
+  CreatedAt     DateTime  @default(now())
+  UpdatedAt     DateTime  @updatedAt
+  ForumPostID   Int
+  ForumPost     ForumPost @relation(fields: [ForumPostID], references: [ForumPostID])
+  UserID        Int
+  User          Users     @relation(fields: [UserID], references: [UserID])
+}
+
+model Post {
+  PostID    Int           @id @default(autoincrement())
+  Content   String
+  MediaUrl  String?
+  CreatedAt DateTime      @default(now())
+  UpdatedAt DateTime      @updatedAt
+  DoctorID  Int
+  Doctor    DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+}
+
+model Comments {
+  CommentID Int             @id @default(autoincrement())
+  Content   String
+  CreatedAt DateTime        @default(now())
+  UpdatedAt DateTime        @updatedAt
+  UserID    Int
+  User      Users           @relation(fields: [UserID], references: [UserID])
+  ItemID    Int
+  ItemType  CommentableType
+}
+
+model Likes {
+  LikeID    Int      @id @default(autoincrement())
+  UserID    Int
+  User      Users    @relation(fields: [UserID], references: [UserID])
+  ItemID    Int
+  ItemType  LikeType
+  CreatedAt DateTime @default(now())
+}
+
+model Views {
+  ViewID    Int             @id @default(autoincrement())
+  UserID    Int?
+  User      Users?          @relation(fields: [UserID], references: [UserID])
+  ItemID    Int
+  ItemType  CommentableType
+  CreatedAt DateTime        @default(now())
+}
+
+model FAQ {
+  FAQID     Int      @id @default(autoincrement())
+  Question  String
+  Answer    String
+  Order     Int      @default(0)
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+}
+
+
+
+model UserFeedback {
+  FeedbackID Int          @id @default(autoincrement())
+  UserID     Int
+  User       Users        @relation(fields: [UserID], references: [UserID])
+  Content    String
+  CreatedAt  DateTime     @default(now())
+  UpdatedAt  DateTime     @updatedAt
+  Type       FeedbackType
+  Rating     Int? // Optional, for reviews
+  Review     String? // Optional, for reviews
+  Replies    Reply[]
+}
+
+model Reply {
+  ReplyID    Int          @id @default(autoincrement())
+  FeedbackID Int
+  Feedback   UserFeedback @relation(fields: [FeedbackID], references: [FeedbackID])
+  Content    String
+  CreatedAt  DateTime     @default(now())
+  UpdatedAt  DateTime     @updatedAt
+  UserID     Int
+  User       Users        @relation(fields: [UserID], references: [UserID])
+}
+
+model Prescription {
+  PrescriptionID    Int                @id @default(autoincrement())
+  DoctorID          Int
+  Doctor            DoctorDetails      @relation(fields: [DoctorID], references: [DoctorID])
+  PatientID         Int
+  Patient           Users              @relation(fields: [PatientID], references: [UserID])
+  IssuedAt          DateTime           @default(now())
+  ValidUntil        DateTime?
+  Notes             String?
+  Status            String?
+  PrescriptionItems PrescriptionItem[]
+  Attachment        Attachment[]
+}
+
+model PrescriptionItem {
+  PrescriptionItemID Int          @id @default(autoincrement())
+  PrescriptionID     Int
+  Prescription       Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
+  MedicationName     String
+  Dosage             String
+  Instructions       String?
+  Quantity           Int?
+  Frequency          String?
+  Duration           String?
+}
+model Attachment {
+ AttachmentID   Int      @id @default(autoincrement())
+ PrescriptionID Int
+ Prescription   Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
+ URL            String
+ Filename       String
+ Size           Int
+ Caption        String?
+ FileType       String
+}
+
+model UserSessions {
+  SessionID    Int       @id @default(autoincrement())
+  UserID       Int
+  SessionToken String
+  SessionStart DateTime  @default(now())
+  SessionEnd   DateTime?
+  IPAddress    String?
+  UserAgent    String?
+  User         Users     @relation(fields: [UserID], references: [UserID])
+
+  @@index([UserID], name: "user_session_index")
+}
