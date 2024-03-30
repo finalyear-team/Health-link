@@ -10,8 +10,26 @@ const config: Config = {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
-      primary: '#1E90FF',
-      secondary: '#008080',
+      primary: {
+        50: '#edf9ff',
+        100: '#d7f1ff',
+        200: '#b9e8ff',
+        300: '#88dbff',
+        400: '#50c5ff',
+        500: '#28a7ff',
+        600: '#1e90ff',
+        700: '#0a71eb',
+      },
+      secondary: {
+        50: '#eefffc',
+        100: '#c5fffa',
+        200: '#8bfff5',
+        300: '#4afef0',
+        400: '#15ece2',
+        500: '#00d0c9',
+        600: '#00a8a5',
+        700: '#008080',
+      },
       strok: '#DFE4EA',
       white:'#FFFFFF',
       dark: {
@@ -51,7 +69,36 @@ const config: Config = {
         600: '#F27430',
         700: '#E1580E',
 
-      }
+      },
+      red: {
+        50: '#FEF3F3',
+        100: '#FEEBEB',
+        200: '#FDD8D8',
+        300: '#FBC0C0',
+        400: '#F89090',
+        500: '#F56060',
+        600: '#F23030',
+        700: '#E10E0E',
+      },
+      blue: {
+        100: '#E1E8FF',
+        200: '#C3CEF6',
+        300: '#ADBCF2',
+        400: '#8099EC',
+        500: '#5475E5',
+        600: '#2D68F8',
+        700: '#1C3FB7',
+      },
+      green: {
+        50: '#DAF8E6',
+        100: '#C2F3D6',
+        200: '#ACEFC8',
+        300: '#82E6AC',
+        400: '#57DE8F',
+        500: '#2CD673',
+        600: '#22AD5C',
+        700: '#1A8245',
+      },
     },
     extend: {
       backgroundImage: {
