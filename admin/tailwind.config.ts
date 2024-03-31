@@ -104,14 +104,6 @@ const config: Config = {
     sans: ['Graphik', 'sans-serif'],
     serif: ['Merriweather', 'serif'],
   },
-  fontSize: {
-    xs: '0.75rem',
-    sm: '0.875rem',
-    base: '1rem',
-    lg: '1.125rem',
-    xl: '1.25rem',
-    h1: '4.5rem'
-  },
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
