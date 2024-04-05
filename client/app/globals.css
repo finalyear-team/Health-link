@@ -5,7 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
  .custom-btn {
   @apply flex flex-row relative justify-center items-center py-3.5 px-7 text-base outline-none rounded font-semibold;
 }

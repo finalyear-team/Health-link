@@ -68,7 +68,7 @@ const LoginPage = () => {
                     id="email-address"
                     name="email"
                     placeholder="Enter your email"
-                    className="appearance-none h-12 relative w-full px-3 py-2 border border-gray-300 placeholder-gray-500 dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
+                    className="appearance-none dark:placeholder-gray-100 h-12 relative w-full px-3 py-2 border border-gray-600 placeholder-dark-500 dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
                   />
                   <ErrorMessage
                     name="email"
@@ -90,7 +90,7 @@ const LoginPage = () => {
                     id="password"
                     name="password"
                     placeholder="Enter your password"
-                    className="appearance-none dark:bg-dark-500 dark:text-gray-100 h-12 relative w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
+                    className="appearance-none dark:bg-dark-500 dark:text-gray-100 h-12 relative w-full px-3 py-2 border dark:placeholder-gray-100 border-gray-600 placeholder-dark-500 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
                   />
                   <ErrorMessage
                     name="password"
@@ -117,12 +117,12 @@ const LoginPage = () => {
                 </div>
 
                 <div className="text-sm">
-                  <a
-                    href="#"
+                  <Link
+                    href="/forgot-password"
                     className="font-main font-medium text-primary-600 hover:text-primary-700"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
