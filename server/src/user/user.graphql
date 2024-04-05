@@ -1,0 +1,82 @@
+
+enum UserType {
+    doctor,
+    patient,
+    admin,
+    moderator,
+    organization
+  }
+
+enum UserStatus{
+  active
+  inactive   
+  suspended
+  blocked
+  deleted
+
+}
+
+type ResetToken{
+token:String
+}
+
+type User{
+     UserID: String!
+   Username: String!
+   Email: String
+   FirstName: String
+   LastName: String
+   Bio: String
+   PhoneNumber: String
+   Address: String
+   Role: UserType!
+   Status: UserStatus!
+   Verified: Boolean!
+
+}
+type authResponse {
+  access_token:String!
+  User:User!
+
+}
+
+
+
+input CreateUserInput {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input UpdateUserInput {
+  id: Int!
+}
+
+input LoginInput{
+  UsernameOrEmail:String!
+  Password:String!
+}
+
+input SignupInput{
+    Username:String!
+    Email:String!
+    Password:String!
+    Role:UserType
+}
+
+type Query {
+  users: [User]!
+  me(id: Int!): User
+}
+
+
+
+type Mutation {
+  login(signinInput:LoginInput!):authResponse!
+  register(signupInput:SignupInput):User!
+  resetPassword(newPassword:String!):User!
+  resetEmail(resetEmail:String!):ResetToken!
+  verifyResetCode(verifyCode:Int!):Boolean!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User
+}

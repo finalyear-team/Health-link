@@ -9,47 +9,61 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
+      - ./client:/app  # Mount the client code directory to /app in the container
       - /app/node_modules
     env_file:
-      - .env.local
-      
-  client_prod:
-    build: 
-      context: ./client
-      dockerfile: Dockerfile.prod
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    env_file:
-      - .env
+      - ./client/.env
+    networks:
+      - demo-network
 
   server_dev:
+    depends_on:
+      - redis
+      - mysql
     build: 
       context: ./server
       dockerfile: Dockerfile.dev
     ports:
-      - "4000:4000"
+      - "4000:4000"  # Map container port 4000 to host port 4500
     volumes:
-      - .:/app
+      - ./server:/app  # Mount the server code directory to /app in the container
       - /app/node_modules
     env_file:
-      - .env.local
+      - ./server/.env
+    environment:
+      DATABASE_URL: mysql://root:thisisabebe@mysql:3306/health_link_test1db
+    networks:
+      - demo-network
 
-
-  server_prod:
-    build: 
-      context: ./server
-      dockerfile: Dockerfile.prod
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: thisisabebe
+      MYSQL_DATABASE: health_link_test1db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: thisisabebe
     ports:
-      - "4000:4000"
+      - "3306:3306"
     volumes:
-      - .:/app
-      - /app/node_modules
-    env_file:
-      - .env
-      
-      
-    
+      - mysql_data:/var/lib/mysql
+    networks:
+      - demo-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - demo-network
+    volumes:
+      - redis:/data
+
+networks:
+  demo-network:
+    external: true
+volumes:
+  mysql_data:
+   
+  redis:
+    driver: local
