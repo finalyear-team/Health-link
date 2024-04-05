@@ -1,17 +1,24 @@
-import React from 'react';
+import React from "react";
 
 interface ButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
+  type?: "submit" | "reset" | "button" | undefined;
   className?: string;
   disabled?: boolean;
-  variant?: 'secondary' | 'danger';
+  variant?: "secondary" | "danger";
   children: React.ReactNode;
 }
 
-const Button = ({ onClick, className, disabled, children } : ButtonProps) => {
-
+const Button = ({
+  onClick,
+  type,
+  className,
+  disabled,
+  children,
+}: ButtonProps) => {
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`custom-btn ${className}`}

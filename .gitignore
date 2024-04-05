@@ -11,9 +11,10 @@ node_modules
 
 # next.js
 **/.next/
+client/.next
+admin/.next
 /.next/
 /out/
-
 # production
 /build
 
