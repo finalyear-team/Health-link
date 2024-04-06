@@ -1,13 +1,12 @@
 "use client";
 
-import { Button } from "@/component";
+import { Button, Container, Input } from "@/component";
 import { FcGoogle } from "react-icons/fc";
 import { MdCircle } from "react-icons/md";
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
-import { Container } from "@/component";
 
 const LoginPage = () => {
   //validation for the input fields
@@ -38,7 +37,6 @@ const LoginPage = () => {
   };
 
   return (
-    // <div className="min-h-screen flex items-center justify-center flex-col bg-white  sm:px-6 lg:px-8 dark:bg-dark-700">
     <Container>
       <div className="custom-container">
         <span className="flex justify-center">
@@ -59,45 +57,21 @@ const LoginPage = () => {
               <div className="">
                 {/* email */}
                 <div className="py-6">
-                  <label
-                    htmlFor="email-address"
-                    className="font-main text-base text-dark"
-                  >
-                    Email address
-                  </label>
-                  <Field
+                  <Input
+                    name="email"
                     type="text"
-                    id="email-address"
-                    name="email"
                     placeholder="Enter your email"
-                    className="appearance-none dark:placeholder-gray-100 h-12 relative w-full px-3 py-2 border border-gray-600 placeholder-dark-500 dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="span"
-                    className="text-red-500 font-main text-sm italic mt-1"
+                    label="Email address"
                   />
                 </div>
 
                 {/* password */}
                 <div className="pb-6">
-                  <label
-                    htmlFor="password"
-                    className="font-main text-base text-dark "
-                  >
-                    Password
-                  </label>
-                  <Field
+                  <Input
+                    name="password"
                     type="password"
-                    id="password"
-                    name="password"
                     placeholder="Enter your password"
-                    className="appearance-none dark:bg-dark-500 dark:text-gray-100 h-12 relative w-full px-3 py-2 border dark:placeholder-gray-100 border-gray-600 placeholder-dark-500 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10 sm:text-sm"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="span"
-                    className="text-red-500 font-main text-sm italic mt-1"
+                    label="Password"
                   />
                 </div>
               </div>
@@ -132,7 +106,7 @@ const LoginPage = () => {
                 <Button
                   disabled={!isValid}
                   className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                  ${true ? "disabled:bg-gray-300" : ""}`}
+                  ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
                 >
                   {isSubmitting ? "Submitting..." : "Login"}
@@ -153,7 +127,6 @@ const LoginPage = () => {
         <Link href="#">Terms</Link>
       </div>
     </Container>
-    //div
   );
 };
 

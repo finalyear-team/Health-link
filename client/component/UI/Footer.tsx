@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="footer__custom">
         <span className="font-bold text-primary-600 text-lg">HealthLink.</span>
         <div>
-          <div> &copy HealthLink {currentYear} All Rights Reserved.</div>
+          <div> &copy; HealthLink {currentYear} All Rights Reserved.</div>
         </div>
       </div>
       <div className="footer__custom">

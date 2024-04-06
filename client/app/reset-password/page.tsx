@@ -3,24 +3,35 @@
 import React from "react";
 import { Button, Input } from "@/component";
 import { MdArrowBack, MdCircle } from "react-icons/md";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
 import { Container } from "@/component";
 
-const forgetPassword = () => {
+const ResetPassword = () => {
   //validation for the input field
-  const LoginSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required!"),
+  const ResetPasswordSchema = Yup.object().shape({
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .max(20, "Password must be at most 20 characters")
+      .required("Password is required!")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
+      ),
+    confirm: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Confirm Password is required!"),
   });
 
   //initializing the value
   const initialValues = {
-    email: "",
+    password: "",
+    confirm: "",
   };
 
   //handilng the submit
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+  const handleReset = (values: any, { setSubmitting, resetForm }: any) => {
     console.log("Form values:", values);
     setSubmitting(false);
     resetForm();
@@ -33,16 +44,16 @@ const forgetPassword = () => {
         </span>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-black dark:text-gray-100 font-main">
-            Forgot Password
+            Reset Password
           </h2>
-          <h4 className="text-base mt-2 font-main font-medium text-primary-600 text-center">
-            we will send you an email to verify your account!
+          <h4 className="text-base font-medium mt-2 font-main text-center text-primary-600">
+            Set a strong password to secure your account!
           </h4>
         </div>
         <Formik
           initialValues={initialValues}
-          onSubmit={handleSubmit}
-          validationSchema={LoginSchema}
+          onSubmit={handleReset}
+          validationSchema={ResetPasswordSchema}
         >
           {({ isValid, isSubmitting }) => (
             <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -50,10 +61,18 @@ const forgetPassword = () => {
                 {/* email */}
                 <div className="py-6">
                   <Input
-                    name="email"
-                    type="text"
-                    placeholder="Enter your email"
-                    label="Email address"
+                    name="password"
+                    type="password"
+                    placeholder="Enter new password"
+                    label="New Password"
+                  />
+                </div>
+                <div className="pb-6">
+                  <Input
+                    name="confirm"
+                    type="password"
+                    placeholder="Confirm password"
+                    label="Confirm Password"
                   />
                 </div>
               </div>
@@ -64,15 +83,18 @@ const forgetPassword = () => {
                 ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
                 >
-                  {isSubmitting ? "Submitting..." : "Forgot Password"}
+                  {isSubmitting ? "Submitting..." : "Reset Password"}
                 </Button>
-                  <Link href={"/login"} className="flex justify-center items-center flex-row mt-2 font-main text-black text-sm font-medium dark:text-gray-100 ">
-                    <span>
-                      {" "}
-                      <MdArrowBack />{" "}
-                    </span>
-                    <span> Back to Login </span>
-                  </Link>
+                <Link
+                  href={"/login"}
+                  className="flex justify-center items-center flex-row mt-2 font-main text-black text-sm font-medium dark:text-gray-100 "
+                >
+                  <span>
+                    {" "}
+                    <MdArrowBack />{" "}
+                  </span>
+                  <span> Back to Login </span>
+                </Link>
               </div>
             </Form>
           )}
@@ -87,4 +109,4 @@ const forgetPassword = () => {
   );
 };
 
-export default forgetPassword;
+export default ResetPassword;

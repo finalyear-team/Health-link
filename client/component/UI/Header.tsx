@@ -7,11 +7,12 @@ const Header = () => {
       <div >
         <div className="font-bold text-primary-600 text-lg">HealthLink.</div>
       </div>
-      <div className="header__right">
-        <Link href={''}>Find Doctor</Link>
+      <div className="header__right font-medium">
+        <Link href={''}>Find a Doctor</Link>
         <Link href={''}>Services</Link>
-        <Link href={''}>lorem</Link>
-        <Link href={''}>lorems</Link>
+        <Link href={''}>About us</Link>
+        <Link href={'/login'}>Log in</Link>
+        <Link href={'/signup'}>Sign up</Link>
       </div>
     </nav>
   );
