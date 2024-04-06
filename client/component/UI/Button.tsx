@@ -1,9 +1,31 @@
-import React from 'react'
+import React from "react";
 
-const Button = () => {
-  return (
-    <div>Button</div>
-  )
+interface ButtonProps {
+  onClick?: () => void;
+  type?: "submit" | "reset" | "button" | undefined;
+  className?: string;
+  disabled?: boolean;
+  variant?: "secondary" | "danger";
+  children: React.ReactNode;
 }
 
-export default Button
+const Button = ({
+  onClick,
+  type,
+  className,
+  disabled,
+  children,
+}: ButtonProps) => {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`custom-btn ${className}`}
+    >
+      {children}
+    </button>
+  );
+};
+
+export default Button;
