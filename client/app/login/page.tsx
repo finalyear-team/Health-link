@@ -7,6 +7,7 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
+import { Container } from "@/component";
 
 const LoginPage = () => {
   //validation for the input fields
@@ -37,8 +38,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center flex-col bg-white  sm:px-6 lg:px-8 dark:bg-dark-700">
-      <div className="max-w-xl w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4">
+    // <div className="min-h-screen flex items-center justify-center flex-col bg-white  sm:px-6 lg:px-8 dark:bg-dark-700">
+    <Container>
+      <div className="custom-container">
         <span className="flex justify-center">
           <MdCircle size={50} className="text-gray-300" />
         </span>
@@ -150,7 +152,8 @@ const LoginPage = () => {
         <Link href="#">Privacy</Link>
         <Link href="#">Terms</Link>
       </div>
-    </div>
+    </Container>
+    //div
   );
 };
 

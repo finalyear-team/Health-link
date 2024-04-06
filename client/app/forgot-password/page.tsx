@@ -6,6 +6,7 @@ import { MdCircle } from "react-icons/md";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
+import { Container } from "@/component";
 
 const forgetPassword = () => {
   //validation for the input field
@@ -25,7 +26,8 @@ const forgetPassword = () => {
     resetForm();
   };
   return (
-    <div className="min-h-screen flex items-center justify-center flex-col bg-white  sm:px-6 lg:px-8 dark:bg-dark-700">
+    // <div className="min-h-screen flex items-center justify-center flex-col bg-white  sm:px-6 lg:px-8 dark:bg-dark-700">
+    <Container>
       <div className="max-w-xl w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4">
         <span className="flex justify-center">
           <MdCircle size={50} className="text-gray-300" />
@@ -87,7 +89,7 @@ const forgetPassword = () => {
         <Link href="#">Privacy</Link>
         <Link href="#">Terms</Link>
       </div>
-    </div>
+    </Container>
   );
 };
 

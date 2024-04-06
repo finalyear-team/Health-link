@@ -8,3 +8,35 @@
  .custom-btn {
   @apply flex flex-row relative justify-center items-center py-3.5 px-7 text-base outline-none rounded font-semibold;
 }
+
+ .custom-container {
+  @apply max-w-lg w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4;
+}
+
+.header__custom{
+  @apply flex justify-between items-center px-3 pt-2 font-main dark:bg-dark-700 text-black dark:text-gray-100
+}
+
+.header__right{
+ @apply flex justify-evenly items-center space-x-10
+}
+
+.footer{
+  @apply flex justify-evenly flex-wrap font-main items-center px-4 py-2 bg-dark-600 text-gray-100 dark:bg-gray-400 dark:text-dark-600
+}
+
+.footer__custom{
+@apply w-32 m-5
+}
+
+.footer__custome__title{
+  @apply font-bold underline
+}
+
+.footer__custome__list{
+  @apply flex flex-col space-y-2 mt-2
+}
+
+.footer__custome__social{
+  @apply flex flex-row flex-wrap space-x-3
+}
