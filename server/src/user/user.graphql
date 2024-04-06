@@ -56,6 +56,11 @@ input LoginInput{
   Password:String!
 }
 
+input ResetPasswordInput{
+  email:String!
+  newPassword:String!
+
+}
 input SignupInput{
     Username:String!
     Email:String!
@@ -73,7 +78,7 @@ type Query {
 type Mutation {
   login(signinInput:LoginInput!):authResponse!
   register(signupInput:SignupInput):User!
-  resetPassword(newPassword:String!):User!
+  resetPassword():User!
   resetEmail(resetEmail:String!):ResetToken!
   verifyResetCode(verifyCode:Int!):Boolean!
   createUser(createUserInput: CreateUserInput!): User!

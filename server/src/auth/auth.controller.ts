@@ -29,11 +29,11 @@ export class AuthController {
             token,
             process.env.PASSWORD_RESET_SECRET
         ):null;
-        // console.log(decodedToken)
-        // if (!decodedToken) {
-        //     console.log("come on man")
-        //     throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
-        // }
+        console.log(decodedToken)
+        if (!decodedToken) {
+            console.log("come on man")
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
+        }
         if (this.authService.isTokenExpired(decodedToken.exp)) {
             throw new HttpException("Token Expired", HttpStatus.BAD_REQUEST);
         }
