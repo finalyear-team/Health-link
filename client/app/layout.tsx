@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header, Footer } from "@/component";
+import Layout from "@/component/Layout";
 
 export const metadata: Metadata = {
   title: "HealthLink",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <Layout>
+          <Header />
+          {children}
+          <Footer />
+        </Layout>
       </body>
     </html>
   );

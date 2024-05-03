@@ -5,6 +5,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
  .custom-btn {
   @apply flex flex-row relative justify-center items-center py-3.5 px-7 text-base outline-none rounded font-semibold;
 }
@@ -16,8 +17,9 @@
 .input__error{
   @apply text-red-500 font-main text-sm mt-1
 }
+
  .custom-container {
-  @apply max-w-lg w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4;
+  @apply max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4;
 }
 
 .header__custom{
@@ -29,7 +31,7 @@
 }
 
 .footer{
-  @apply flex justify-evenly flex-wrap min-w-full overflow-x-hidden font-main items-center px-4 py-2 bg-dark-600 text-gray-100 dark:bg-gray-400 dark:text-dark-600
+  @apply flex justify-evenly flex-wrap min-w-full overflow-x-hidden font-main items-center px-4 py-2 bg-primary-100 text-dark-700 dark:text-gray-100 dark:bg-dark-600
 }
 
 .footer__custom{

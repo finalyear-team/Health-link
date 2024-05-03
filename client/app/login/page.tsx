@@ -38,7 +38,7 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <div className="custom-container">
+      <div className="custom-container dark:bg-dark-700">
         <span className="flex justify-center">
           <MdCircle size={50} className="text-gray-300" />
         </span>
@@ -115,11 +115,7 @@ const LoginPage = () => {
             </Form>
           )}
         </Formik>
-        <div className="mt-6">
-          <Button className="font-main border border-solid hover:bg-primary-50 dark:hover:bg-dark-600 border-dark-200 w-full text-base font-semibold rounded text-dark focus:outline-none focus:ring-2 focus:ring-offset-2">
-            <FcGoogle size={30} /> Continue with Google
-          </Button>
-        </div>
+
       </div>
       <div className="space-x-3 mt-2 text-sm text-gray-700 dark:text-gray-300">
         <Link href="#">Help</Link>

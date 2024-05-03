@@ -4,9 +4,9 @@ import React from "react";
 const Header = () => {
   return (
     <nav className="header__custom">
-      <div >
+      <Link href={"/"} >
         <div className="font-bold text-primary-600 text-lg">HealthLink.</div>
-      </div>
+      </Link>
       <div className="header__right font-medium">
         <Link href={''}>Find a Doctor</Link>
         <Link href={''}>Services</Link>

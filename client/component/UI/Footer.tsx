@@ -14,21 +14,21 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer__custom">
-        <span className="footer__custome__title">About us</span>
+        <span className="footer__custome__title">User Support and Info</span>
         <div className="footer__custome__list">
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
+          <Link href={"/faqs"}>FAQs</Link>
+          <Link href={"/terms-of-service"}>Terms of Services</Link>
+          <Link href={"/privacy-policy"}>Privacy Policy</Link>
+          <Link href={"/security"}>Security</Link>
+          <Link href={"/accessibility"}>Accessibility</Link>
         </div>
       </div>
       <div className="footer__custom">
-        <span className="footer__custome__title">Product</span>
+        <span className="footer__custome__title">Resources</span>
         <div className="footer__custome__list">
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
-          <Link href={""}>lorem</Link>
+          <Link href={"/blogs"}>Blogs</Link>
+          <Link href={"/feedback"}>Feedback and Suggestion</Link>
+          <Link href={"/partners"}>Partnership</Link>
         </div>
       </div>
       <div className="footer__custom">
