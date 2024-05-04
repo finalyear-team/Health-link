@@ -1,13 +1,14 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 const Header = () => {
   return (
-    <nav className="header__custom">
+    <nav className=" header__custom ">
       <Link href={"/"} >
-        <div className="font-bold text-primary-600 text-lg">HealthLink.</div>
+        <Image src='/Logo.png' alt="logo" width={200} height={100} />
       </Link>
-      <div className="header__right font-medium">
+      <div className="header__right text-sm">
         <Link href={''}>Find a Doctor</Link>
         <Link href={''}>Services</Link>
         <Link href={''}>About us</Link>

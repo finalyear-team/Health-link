@@ -2,15 +2,24 @@ import Link from "next/link";
 import React from "react";
 import { BsTwitter, BsLinkedin } from "react-icons/bs";
 import { MdFacebook } from "react-icons/md";
+import Image from "next/image";
 
 const Footer = () => {
   let currentYear = new Date().getFullYear();
   return (
     <footer className="footer">
       <div className="footer__custom">
-        <span className="font-bold text-primary-600 text-lg">HealthLink.</span>
         <div>
-          <div> &copy; HealthLink {currentYear} All Rights Reserved.</div>
+          <div>
+            <Image
+              src="/logo-icon.png"
+              alt="HealthLink"
+              width={100}
+              height={100}
+            />
+            &copy;
+            {currentYear} All Rights Reserved.
+          </div>
         </div>
       </div>
       <div className="footer__custom">

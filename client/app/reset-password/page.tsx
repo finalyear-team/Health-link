@@ -100,11 +100,11 @@ const ResetPassword = () => {
           )}
         </Formik>
       </div>
-      <div className="space-x-3 mt-2 text-sm text-gray-700 dark:text-gray-300">
+      {/* <div className="space-x-3 mt-2 text-sm text-gray-700 dark:text-gray-300">
         <Link href="#">Help</Link>
         <Link href="#">Privacy</Link>
         <Link href="#">Terms</Link>
-      </div>
+      </div> */}
     </Container>
   );
 };
