@@ -37,7 +37,7 @@ const MultiStepForm = () => {
     //   <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
     //     <h1 className="text-3xl font-semibold mb-4">Create Account</h1>
     <Container>
-      <div className="custom-container">
+      <div className="custom-container bg-white bg-opacity-50 backdrop-blur-sm">
         <span className="flex justify-center">
           <MdCircle size={50} className="text-gray-300" />
         </span>

@@ -38,7 +38,7 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <div className="custom-container dark:bg-dark-700">
+      <div className="custom-container dark:bg-dark-700 bg-white bg-opacity-50 backdrop-blur-sm">
         <span className="flex justify-center">
           <MdCircle size={50} className="text-gray-300" />
         </span>
