@@ -6,6 +6,8 @@ import * as Yup from "yup";
 import { Input, Button } from "@/component";
 import { MdOutlineSearch, MdOutlineArrowForward } from "react-icons/md";
 import Features from "@/component/Landing-common/Features";
+import features from "@/public/data/feature";
+import TopDoctors from "@/component/Landing-common/TopDoctors";
 export default function Home() {
   // const SearchProfile = Yup.object().shape({
   //   FirstName: Yup.string().required("Email is required!"),
@@ -28,17 +30,17 @@ export default function Home() {
     <div>
       <div className="relative w-full">
         <Image
-          src="/bg.jpg"
+          src="/image/bg.jpg"
           alt="Front-page_doctor"
           width={400}
           height={400}
-          className="w-full h-full object-cover object-center filter blur-sm"
+          className="w-full h-full object-cover object-center filter blur-sm mt-10"
         />
-        <div className="absolute left-5 font-main" style={{ top: "17%" }}>
-          <div className="text-2xl md:text-4xl lg:text-6xl text-secondary-600 font-bold  border-solid border-white border-2 p-3">
+        <div className="absolute left-5 font-main" style={{ top: "10%" }}>
+          <div className="text-2xl md:text-4xl lg:text-6xl text-secondary-600 font-bold">
             Your Bridge to Health
           </div>
-          <div className="text-lg md:text-xl lg:text-4xl p-2 font-bold text-primary-600 mt-3">
+          <div className="text-md sm:text-lg md:text-xl lg:text-4xl font-bold text-primary-600 ">
             Where Care Meets Convenience
           </div>
           <Formik
@@ -48,24 +50,26 @@ export default function Home() {
           >
             {({ isValid, isSubmitting }) => (
               <Form className="mt-1 space-y-6" action="#" method="POST">
-                <div className="flex flex-wrap items-center justify-start lg:space-x-3 md:space-x-2 sm:space-x-1 sm:space-y-1 text-base sm:text-sm md:text-lg lg:text-xl xl:text-2xl">
-                  <div className="">
-                    <Input
-                      name="FirstName"
-                      type="text"
-                      placeholder="First Name"
-                    />
-                  </div>
-                  <div className="">
-                    <Input
-                      name="LastName"
-                      type="text"
-                      placeholder="Last Name"
-                    />
+                <div className="flex flex-wrap items-center text-base space-y-1 space-x-1">
+                  <div className="flex items-center justify-center space-x-1">
+                    <div className="">
+                      <Input
+                        name="FirstName"
+                        type="text"
+                        placeholder="First Name"
+                      />
+                    </div>
+                    <div className="">
+                      <Input
+                        name="LastName"
+                        type="text"
+                        placeholder="Last Name"
+                      />
+                    </div>
                   </div>
                   <div className="">
                     <Button
-                      className="font-main text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      className="font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                       type="submit"
                     >
                       {isSubmitting ? "Submitting..." : "Search My Profile  "}
@@ -76,9 +80,9 @@ export default function Home() {
               </Form>
             )}
           </Formik>
-          <div className="">
+          <div className="pt-1">
             <Button
-              className="font-main text-base font-medium rounded text-white bg-dark-600 hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dark-500"
+              className="font-main w-fit text-base font-medium rounded text-white bg-dark-600 hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dark-500"
               type="submit"
             >
               Are You A Doctor
@@ -87,10 +91,38 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* <div>
-        <Features />
-      </div> */}
-      
+      {/* features */}
+      <div>
+        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+          Insights to Our Features
+        </div>
+        <div className="flex flex-wrap justify-center mt-3">
+          {features.map(
+            (
+              feature: {
+                title: string;
+                description: string;
+                icon: string;
+              },
+              index
+            ) => (
+              <Features
+                key={index}
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+              />
+            )
+          )}
+        </div>
+      </div>
+      {/* Top Doctors */}
+      <div>
+        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+          Our Top Doctors
+        </div>
+        <TopDoctors />
+      </div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ const Footer = () => {
         <div>
           <div>
             <Image
-              src="/logo-icon.png"
+              src="/image/logo-icon.png"
               alt="HealthLink"
               width={100}
               height={100}
