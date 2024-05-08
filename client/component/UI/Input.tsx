@@ -13,12 +13,13 @@ interface InputProps {
   name: string;
   idd?: string;
   autoComplete?: string;
+  accept?:string;
 }
 
 const Input = ({ label, name, type, ...rest }: InputProps) => {
   return (
     <div>
-      <label htmlFor={name} className="font-main text-base text-dark">
+      <label htmlFor={name} className="font-main text-sm text-dark-700 font-medium">
         {label}
       </label>
       <Field

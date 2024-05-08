@@ -4,15 +4,13 @@ import React from "react";
 import { Button, Input } from "@/component";
 import { MdArrowBack, MdCircle } from "react-icons/md";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import Link from "next/link";
 import { Container } from "@/component";
+import validationSchema from "@/utils/validationSchema";
 
 const forgetPassword = () => {
   //validation for the input field
-  const LoginSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required!"),
-  });
+  const LoginSchema = validationSchema;
 
   //initializing the value
   const initialValues = {

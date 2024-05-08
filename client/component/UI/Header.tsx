@@ -12,8 +12,8 @@ const Header = () => {
         <Link href={''}>Find a Doctor</Link>
         <Link href={''}>Services</Link>
         <Link href={''}>About us</Link>
-        <Link href={'/login'}>Log in</Link>
-        <Link href={'/signup'}>Sign up</Link>
+        <Link href={'/sign-in'}>Log in</Link>
+        <Link href={'/sign-up'}>Sign up</Link>
       </div>
     </nav>
   );

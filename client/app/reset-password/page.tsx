@@ -4,25 +4,13 @@ import React from "react";
 import { Button, Input } from "@/component";
 import { MdArrowBack, MdCircle } from "react-icons/md";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
 import Link from "next/link";
 import { Container } from "@/component";
+import validationSchema from "@/utils/validationSchema";
 
 const ResetPassword = () => {
   //validation for the input field
-  const ResetPasswordSchema = Yup.object().shape({
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .max(20, "Password must be at most 20 characters")
-      .required("Password is required!")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
-      ),
-    confirm: Yup.string()
-      .oneOf([Yup.ref("password")], "Passwords must match")
-      .required("Confirm Password is required!"),
-  });
+  const ResetPasswordSchema = validationSchema;
 
   //initializing the value
   const initialValues = {

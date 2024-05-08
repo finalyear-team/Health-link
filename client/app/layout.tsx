@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header, Footer } from "@/component";
 import Layout from "@/component/Layout";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "HealthLink",
@@ -14,14 +15,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Layout>
-          <Header />
-          {children}
-          <Footer />
-        </Layout>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
+          <Layout>
+            <Header />
+            {children}
+            <Footer />
+          </Layout>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
