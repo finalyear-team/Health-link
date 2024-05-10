@@ -1,26 +1,34 @@
 "use client";
 
 import { Button, Container, Input } from "@/component";
-import { FcGoogle } from "react-icons/fc";
+import { useRouter } from "next/navigation";
+import { useSignIn } from "@clerk/nextjs";
 import { MdCircle } from "react-icons/md";
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import Link from "next/link";
-import * as Yup from 'yup'
+import * as Yup from "yup";
+import { useState } from "react";
+import { InfinitySpin } from "react-loader-spinner";
 
 const LoginPage = () => {
+  const [error, setError] = useState(null);
+  const { isLoaded, signIn, setActive } = useSignIn();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
   //validation for the input fields
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("*Email is required!"),
     password: Yup.string()
-    .min(8, "*Password must be at least 8 characters")
-    .max(20, "*Password must be at most 20 characters")
-    .required("*Password is required!")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
-      "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
-    ),
+      .min(8, "*Password must be at least 8 characters")
+      .max(20, "*Password must be at most 20 characters")
+      .required("*Password is required!")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
+        "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
+      ),
   });
 
   //initializing the values
@@ -30,8 +38,32 @@ const LoginPage = () => {
   };
 
   //handilng the submit
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+  const handleSubmit = async (
+    values: any,
+    { setSubmitting, resetForm }: any
+  ) => {
     console.log("Form values:", values);
+
+    if (!isLoaded) {
+      setLoading(true);
+      return;
+    }
+
+    try {
+      const result = await signIn.create({
+        identifier: values.email,
+        password: values.password,
+      });
+      if (result.status === "complete") {
+        console.log(result);
+        await setActive({ session: result.createdSessionId });
+        router.push("/dashboard/");
+      } else {
+        console.log(result);
+      }
+    } catch (err: any) {
+      setError(err.errors[0].longMessage);
+    }
 
     setSubmitting(false);
     resetForm();
@@ -105,13 +137,31 @@ const LoginPage = () => {
 
               <div>
                 <Button
-                  // disabled={!isValid}
+                  disabled={!isValid}
                   className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
                   ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
                 >
-                  {isSubmitting ? "Submitting..." : "Login"}
+                  {loading ? (
+                    <InfinitySpin
+                      // visible={true}
+                      width="50"
+                      color="#4fa94d"
+                      // ariaLabel="infinity-spin-loading"
+                    />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
+                <div className="text-sm mt-4 text-center">
+                  Don&apos;t have an account?
+                  <Link
+                    href="/forgot-password"
+                    className="font-main font-medium text-primary-600 hover:text-primary-700"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
               </div>
             </Form>
           )}
