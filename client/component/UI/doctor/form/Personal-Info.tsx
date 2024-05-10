@@ -1,11 +1,12 @@
 import Container from "../../container";
 import Input from "../../Input";
 import { Formik, Form } from "formik";
-import validationSchema from "@/utils/validationSchema";
 import GenderSelect from "@/component/genderSelect/genderSelect";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
-import Button from '../../Button';
+import Button from "../../Button";
+import { useState } from "react";
+import * as Yup from "yup";
 
 const BasicInfoForm = ({
   onNext,
@@ -15,19 +16,32 @@ const BasicInfoForm = ({
   onBack: () => void;
 }) => {
 
-  const LoginSchema = validationSchema;
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required("*First Name is required"),
+    lastName: Yup.string().required("*Last Name is required"),
+    userName: Yup.string().required("*User Name is required"),
+    DOB: Yup.date().required("*Date of Birth is required").nullable(),
+    gender: Yup.string()
+      .oneOf(["male", "female"])
+      .required("*Gender is required"),
+  });
 
-  const initialValues = {
-    firstName: "",
-    lastName: "",
-    DOB: "",
-    gender: "",
-  };
+  const [storedValues, setStoredValues] = useState<any>(() => {
+    const storedBasicInfo = localStorage.getItem("personalInfo");
+    return storedBasicInfo
+      ? JSON.parse(storedBasicInfo)
+      : {
+          firstName: "",
+          lastName: "",
+          userName: "",
+          DOB: "",
+          gender: "",
+        };
+  });
 
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
-    console.log("Form values:", values);
+  const handleSubmit = (values: any, { setSubmitting }: any) => {
+    localStorage.setItem("personalInfo", JSON.stringify(values));
     setSubmitting(false);
-    resetForm();
     onNext();
   };
 
@@ -43,9 +57,9 @@ const BasicInfoForm = ({
             Personal Information
           </h2>
           <Formik
-            initialValues={initialValues}
+            initialValues={storedValues}
             onSubmit={handleSubmit}
-            validationSchema={LoginSchema}
+            validationSchema={validationSchema}
           >
             {({ isValid, isSubmitting }) => (
               <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -68,6 +82,15 @@ const BasicInfoForm = ({
                       label="Last Name"
                     />
                   </div>
+                  {/* username */}
+                  <div className="mt-3">
+                    <Input
+                      name="userName"
+                      type="text"
+                      placeholder="Enter userName"
+                      label="User Name"
+                    />
+                  </div>
                   {/* date of birth */}
                   <div className="mt-3">
                     <Input
@@ -83,7 +106,27 @@ const BasicInfoForm = ({
                     <GenderSelect name="gender" label="Gender" />
                   </div>
                 </div>
-               
+                <div className="flex items-center justify-evenly w-full mt-2">
+                  <div>
+                    <Button
+                      className="font-main w-fit text-base font-semibold rounded disabled:bg-gray-300 disabled:text-dark-200"
+                      type="button"
+                      disabled={true}
+                      onClick={onBack}
+                    >
+                      Back
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      disabled={!isValid}
+                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:text-dark-200"
+                      type="submit"
+                    >
+                      {isSubmitting ? "Submitting..." : "Next"}
+                    </Button>
+                  </div>
+                </div>
               </Form>
             )}
           </Formik>
@@ -94,27 +137,9 @@ const BasicInfoForm = ({
             alt="right-side"
             width={300}
             height={300}
+            className="auto"
+            priority
           />
-        </div>
-      </div>
-      <div className="flex items-center justify-evenly w-full mt-2">
-        <div>
-          <Button
-            className="font-main w-fit text-base font-semibold rounded disabled:bg-gray-300 disabled:text-dark-200"
-            type="button"
-            disabled={true}
-            onClick={onBack}
-          >
-            Back
-          </Button>
-        </div>
-        <div>
-          <Button
-            className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:text-dark-200"
-            type="submit"
-          >
-            Next
-          </Button>
         </div>
       </div>
     </Container>

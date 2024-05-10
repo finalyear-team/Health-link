@@ -13,27 +13,37 @@ interface InputProps {
   name: string;
   idd?: string;
   autoComplete?: string;
-  accept?:string;
+  accept?: string;
 }
 
 const Input = ({ label, name, type, ...rest }: InputProps) => {
   return (
     <div>
-      <label htmlFor={name} className="font-main text-sm text-dark-700 font-medium">
+      {type === "checkbox" ? (
+        <Field
+          id={name}
+          name={name}
+          type={type}
+          {...rest}
+        />
+      ) : null}
+      <label
+        htmlFor={name}
+        className="font-main text-sm text-dark-700 font-medium"
+      >
         {label}
       </label>
-      <Field
-        id={name}
-        name={name}
-        type={type}
-        {...rest}
-        className="custome-input"
-      />
-      <ErrorMessage
-        name={name}
-        component="div"
-        className="input__error"
-      />
+
+      {type !== "checkbox" ? (
+        <Field
+          id={name}
+          name={name}
+          type={type}
+          {...rest}
+          className="custome-input"
+        />
+      ) : null}
+      <ErrorMessage name={name} component="div" className="input__error" />
     </div>
   );
 };

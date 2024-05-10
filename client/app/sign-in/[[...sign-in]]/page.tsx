@@ -5,12 +5,24 @@ import { FcGoogle } from "react-icons/fc";
 import { MdCircle } from "react-icons/md";
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import validationSchema from "@/utils/validationSchema";
 import Link from "next/link";
+import * as Yup from 'yup'
 
 const LoginPage = () => {
   //validation for the input fields
-  const LoginSchema = validationSchema;
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("*Email is required!"),
+    password: Yup.string()
+    .min(8, "*Password must be at least 8 characters")
+    .max(20, "*Password must be at most 20 characters")
+    .required("*Password is required!")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
+      "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
+    ),
+  });
+
   //initializing the values
   const initialValues = {
     email: "",
@@ -39,7 +51,7 @@ const LoginPage = () => {
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
-          validationSchema={LoginSchema}
+          validationSchema={validationSchema}
         >
           {({ isValid, isSubmitting }) => (
             <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -93,7 +105,7 @@ const LoginPage = () => {
 
               <div>
                 <Button
-                  disabled={!isValid}
+                  // disabled={!isValid}
                   className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
                   ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
@@ -104,7 +116,6 @@ const LoginPage = () => {
             </Form>
           )}
         </Formik>
-
       </div>
       {/* <div className="space-x-3 mt-2 text-sm text-gray-700 dark:text-gray-300">
         <Link href="#">Help</Link>

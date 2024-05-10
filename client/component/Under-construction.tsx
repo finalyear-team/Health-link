@@ -9,11 +9,12 @@ const UnderConstruction = () => {
     <div className="custome-under-construction">
       <div>
         <Image
-          src="Under construction-amico.svg"
+          src="/image/Under construction-amico.svg"
           alt="Under Construction"
           width={400}
           height={400}
-          
+          priority
+          // className="auto"
         />
       </div>
       <div>

@@ -15,7 +15,8 @@ const Footer = () => {
               src="/image/logo-icon.png"
               alt="HealthLink"
               width={100}
-              height={100}
+              height={150}
+              className="auto"
             />
             &copy;
             {currentYear} All Rights Reserved.

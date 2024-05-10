@@ -3,7 +3,6 @@ import { useState } from "react";
 import BasicInfoForm from "@/component/UI/doctor/form/Personal-Info";
 import ContactInfoForm from "@/component/UI/doctor/form/Contact-Info";
 import SpecializationForm from "@/component/UI/doctor/form/Additional-Info";
-import { Button } from "@/component";
 
 const DoctorSignUp = () => {
   const [step, setStep] = useState(1);
@@ -14,11 +13,6 @@ const DoctorSignUp = () => {
 
   const handleBack = () => {
     setStep(step - 1);
-  };
-
-  const handleFinish = () => {
-    console.log("Doctor account creation finished!");
-    // You can navigate to another page or perform any other action upon completion
   };
 
   return (
@@ -38,31 +32,8 @@ const DoctorSignUp = () => {
         <ContactInfoForm onNext={handleNext} onBack={handleBack} />
       )}
       {step === 3 && (
-        <SpecializationForm onFinish={handleFinish} onBack={handleBack} />
+        <SpecializationForm onBack={handleBack} />
       )}
-      {/* Navigation buttons */}
-      {/* <div className="flex justify-evenly space-x-4">
-        {step > 1 && (
-          <Button
-            className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            onClick={handleBack}
-            type="submit"
-          >
-            Back
-          </Button>
-        )}
-        {step < 3 ? (
-          <Button
-            className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            onClick={handleNext}
-            type="submit"
-          >
-            Next
-          </Button>
-        ) : (
-          <button onClick={handleFinish}>Finish</button>
-        )}
-      </div> */}
     </div>
   );
 };

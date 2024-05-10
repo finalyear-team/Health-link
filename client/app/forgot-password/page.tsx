@@ -6,11 +6,14 @@ import { MdArrowBack, MdCircle } from "react-icons/md";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Link from "next/link";
 import { Container } from "@/component";
-import validationSchema from "@/utils/validationSchema";
+// import validationSchema from "@/utils/validationSchema";
+import * as Yup from "yup";
 
 const forgetPassword = () => {
-  //validation for the input field
-  const LoginSchema = validationSchema;
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("*Email is required!"),
+  });
 
   //initializing the value
   const initialValues = {
@@ -40,7 +43,7 @@ const forgetPassword = () => {
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
-          validationSchema={LoginSchema}
+          validationSchema={validationSchema}
         >
           {({ isValid, isSubmitting }) => (
             <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -57,20 +60,23 @@ const forgetPassword = () => {
               </div>
               <div>
                 <Button
-                  disabled={!isValid}
+                  disabled={!isValid || isSubmitting}
                   className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
+                ${isSubmitting ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
                 >
                   {isSubmitting ? "Submitting..." : "Forgot Password"}
                 </Button>
-                  <Link href={"/login"} className="flex justify-center items-center flex-row mt-2 font-main text-black text-sm font-medium dark:text-gray-100 ">
-                    <span>
-                      {" "}
-                      <MdArrowBack />{" "}
-                    </span>
-                    <span> Back to Login </span>
-                  </Link>
+                <Link
+                  href={"/login"}
+                  className="flex justify-center items-center flex-row mt-2 font-main text-black text-sm font-medium dark:text-gray-100 "
+                >
+                  <span>
+                    {" "}
+                    <MdArrowBack />{" "}
+                  </span>
+                  <span> Back to Login </span>
+                </Link>
               </div>
             </Form>
           )}

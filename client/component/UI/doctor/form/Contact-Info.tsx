@@ -2,10 +2,10 @@ import Container from "../../container";
 import Input from "../../Input";
 import Button from "../../Button";
 import { Formik, Form } from "formik";
-import validationSchema from "@/utils/validationSchema";
-import GenderSelect from "@/component/genderSelect/genderSelect";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
+import * as Yup from "yup";
+import { useState } from "react";
 
 const ContactInfoForm = ({
   onNext,
@@ -14,21 +14,40 @@ const ContactInfoForm = ({
   onNext: () => void;
   onBack: () => void;
 }) => {
-  const LoginSchema = validationSchema;
+  const validationSchema = Yup.object().shape({
+    password: Yup.string()
+      .min(8, "*Password must be at least 8 characters")
+      .max(20, "*Password must be at most 20 characters")
+      .required("*Password is required!")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
+        "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
+      ),
+    email: Yup.string().email("Invalid email").required("*Email is required!"),
+    address: Yup.string().required("*Address is required"),
+    phone: Yup.string()
+      .matches(
+        /^\+251[79]\d{8}$|^(07|09)\d{8}$/,
+        "*Invalid Ethiopian phone number"
+      )
+      .required("*Phone number is required"),
+  });
 
-  const initialValues = {
-    email: "",
-    password: "",
-    phone: "",
-    address: "",
-  };
+  const [storedValues, setStoredValues] = useState<any>(() => {
+    const storedBasicInfo = localStorage.getItem("contactInfo");
+    return storedBasicInfo
+      ? JSON.parse(storedBasicInfo)
+      : {
+          email: "",
+          password: "",
+          phone: "",
+          address: "",
+        };
+  });
 
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
-    values.preventDefault();
-    // Store values in global state or context
-    console.log("Form values:", values);
+  const handleSubmit = (values: any, { setSubmitting }: any) => {
+    localStorage.setItem("contactInfo", JSON.stringify(values));
     setSubmitting(false);
-    resetForm();
     onNext();
   };
 
@@ -44,9 +63,9 @@ const ContactInfoForm = ({
             Contact Information
           </h2>
           <Formik
-            initialValues={initialValues}
+            initialValues={storedValues}
             onSubmit={handleSubmit}
-            validationSchema={LoginSchema}
+            validationSchema={validationSchema}
           >
             {({ isValid, isSubmitting }) => (
               <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -88,6 +107,26 @@ const ContactInfoForm = ({
                     />
                   </div>
                 </div>
+                <div className="flex items-center justify-evenly w-full mt-2">
+                  <div>
+                    <Button
+                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      type="button"
+                      onClick={onBack}
+                    >
+                      Back
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      disabled={!isValid}
+                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      type="submit"
+                    >
+                      {isSubmitting ? "Submitting..." : "Next"}
+                    </Button>
+                  </div>
+                </div>
               </Form>
             )}
           </Formik>
@@ -98,27 +137,8 @@ const ContactInfoForm = ({
             alt="right-side"
             width={300}
             height={300}
+            className="auto"
           />
-        </div>
-      </div>
-      <div className="flex items-center justify-evenly w-full mt-2">
-        <div>
-          <Button
-            className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            type="button"
-            onClick={onBack}
-          >
-            Back
-          </Button>
-        </div>
-        <div>
-          <Button
-            className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            type="submit"
-            onClick={onNext}
-          >
-            Next
-          </Button>
         </div>
       </div>
     </Container>

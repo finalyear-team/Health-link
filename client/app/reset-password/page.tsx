@@ -6,11 +6,26 @@ import { MdArrowBack, MdCircle } from "react-icons/md";
 import { Formik, Form } from "formik";
 import Link from "next/link";
 import { Container } from "@/component";
-import validationSchema from "@/utils/validationSchema";
+import * as Yup from 'yup';
+// import validationSchema from "@/utils/validationSchema";
 
 const ResetPassword = () => {
   //validation for the input field
-  const ResetPasswordSchema = validationSchema;
+  const validationSchema = Yup.object().shape({
+    password: Yup.string()
+    .min(8, "*Password must be at least 8 characters")
+    .max(20, "*Password must be at most 20 characters")
+    .required("*Password is required!")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/,
+      "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
+    ),
+  email: Yup.string().email("Invalid email").required("*Email is required!"),
+  confirm: Yup.string()
+    .oneOf([Yup.ref("password")], "*Passwords must match")
+    .required("*Confirm Password is required!"),
+  });
+
 
   //initializing the value
   const initialValues = {
@@ -41,7 +56,7 @@ const ResetPassword = () => {
         <Formik
           initialValues={initialValues}
           onSubmit={handleReset}
-          validationSchema={ResetPasswordSchema}
+          validationSchema={validationSchema}
         >
           {({ isValid, isSubmitting }) => (
             <Form className="mt-8 space-y-6" action="#" method="POST">
