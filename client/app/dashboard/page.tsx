@@ -1,13 +1,13 @@
 import React from "react";
-import UnderConstruction from "@/component/Under-construction";
+import { Container } from "@/component";
 import { UserButton } from "@clerk/nextjs";
 
 const PatDashboard = () => {
   return (
-    <div>
-      <UnderConstruction />
+    <Container>
+      <h1>Dashboard is Under Construction</h1>
       <UserButton />
-    </div>
+    </Container>
   );
 };
 

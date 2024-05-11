@@ -45,7 +45,7 @@ const LoginPage = () => {
     console.log("Form values:", values);
 
     if (!isLoaded) {
-      setLoading(true);
+      // setLoading(true);
       return;
     }
 
@@ -142,12 +142,10 @@ const LoginPage = () => {
                   ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
                   type="submit"
                 >
-                  {loading ? (
+                  { isSubmitting ? (
                     <InfinitySpin
-                      // visible={true}
                       width="50"
                       color="#4fa94d"
-                      // ariaLabel="infinity-spin-loading"
                     />
                   ) : (
                     "Login"
@@ -156,7 +154,7 @@ const LoginPage = () => {
                 <div className="text-sm mt-4 text-center">
                   Don&apos;t have an account?
                   <Link
-                    href="/forgot-password"
+                    href="/sign-up"
                     className="font-main font-medium text-primary-600 hover:text-primary-700"
                   >
                     Sign Up
@@ -167,11 +165,6 @@ const LoginPage = () => {
           )}
         </Formik>
       </div>
-      {/* <div className="space-x-3 mt-2 text-sm text-gray-700 dark:text-gray-300">
-        <Link href="#">Help</Link>
-        <Link href="#">Privacy</Link>
-        <Link href="#">Terms</Link>
-      </div> */}
     </Container>
   );
 };
