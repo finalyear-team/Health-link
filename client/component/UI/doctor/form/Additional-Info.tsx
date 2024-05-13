@@ -13,7 +13,7 @@ import { InfinitySpin } from "react-loader-spinner";
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [pendingVerification, setPendingVerification] = useState(false);
-  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
 
   const validationSchema = Yup.object().shape({
     // profilePicture: Yup.mixed().required("Profile picture is required"),
@@ -40,6 +40,16 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
       ),
   });
 
+  const codeValidation = Yup.object().shape({
+    code: Yup.string()
+      .matches(/^[0-9]{6,6}$/, "Must be a 6-digit number")
+      .required("This field is required"),
+  });
+
+  const codeInitial = {
+    code: "",
+  };
+
   const [storedValues, setStoredValues] = useState<any>(() => {
     const storedBasicInfo = localStorage.getItem("professionalInfo");
     return storedBasicInfo
@@ -62,84 +72,69 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     const item2 = localStorage.getItem("contactInfo");
     const item3 = localStorage.getItem("professionalInfo");
 
-    // console.log(item1, item2, item3);
-
-    // Parse the string back into an array of objects
     if (item1 && item2 && item3) {
-      console.log("item1:", item1, "item2:", item2, "item3:", item3);
+      // Parse the string back into an array of objects
+      const parsedPersonal = JSON.parse(item1);
+      const parsedContact = JSON.parse(item2);
+      const parsedProfessional = JSON.parse(item3);
 
-      const personalInfo: Array<{
-        firstName: string;
-        lastName: string;
-        userName: string;
-        DOB: Date;
-        gender: string;
-      }> = JSON.parse(item1);
-      const contactInfo: Array<{
-        email: string;
-        password: string;
-        phone: string;
-        address: string;
-      }> = JSON.parse(item2);
-      const professionalInfo: Array<{
-        specialization: string;
-        consultationFee: number;
-        education: string;
-        license: string;
-        experiance: number;
-      }> = JSON.parse(item3);
+      //access elements from the parsed object
+      const firstName = parsedPersonal.firstName;
+      const lastName = parsedPersonal.lastName;
+      const email = parsedContact.email;
+      const password = parsedContact.password;
 
-      // Access a specific properties
-
-      const firstName = personalInfo[0]?.firstName;
-      const lastName = personalInfo[0]?.lastName;
-      const email = contactInfo[0]?.email;
-      const password = contactInfo[0]?.password;
-
-      // router.push("/dashboard/doctor");
-
+      //check if it is loading
       if (!isLoaded) {
         return;
       }
 
+      // Create a new user
       try {
         await signUp.create({
           firstName: firstName,
           lastName: lastName,
           emailAddress: email,
           password: password,
+          unsafeMetadata: {
+            role: "provider",
+          },
         });
 
+        // Send email verification
         await signUp.prepareEmailAddressVerification({
           strategy: "email_code",
         });
 
         //Change UI
-
         setPendingVerification(true);
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.log("The Error is as follows: ", error);
+        setError(error.errors[0].longMessage);
       }
 
+      // remove stored valuse from localstorage
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("contactInfo");
       localStorage.removeItem("professionalInfo");
 
+      //set submitting false for Formic
       setSubmitting(false);
     }
   };
 
   //verify email
   const onPressVerify = async (e: any) => {
-    e.preventDefault();
+    // e.preventDefault();
 
+    //check if it is loading
     if (!isLoaded) {
       return;
     }
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+        code: e.code,
       });
 
       if (completeSignUp.status !== "complete") {
@@ -147,24 +142,25 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
       }
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.push("/dashboard");
+        router.push("/dashboard/doctor");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
+      setError(err.errors[0].longMessage);
     }
   };
 
   return (
     <Container>
       {!pendingVerification && (
-        <div className="custom-container flex items-center justify-center flex-wrap space-x-5">
+        <div className="custom-container flex items-center justify-center flex-wrap space-x-5 my-8">
           <div className="w-1/3">
             <MdCircle size={50} color="#C4C4C4" />
             <h2 className="text-2xl font-extrabold text-dark-700">
               Complete Your Account
             </h2>
             <h2 className="text-base font-bold text-primary-600">
-              Professional Information
+              Professional Information (3/3)
             </h2>
             <Formik
               initialValues={storedValues}
@@ -239,8 +235,11 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                         label=" I agree to the Terms and Conditions of HealthLink"
                       />
                     </div>
+                    <div className="py-4">
+                      {error && <p className="text-xs text-red-600">{error}</p>}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-evenly w-full space-x-6 my-2">
+                  <div className="space_buttons">
                     <div>
                       <Button
                         className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
@@ -257,7 +256,9 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                         type="submit"
                       >
                         {isSubmitting ? (
-                          <InfinitySpin width="50" color="#4fa94d" />
+                          <div className="mr-4">
+                            <InfinitySpin width="70" color="#1e90ff" />
+                          </div>
                         ) : (
                           "Finish"
                         )}
@@ -279,9 +280,16 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
           </div>
         </div>
       )}
-      {pendingVerification && (
+      {/* {pendingVerification && (
         <form onSubmit={onPressVerify} className="mt-8 space-y-6">
           <div className="rounded-md shadow-sm -space-y-px">
+            <MdCircle size={50} color="#C4C4C4" />
+            <h2 className="text-2xl font-extrabold text-dark-700">
+              Complete Your Account
+            </h2>
+            <h2 className="text-base font-bold text-primary-600">
+              Professional Information (3/3)
+            </h2>
             <div>
               <label htmlFor="verification-code" className="sr-only">
                 Verification Code
@@ -292,7 +300,8 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                 type="text"
                 autoComplete="off"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="custome-input"
+                // className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Verification Code"
                 value={code}
                 onChange={(e) => {
@@ -303,14 +312,61 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
           </div>
 
           <div>
-            <button
+            <Button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:text-dark-200"
+              // className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Submit Verification Code
-            </button>
+            </Button>
           </div>
         </form>
+      )} */}
+      {pendingVerification && (
+        <div>
+          <h2 className="text-2xl text-center font-extrabold text-dark-700 mb-5">
+            Verify Your Account
+          </h2>
+          <Formik
+            initialValues={codeInitial}
+            onSubmit={onPressVerify}
+            validationSchema={codeValidation}
+          >
+            {({ isValid, isSubmitting }) => (
+              <Form className="my-8 space-y-6" action="#" method="POST">
+                <Input
+                  name="code"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Verification Code"
+                  label="Enter the Verification code sent to your Email."
+                />
+                <div className="py-4">
+                  {error && <p className="text-xs text-red-600">{error}</p>}
+                </div>
+                <Button
+                  disabled={!isValid || isSubmitting}
+                  className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
+                                ${
+                                  true
+                                    ? "disabled:bg-gray-300 disabled:text-dark-200"
+                                    : ""
+                                }`}
+                  type="submit"
+                >
+                  {isSubmitting ? (
+                    <div className="mr-4">
+                      <InfinitySpin width="70" color="#1e90ff" />
+                    </div>
+                  ) : (
+                    "Submit Verification Code"
+                  )}
+                </Button>
+                {/* {error && <p className="text-xs text-red-600">{error}</p>} */}
+              </Form>
+            )}
+          </Formik>
+        </div>
       )}
     </Container>
   );

@@ -8,6 +8,7 @@ import { MdOutlineSearch, MdOutlineArrowForward } from "react-icons/md";
 import Features from "@/component/Landing-common/Features";
 import features from "@/public/data/feature";
 import TopDoctors from "@/component/Landing-common/TopDoctors";
+import {Header, Footer} from '@/component';
 export default function Home() {
   // const SearchProfile = Yup.object().shape({
   //   FirstName: Yup.string().required("Email is required!"),
@@ -28,12 +29,14 @@ export default function Home() {
 
   return (
     <div>
+      <Header />
       <div className="relative w-full">
         <Image
           src="/image/bg.jpg"
           alt="Front-page_doctor"
           width={400}
           height={400}
+          priority
           className="w-full h-full object-cover object-center filter blur-sm mt-10"
         />
         <div className="absolute left-5 font-main" style={{ top: "10%" }}>
@@ -123,6 +126,7 @@ export default function Home() {
         </div>
         <TopDoctors />
       </div>
+      <Footer />
     </div>
   );
 }

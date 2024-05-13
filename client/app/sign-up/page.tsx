@@ -5,6 +5,7 @@ import { Container, Button } from "@/component";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Header, Footer } from "@/component";
 
 const SignUp = () => {
   const router = useRouter();
@@ -13,22 +14,24 @@ const SignUp = () => {
     router.push(`/sign-up/${choice}`);
   };
   return (
-    <Container>
-      <div className="custom-container font-main">
-        <h2 className="text-xl font-extrabold text-dark-700 font-main">
-          Create an Account
-        </h2>
-        <span className="text-sm font-normal">
-          Already have an account?{" "}
-          <Link href="/sign-in" className="text-primary-600 font-medium">
-            Sign In
-          </Link>{" "}
-          Instead.
-        </span>
-        <h2 className="mt-6 text-3xl font-extrabold text-secondary-600 italic font-main">
-          Are You
-        </h2>
-        <div className="flex items-center justify-between space-x-5">
+    <div>
+      <Header />
+      <Container>
+        <div className="custom-container font-main">
+          <h2 className="text-xl font-extrabold text-dark-700 font-main">
+            Create an Account
+          </h2>
+          <span className="text-sm font-normal">
+            Already have an account?{" "}
+            <Link href="/sign-in" className="text-primary-600 font-medium">
+              Sign In
+            </Link>{" "}
+            Instead.
+          </span>
+          <h2 className="mt-6 text-3xl font-extrabold text-secondary-600 italic font-main">
+            Are You
+          </h2>
+          <div className="flex items-center justify-between space-x-5">
             <div className="flex flex-col">
               <Image
                 src="/image/I am doctor.svg"
@@ -59,9 +62,11 @@ const SignUp = () => {
                 A Patient
               </Button>
             </div>
+          </div>
         </div>
-      </div>
-          </Container>
+      </Container>
+      <Footer />
+    </div>
   );
 };
 

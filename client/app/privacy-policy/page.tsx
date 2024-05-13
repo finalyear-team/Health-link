@@ -1,10 +1,15 @@
-import React from 'react'
-import UnderConstruction from '@/component/Under-construction'
+import React from "react";
+import UnderConstruction from "@/component/Under-construction";
+import { Header, Footer } from "@/component";
 
 const PrivacyPolicy = () => {
   return (
-    <UnderConstruction></UnderConstruction>
-  )
-}
+    <div>
+      <Header />
+      <UnderConstruction></UnderConstruction>
+      <Footer />
+    </div>
+  );
+};
 
-export default PrivacyPolicy
+export default PrivacyPolicy;

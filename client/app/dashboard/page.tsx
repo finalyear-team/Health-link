@@ -1,14 +1,25 @@
-import React from "react";
-import { Container } from "@/component";
-import { UserButton } from "@clerk/nextjs";
+"use client"
+
+import { useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const PatDashboard = () => {
-  return (
-    <Container>
-      <h1>Dashboard is Under Construction</h1>
-      <UserButton />
-    </Container>
-  );
+  const { user } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    // when the component mounted it directly redirect based on the user rolee
+    if (user && user.unsafeMetadata && user.unsafeMetadata.role) {
+      if (user.unsafeMetadata.role === "provider") {
+        router.push("/dashboard/doctor");
+      } else {
+        router.push("/dashboard/patient");
+      }
+    }
+  }, [user, router]);
+
+  return null; // Render nothing
 };
 
 export default PatDashboard;

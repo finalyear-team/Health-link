@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header, Footer } from "@/component";
+// import { Header, Footer } from "@/component";
 import Layout from "@/component/Layout";
 import { ClerkProvider } from "@clerk/nextjs";
 
@@ -19,9 +19,9 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <Layout>
-            <Header />
+            {/* <Header /> */}
             {children}
-            <Footer />
+            {/* <Footer /> */}
           </Layout>
         </body>
       </html>

@@ -1,10 +1,15 @@
-import React from 'react'
-import UnderConstruction from '@/component/Under-construction'
+import React from "react";
+import UnderConstruction from "@/component/Under-construction";
+import { Header, Footer } from "@/component";
 
 const TermsOfServices = () => {
   return (
-    <UnderConstruction></UnderConstruction>
-  )
-}
+    <div>
+      <Header />
+      <UnderConstruction />
+      <Footer />
+    </div>
+  );
+};
 
-export default TermsOfServices
+export default TermsOfServices;

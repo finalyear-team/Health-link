@@ -53,14 +53,14 @@ const ContactInfo = ({
 
   return (
     <Container>
-      <div className="custom-container flex items-center justify-center flex-wrap space-x-5">
+      <div className="custom-container flex items-center justify-center flex-wrap space-x-5 my-8">
         <div>
           <MdCircle size={50} color="#C4C4C4" />
           <h2 className="text-2xl font-extrabold text-dark-700">
             Create Your Account
           </h2>
           <h2 className="text-base font-bold text-primary-600">
-            Contact Information
+            Contact Information (2/3)
           </h2>
           <Formik
             initialValues={storedValues}
@@ -107,7 +107,7 @@ const ContactInfo = ({
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-evenly w-full mt-2">
+                <div className="space_buttons">
                   <div>
                     <Button
                       className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
