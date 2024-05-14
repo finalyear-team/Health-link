@@ -71,7 +71,7 @@ const UserProfileCard: React.FC<UserProfile> = ({
       </div>
       <div className="mt-4 text-xs">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center font-medium text-xs border-b-2 border-stroke ">
+          <div className="flex items-center font-medium text-sm border-b-2 border-stroke ">
             <div className="">
               <p className="font-bold text-lg mr-2"> {followers} </p>
               <p> Followers</p>

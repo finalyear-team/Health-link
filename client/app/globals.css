@@ -1,104 +1,122 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+ .glow {
+  animation: glowing 1500ms infinite;
+}
+
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 10px #fff; /* Adjust the color and size of the glow */
+  }
+  50% {
+    box-shadow: 0 0 20px #00a8a5; /* Adjust the color and size of the glow */
+  }
+  100% {
+    box-shadow: 0 0 10px #fff; /* Adjust the color and size of the glow */
+  }
+}
 
 .custom-btn {
   @apply relative flex items-center justify-center flex-nowrap text-center py-2 px-3 sm:py-3 sm:px-4 text-xs sm:text-base outline-none focus:outline-none font-main;
 }
 
-
 .follow-btn {
-  @apply font-main px-5 py-2 text-sm md:text-base font-medium rounded-full  text-white bg-primary-600 hover:bg-primary-700 focus:outline-none
+  @apply font-main px-5 py-2 text-sm md:text-base font-medium rounded-full  text-white bg-primary-600 hover:bg-primary-700 focus:outline-none;
 }
 
-.profile-image{
-  @apply rounded-full
+.profile-image {
+  @apply rounded-full;
 }
 
 .custome-input {
-  @apply appearance-none dark:placeholder-gray-100 h-fit sm:h-12 relative w-full px-3 py-2 border border-gray-600 placeholder-dark-300 placeholder:text-sm dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10
+  @apply appearance-none dark:placeholder-gray-100 h-fit sm:h-12 relative w-full px-3 py-2 border border-gray-600 placeholder-dark-300 placeholder:text-sm dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10;
 }
 
-.input__error{
-  @apply text-red-500 font-main text-xs mt-1
+.input__error {
+  @apply text-red-500 font-main text-xs mt-1;
 }
 
-.main_container{
-  @apply min-h-screen flex flex-col items-center justify-center  sm:px-6 lg:px-8  overflow-y-hidden bg-cover 
+.main_container {
+  @apply min-h-screen flex flex-col items-center justify-center  sm:px-6 lg:px-8  overflow-y-hidden bg-cover;
 }
 
- .custom-container {
-  @apply  w-fit border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-6 px-4 rounded-lg space-y-4 font-main;
+.custom-container {
+  @apply w-fit border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-6 px-4 rounded-lg space-y-4 font-main;
 }
 
-.header__custom{
-  @apply flex justify-between h-auto w-auto items-center px-3 py-2 font-main dark:bg-dark-700 text-dark-700 dark:text-gray-100 fixed top-0 left-0 right-0 z-10 shadow-md bg-white
+.header__custom {
+  @apply flex justify-between h-auto w-auto items-center px-3 py-2 font-main dark:bg-dark-700 text-dark-700 dark:text-gray-100 fixed top-0 left-0 right-0 z-10 shadow-md bg-white;
 }
 
-.header__right{
- @apply flex justify-evenly items-center space-x-7
+.header__right {
+  @apply flex justify-evenly items-center space-x-7;
 }
 
-.footer{
-  @apply flex justify-evenly flex-wrap min-w-full overflow-x-hidden font-main px-4 py-2 bg-primary-100 text-dark-700 dark:text-gray-100 dark:bg-dark-600
+.footer {
+  @apply flex justify-evenly flex-wrap min-w-full overflow-x-hidden font-main px-4 py-2 bg-primary-100 text-dark-700 dark:text-gray-100 dark:bg-dark-600;
 }
 
-.footer__custom{
-@apply w-1/5 m-5
+.footer__custom {
+  @apply w-1/5 m-5;
 }
 
-.footer__custome__title{
-  @apply font-bold underline
+.footer__custome__title {
+  @apply font-bold underline;
 }
 
-.footer__custome__list{
-  @apply flex flex-col space-y-2 mt-2 text-sm
+.footer__custome__list {
+  @apply flex flex-col space-y-2 mt-2 text-sm;
 }
 
-.footer__custome__social{
-  @apply flex flex-row space-x-3 sm:space-x-1
+.footer__custome__social {
+  @apply flex flex-row space-x-3 sm:space-x-1;
 }
 
-.custome-under-construction{
-  @apply min-h-screen flex flex-col items-center justify-center dark:bg-dark-700
+.custome-under-construction {
+  @apply min-h-screen flex flex-col items-center justify-center dark:bg-dark-700;
 }
 
-.custome-under-construction-title{
-  @apply text-3xl md:text-4xl font-bold font-main mb-4 dark:text-white
+.custome-under-construction-title {
+  @apply text-3xl md:text-4xl font-bold font-main mb-4 dark:text-white;
 }
 
-.custome-under-construction-timer{
-  @apply text-6xl font-main text-center md:text-2xl mb-8 dark:text-white
+.custome-under-construction-timer {
+  @apply text-6xl font-main text-center md:text-2xl mb-8 dark:text-white;
 }
 
-.features_container{
-  @apply bg-white shadow-lg rounded-lg overflow-hidden w-full h-fit md:w-1/2 lg:w-1/3 xl:w-1/4 p-6 m-4 flex flex-col items-center
+.features_container {
+  @apply bg-white shadow-lg rounded-lg overflow-hidden w-full h-fit md:w-1/2 lg:w-1/3 xl:w-1/4 p-6 m-4 flex flex-col items-center;
 }
 
-.top-doctors{
-  @apply bg-white shadow-lg rounded-lg overflow-hidden w-96 md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 m-4 h-fit
+.top-doctors {
+  @apply bg-white shadow-lg rounded-lg overflow-hidden w-96 md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 m-4 h-fit;
 }
 
-.proffesional-type{
-  @apply bg-secondary-600 text-secondary-700 bg-opacity-5 rounded px-2 py-1 ml-2 font-main
+.proffesional-type {
+  @apply bg-secondary-600 text-secondary-700 bg-opacity-5 rounded px-2 py-1 ml-2 font-main;
 }
 
-.icon-gap{
-  @apply mr-2
+.icon-gap {
+  @apply mr-2;
 }
 
-.file-hidden{
-  @apply hidden
+.file-hidden {
+  @apply hidden;
 }
 
-.auto{
-  @apply h-auto w-auto
+.auto {
+  @apply h-auto w-auto;
 }
 
-.space_buttons{
-  @apply flex items-center justify-evenly w-full my-2
+.space_buttons {
+  @apply flex items-center justify-evenly w-full my-2;
+}
+
+.txt_dasbrd {
+  @apply px-4 py-2 border-2 border-solid border-primary-600 text-secondary-600 font-medium text-sm rounded hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-opacity-50 shadow-sm hover:shadow-md glow;
 }
