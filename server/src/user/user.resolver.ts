@@ -61,7 +61,6 @@ export class UserResolver {
 
   @Query('users')
   findAll() {
-    console.log("come onam")
     return this.userService.findAll();
   }
 

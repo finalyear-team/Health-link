@@ -1,8 +1,9 @@
-import { Controller, Get, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
 import { Request, Response } from 'express';
+import { ClerkAuthGuard } from './auth.guard';
 
 
 @Controller('auth')
@@ -14,7 +15,11 @@ export class AuthController {
    
     
    
-
+    @Get("")
+    @UseGuards(ClerkAuthGuard)
+    async clerkUsers(){
+      return this.authService.clerkUser()
+    }
     @Get("verify-email")
     async verifyEmail() {}
 
@@ -24,14 +29,11 @@ export class AuthController {
         @Req() req: Request,
         @Res() res: Response
     ) {
-       console.log(token)
         const decodedToken = token?await this.authService.validateToken(
             token,
             process.env.PASSWORD_RESET_SECRET
         ):null;
-        console.log(decodedToken)
         if (!decodedToken) {
-            console.log("come on man")
             throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
         }
         if (this.authService.isTokenExpired(decodedToken.exp)) {

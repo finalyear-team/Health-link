@@ -1,16 +1,13 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginInput, LoginSchema, RegisterInput, RegisterSchema } from './dto/auth-input';
 import { ZodError, date } from 'zod';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { connect } from 'http2';
 import * as crypto from "crypto"
-import { Users } from '@prisma/client';
-import { MailService } from 'src/mail/mail.service';
-import { Token } from 'graphql';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import clerkClient from '@clerk/clerk-sdk-node';
+import { ClerkAuthGuard } from './auth.guard';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +17,13 @@ export class AuthService {
     this.salt=process.env.HASH_KEY_SALT
 
         
+    }
+
+    @UseGuards(ClerkAuthGuard)
+
+    async clerkUser(){
+        return clerkClient.users.getUserList()
+    
     }
    
       validatePassword (Password:string,hashedPassword:any)  {
@@ -231,7 +235,6 @@ export class AuthService {
             })
           if(!user)
           throw new HttpException("Email not registered",HttpStatus.NOT_FOUND)
-        console.log(user)
         const verificationToken=this.generateJWTToken(process.env.PASSWORD_RESET_SECRET,{sub:user.UserID,username:user.Username,email:user.Email},"15m")  
         const verificationLink=`${process.env.API}/auth/reset-password?token=${verificationToken}`
         this.eventEmitter.emit("Reset-password",{
@@ -243,7 +246,6 @@ export class AuthService {
         
             
         } catch (error) {
-            console.log("come on ")
             throw error
             
         }

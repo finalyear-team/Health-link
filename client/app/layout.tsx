@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ApolloWrappper from "./providers/ApolloWrappper";
+import {ClerkProvider} from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,6 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
     <html lang="en">
       <body >
         <ApolloWrappper>
@@ -20,5 +22,6 @@ export default function RootLayout({
         </ApolloWrappper>
         </body>
     </html>
+    </ClerkProvider>
   );
 }

@@ -41,8 +41,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: thisisabebe
       MYSQL_DATABASE: health_link_test1db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: thisisabebe
     ports:
       - "3306:3306"
     volumes:

@@ -8,6 +8,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { MailService } from 'src/mail/mail.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ConfigModule } from '@nestjs/config';
+
 
 
 @Module({
@@ -16,7 +18,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
       global: true,
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '15m' },
-    }),],
+  
+    }),
+    ConfigModule.forRoot()
+  ],
   providers: [AuthService,PrismaService,UserService,JwtService],
   controllers:[AuthController]
 })

@@ -14,6 +14,7 @@ import { MailService } from './mail/mail.service';
 import { EventEmitter2, EventEmitterModule } from  "@nestjs/event-emitter"
 import { MailModule } from './mail/mail.module';
 import { SocketGateway } from './socket/socket.gateway';
+import { AccessControlService } from './access-control/access-control.service';
 
 @Module({
   imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -28,7 +29,7 @@ import { SocketGateway } from './socket/socket.gateway';
   EventEmitterModule.forRoot()
   ,
   AgoraModule, UserModule, AuthModule,  MailModule],
-  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, ],
+  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService, ],
   controllers: [PaymentController],
 })
 export class AppModule {
