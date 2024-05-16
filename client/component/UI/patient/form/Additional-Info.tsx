@@ -1,7 +1,5 @@
 import Container from "../../container";
-import Input from "../../Input";
-import Button from "../../Button";
-import { Formik, Form } from "formik";
+import { Formik, Form, Field } from "formik";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
 import * as Yup from "yup";
@@ -9,6 +7,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
 import { InfinitySpin } from "react-loader-spinner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -175,7 +182,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                   <div className="space_buttons">
                     <div>
                       <Button
-                        className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        variant={"outline"}
                         type="button"
                         onClick={onBack}
                       >
@@ -183,14 +190,10 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                       </Button>
                     </div>
                     <div>
-                      <Button
-                        disabled={!isValid || isSubmitting}
-                        className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                        type="submit"
-                      >
+                      <Button disabled={!isValid || isSubmitting} type="submit">
                         {isSubmitting ? (
                           <div className="mr-4">
-                            <InfinitySpin width="70" color="#1e90ff" />
+                            <InfinitySpin width="32" color="#1b1f2f" />
                           </div>
                         ) : (
                           "Finish"
@@ -213,53 +216,19 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
           </div>
         </div>
       )}
-      {/* {pendingVerification && (
-        <form onSubmit={onPressVerify} className="mt-8 space-y-6">
-          <div className="rounded-md shadow-sm -space-y-px">
-            <MdCircle size={50} color="#C4C4C4" />
-            <h2 className="text-2xl font-extrabold text-dark-700">
-              Complete Your Account
-            </h2>
-            <h2 className="text-base font-bold text-primary-600">
-              Professional Information (3/3)
-            </h2>
-            <div>
-              <label htmlFor="verification-code" className="sr-only">
-                Verification Code
-              </label>
-              <input
-                id="verification-code"
-                name="verification-code"
-                type="text"
-                autoComplete="off"
-                required
-                className="custome-input"
-                // className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Verification Code"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                }}
-              />
-            </div>
-          </div>
 
-          <div>
-            <Button
-              type="submit"
-              className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:text-dark-200"
-              // className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Submit Verification Code
-            </Button>
-          </div>
-        </form>
-      )} */}
       {pendingVerification && (
         <div>
-          <h2 className="text-2xl text-center font-extrabold text-dark-700 mb-5">
+          <Image
+            src="/image/brand/logo-icon.svg"
+            alt="Logo"
+            width={70}
+            height={70}
+            className="auto"
+          />
+          <h1 className="text-3xl text-center font-extrabold text-dark-700 my-4">
             Verify Your Account
-          </h2>
+          </h1>
 
           <Formik
             initialValues={codeInitial}
@@ -268,26 +237,41 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
           >
             {({ isValid, isSubmitting }) => (
               <Form className="my-8 space-y-6" action="#" method="POST">
-                <Input
+                {/* <Input
                   name="code"
                   type="text"
                   autoComplete="off"
                   placeholder="Verification Code"
                   label="Enter the Verification code sent to your Email."
-                />
+                /> */}
+
+                <label className="font-main text-sm text-dark-700 font-medium mt-3">
+                  Enter the Verification code sent to your Email.
+                </label>
+
+                <Field name="code">
+                  {({ field, form }: any) => (
+                    <InputOTP
+                      {...field}
+                      maxLength={6}
+                      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                      onChange={(value) =>
+                        form.setFieldValue(field.name, value)
+                      }
+                    >
+                      <InputOTPGroup>
+                        {[...Array(6)].map((_, index) => (
+                          <InputOTPSlot key={index} index={index} />
+                        ))}
+                      </InputOTPGroup>
+                    </InputOTP>
+                  )}
+                </Field>
+
                 <div className="py-4">
                   {error && <p className="text-xs text-red-600">{error}</p>}
                 </div>
-                <Button
-                  disabled={!isValid || isSubmitting}
-                  className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                                ${
-                                  true
-                                    ? "disabled:bg-gray-300 disabled:text-dark-200"
-                                    : ""
-                                }`}
-                  type="submit"
-                >
+                <Button disabled={!isValid || isSubmitting} type="submit">
                   {isSubmitting ? (
                     <div className="mr-4">
                       <InfinitySpin width="70" color="#1e90ff" />
@@ -296,7 +280,6 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                     "Submit Verification Code"
                   )}
                 </Button>
-                {/* {error && <p className="text-xs text-red-600">{error}</p>} */}
               </Form>
             )}
           </Formik>

@@ -1,11 +1,13 @@
 import Container from "../../container";
-import Input from "../../Input";
-import Button from "../../Button";
+// import Input from "../../Input";
+// import Button from "../../Button";
 import { Formik, Form } from "formik";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
 import * as Yup from "yup";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const ContactInfoForm = ({
   onNext,
@@ -111,8 +113,9 @@ const ContactInfoForm = ({
                 <div className="space_buttons">
                   <div>
                     <Button
-                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      // className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                       type="button"
+                      variant={"outline"}
                       onClick={onBack}
                     >
                       Back
@@ -121,7 +124,7 @@ const ContactInfoForm = ({
                   <div>
                     <Button
                       disabled={!isValid}
-                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      // className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                       type="submit"
                     >
                       {isSubmitting ? "Submitting..." : "Next"}

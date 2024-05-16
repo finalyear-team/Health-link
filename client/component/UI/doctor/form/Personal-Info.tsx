@@ -1,20 +1,15 @@
 import Container from "../../container";
-import Input from "../../Input";
 import { Formik, Form } from "formik";
 import GenderSelect from "@/component/genderSelect/genderSelect";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
-import Button from "../../Button";
 import { useState } from "react";
 import * as Yup from "yup";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const BasicInfoForm = ({
-  onNext,
-}: {
-  onNext: () => void;
-}) => {
-
+const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("*First Name is required"),
     lastName: Yup.string().required("*Last Name is required"),
@@ -107,19 +102,12 @@ const BasicInfoForm = ({
                 </div>
                 <div className="space_buttons">
                   <div>
-                    <Button
-                      className="font-main w-fit text-base font-semibold rounded disabled:bg-gray-300 disabled:text-dark-200"
-                      type="button"
-                    >
-                     <Link href="/sign-up">Back</Link>
+                    <Button variant={"outline"} type="button">
+                      <Link href="/sign-up">Back</Link>
                     </Button>
                   </div>
                   <div>
-                    <Button
-                      disabled={!isValid}
-                      className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:text-dark-200"
-                      type="submit"
-                    >
+                    <Button disabled={!isValid} type="submit">
                       {isSubmitting ? "Submitting..." : "Next"}
                     </Button>
                   </div>

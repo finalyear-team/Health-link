@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import Button from "./Button";
+// import Button from "./Button";
+import { Button } from "@/components/ui/button";
 import {
   MdVerified,
   MdOutlineMedicalServices,
@@ -64,7 +65,7 @@ const UserProfileCard: React.FC<UserProfile> = ({
           </div>
         </div>
         <div>
-          <Button className="follow-btn" type="submit" onClick={onFollow}>
+          <Button variant={"follow"} type="submit" onClick={onFollow}>
             Follow
           </Button>
         </div>
@@ -86,7 +87,7 @@ const UserProfileCard: React.FC<UserProfile> = ({
             <Rating />
           </span>
         </div>
-        <hr className="py-4" />
+        <span className="py-4"> {""} </span>
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center justify-evenly flex-nowrap ">
@@ -107,9 +108,10 @@ const UserProfileCard: React.FC<UserProfile> = ({
           </span>
         </div>
       </div>
-      <div className="mt-4">
+      <div className="mt-4 w-full flex justify-center items-center">
         <Button
-          className="font-main w-full text-base font-medium rounded-lg text-dark-700 border-2 border-dark-700 border-solid  hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          variant={"outline"}
+          className="w-full"
           type="submit"
           onClick={onMakeAppointment}
         >

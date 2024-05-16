@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, Input } from "@/component";
+// import { Button, Input } from "@/component";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MdArrowBack, MdCircle } from "react-icons/md";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Link from "next/link";
@@ -11,6 +13,13 @@ import { useAuth, useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { InfinitySpin } from "react-loader-spinner";
 import { Header, Footer } from "@/component";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const ForgetPassword = () => {
   const [successfulCreation, setSuccessfulCreation] = useState(false);
@@ -113,7 +122,7 @@ const ForgetPassword = () => {
   }
 
   return (
-    <div>
+    <div className="bg-container">
       <Header />
       <Container>
         <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white bg-opacity-50 backdrop-blur-sm">
@@ -148,21 +157,21 @@ const ForgetPassword = () => {
                             label="Email address"
                           />
                         </div>
+                        <div className="pb-4">
+                          {error && (
+                            <p className="text-xs text-red-600">{error}</p>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <Button
                           disabled={!isValid || isSubmitting}
-                          className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                                  ${
-                                    true
-                                      ? "disabled:bg-gray-300 disabled:text-dark-200"
-                                      : ""
-                                  } `}
+                          className="w-full"
                           type="submit"
                         >
                           {isSubmitting ? (
                             <div className="mr-4">
-                              <InfinitySpin width="70" color="#1e90ff" />
+                              <InfinitySpin width="40" color="#1b1f2f" />
                             </div>
                           ) : (
                             "Forgot Password"
@@ -192,14 +201,37 @@ const ForgetPassword = () => {
               validationSchema={resetValidationSchema}
             >
               {({ isValid, isSubmitting }) => (
-                <Form className="mt-8 space-y-6" action="#" method="POST">
+                <Form className="mt-12 space-y-6" action="#" method="POST">
                   <>
-                    <Input
+                    {/* <Input
                       name="code"
                       type="number"
                       label="Enter the password reset code that was sent to your email"
                       placeholder="Enter your Code"
-                    />
+                    /> */}
+                    <label className="font-main text-sm text-dark-700 font-medium mt-3">
+                      Enter the Verification code sent to your Email.
+                    </label>
+
+                    <Field name="code">
+                      {({ field, form }: any) => (
+                        <InputOTP
+                          {...field}
+                          maxLength={6}
+                          pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                          onChange={(value) =>
+                            form.setFieldValue(field.name, value)
+                          }
+                        >
+                          <InputOTPGroup>
+                            {[...Array(6)].map((_, index) => (
+                              <InputOTPSlot key={index} index={index} />
+                            ))}
+                          </InputOTPGroup>
+                        </InputOTP>
+                      )}
+                    </Field>
+
                     <div className="mb-4">
                       <Input
                         name="password"
@@ -220,17 +252,18 @@ const ForgetPassword = () => {
                     </div>
                     <Button
                       disabled={!isValid || isSubmitting}
-                      className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                                ${
-                                  true
-                                    ? "disabled:bg-gray-300 disabled:text-dark-200"
-                                    : ""
-                                }`}
+                      className="w-full"
+                      // className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+                      //           ${
+                      //             true
+                      //               ? "disabled:bg-gray-300 disabled:text-dark-200"
+                      //               : ""
+                      //           }`}
                       type="submit"
                     >
                       {isSubmitting ? (
                         <div className="mr-4">
-                          <InfinitySpin width="70" color="#1e90ff" />
+                          <InfinitySpin width="40" color="#1b1f2f" />
                         </div>
                       ) : (
                         "Reset Password"

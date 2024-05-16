@@ -17,17 +17,17 @@ const DoctorSignUp = () => {
   };
 
   return (
-    <div>
+    <div className="bg-container">
       <Header />
       <div className="container flex items-center justify-center flex-col mx-auto relative">
         <h1 className="text-2xl font-semibold mb-4">Doctor Sign Up</h1>
         {/* Progress bar */}
         <div className="progress-bar-container">
           <div className="progress-bar-wrapper">
-            <div className="bg-gray-200 h-2 ">
+            <div className="bg-gray-200 h-1 ">
               <div
-                className="bg-primary-600 h-full transition-all duration-300 ease-in-out"
-                style={{ width: `${step * 33}%` }}
+                className="bg-primary-600 h-full transition-all duration-300 ease-in-out rounded-r-lg"
+                style={{ width: `${step * 34}%` }}
               />
             </div>
           </div>
