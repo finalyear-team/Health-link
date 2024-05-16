@@ -5,19 +5,23 @@
 @tailwind components;
 @tailwind utilities;
 
- .glow {
+:root {
+  font-family: "Poppins";
+}
+
+.glow {
   animation: glowing 1500ms infinite;
 }
 
 @keyframes glowing {
   0% {
-    box-shadow: 0 0 10px #fff; 
+    box-shadow: 0 0 10px #fff;
   }
   50% {
-    box-shadow: 0 0 20px #00a8a5; 
+    box-shadow: 0 0 20px #00a8a5;
   }
   100% {
-    box-shadow: 0 0 10px #fff; 
+    box-shadow: 0 0 10px #fff;
   }
 }
 
@@ -46,7 +50,7 @@
   .sidebar {
     display: block;
     position: absolute;
-    top: 60px; 
+    top: 60px;
     right: 0;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -60,7 +64,6 @@
     margin-bottom: 10px;
   }
 }
-
 
 .profile-image {
   @apply rounded-full;
@@ -86,10 +89,8 @@
   @apply flex justify-between h-auto w-auto items-center px-3 py-2 font-main dark:bg-dark-700 text-dark-700 dark:text-gray-100 fixed top-0 left-0 right-0 z-10 shadow-md bg-white;
 }
 
-
-
 .footer {
-  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100 text-dark-700 dark:text-gray-100 dark:bg-dark-600;
+  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100  dark:text-gray-100 dark:bg-dark-600 backdrop-blur-sm;
 }
 
 .footer__custom {
@@ -97,7 +98,7 @@
 }
 
 .footer__custome__title {
-  @apply font-bold underline;
+  @apply font-bold underline text-secondary-700 dark:text-primary-600;
 }
 
 .footer__custome__list {
@@ -152,12 +153,38 @@
   @apply px-4 py-2 border-2 border-solid border-primary-600 text-secondary-600 font-medium text-sm rounded hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-opacity-50 shadow-sm hover:shadow-md glow;
 }
 
-.verify_container{
-  @apply flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-12
+.verify_container {
+  @apply flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-12;
 }
 
 .bg-container {
-  background-image: url('/image/Login.jpg'); 
-  background-size: cover; 
+  background-image: url("/image/Login.jpg");
+  background-size: cover;
   background-position: center;
 }
+
+
+.db-header-left {
+  flex: 1;
+}
+
+.db-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.db-toggle-button {
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .db-header-container {
+    padding: 10px;
+  }
+
+  .db-toggle-button {
+    display: none;
+  }
+}
+

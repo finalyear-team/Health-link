@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import BasicInfoForm from "@/component/UI/doctor/form/Personal-Info";
-import ContactInfoForm from "@/component/UI/doctor/form/Contact-Info";
-import SpecializationForm from "@/component/UI/doctor/form/Additional-Info";
-import { Header, Footer } from "@/component";
+import BasicInfoForm from "@/components/form/doctor/form/Personal-Info";
+import ContactInfoForm from "@/components/form/doctor/form/Contact-Info";
+import SpecializationForm from "@/components/form/doctor/form/Additional-Info";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const DoctorSignUp = () => {
   const [step, setStep] = useState(1);

@@ -6,10 +6,11 @@ import * as Yup from "yup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MdOutlineSearch, MdOutlineArrowForward } from "react-icons/md";
-import Features from "@/component/Landing-common/Features";
+import Features from "@/components/Landing-common/Features";
 import features from "@/public/data/feature";
-import TopDoctors from "@/component/Landing-common/TopDoctors";
-import { Header, Footer } from "@/component";
+import TopDoctors from "@/components/Landing-common/TopDoctors";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
 export default function Home() {

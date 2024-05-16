@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import AdditionalInfo from "@/component/UI/patient/form/Additional-Info";
-import ContactInfo from "@/component/UI/patient/form/Contact-Info";
-import PersonalInfo from "@/component/UI/patient/form/Personal-Info";
-import { Header, Footer } from "@/component";
+import AdditionalInfo from "@/components/form/patient/form/Additional-Info";
+import ContactInfo from "@/components/form/patient/form/Contact-Info";
+import PersonalInfo from "@/components/form/patient/form/Personal-Info";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const PatientSignUp = () => {
   const [step, setStep] = useState(1);

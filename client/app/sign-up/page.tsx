@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { Container } from "@/component";
+import Container from "@/components/container/container";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/component";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const SignUp = () => {
   const router = useRouter();
