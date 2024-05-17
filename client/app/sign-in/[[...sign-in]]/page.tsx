@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Container, Input } from "@/component";
+import { Container } from "@/component";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useSignIn, useUser } from "@clerk/nextjs";
 import { MdCircle } from "react-icons/md";
@@ -69,10 +71,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
+    <div className="bg-container">
       <Header />
       <Container>
-        <div className="custom-container dark:bg-dark-700 mt-8">
+        <div className="custom-container bg-white dark:bg-dark-700 mt-8">
           <span className="flex justify-center">
             <MdCircle size={50} className="text-gray-300" />
           </span>
@@ -87,7 +89,7 @@ const LoginPage = () => {
             validationSchema={validationSchema}
           >
             {({ isValid, isSubmitting }) => (
-              <Form className="mt-8 space-y-6" action="#" method="POST">
+              <Form className="mt-8 space-y-4" action="#" method="POST">
                 <div className="">
                   {/* email */}
                   <div className="py-6">
@@ -113,7 +115,7 @@ const LoginPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center">
                     <input
                       id="remember-me"
@@ -142,13 +144,12 @@ const LoginPage = () => {
                 <div>
                   <Button
                     disabled={!isValid || isSubmitting}
-                    className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 
-                  ${true ? "disabled:bg-gray-300 disabled:text-dark-200" : ""}`}
+                    className="w-full"
                     type="submit"
                   >
                     {isSubmitting ? (
                       <div className="text-center">
-                        <InfinitySpin width="70" color="#1e90ff" />
+                        <InfinitySpin width="40" color="#1b1f2f" />
                       </div>
                     ) : (
                       "Login"

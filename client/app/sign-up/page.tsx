@@ -1,11 +1,13 @@
 "use client";
 
 import React from "react";
-import { Container, Button } from "@/component";
+import Container from "@/components/container/container";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/component";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const SignUp = () => {
   const router = useRouter();
@@ -14,7 +16,7 @@ const SignUp = () => {
     router.push(`/sign-up/${choice}`);
   };
   return (
-    <div>
+    <div className="bg-container">
       <Header />
       <Container>
         <div className="custom-container font-main">
@@ -42,7 +44,7 @@ const SignUp = () => {
               />
               <Button
                 onClick={() => handleSelection("doctor")}
-                className="text-dark-700 px-5 focus:ring-primary-500 rounded border-stroke border hover:bg-gray-50 hover:shadow-sm"
+                variant={"outline"}
               >
                 A Doctor
               </Button>
@@ -55,10 +57,7 @@ const SignUp = () => {
                 height={200}
                 className="mb-4"
               />
-              <Button
-                onClick={() => handleSelection("patient")}
-                className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded hover:shadow-sm"
-              >
+              <Button onClick={() => handleSelection("patient")}>
                 A Patient
               </Button>
             </div>

@@ -3,12 +3,16 @@
 import Image from "next/image";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Input, Button } from "@/component";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { MdOutlineSearch, MdOutlineArrowForward } from "react-icons/md";
-import Features from "@/component/Landing-common/Features";
+import Features from "@/components/Landing-common/Features";
 import features from "@/public/data/feature";
-import TopDoctors from "@/component/Landing-common/TopDoctors";
-import {Header, Footer} from '@/component';
+import TopDoctors from "@/components/Landing-common/TopDoctors";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Link from "next/link";
+
 export default function Home() {
   // const SearchProfile = Yup.object().shape({
   //   FirstName: Yup.string().required("Email is required!"),
@@ -30,7 +34,7 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <div className="relative w-full">
+      {/* <div className="relative w-full">
         <Image
           src="/image/bg.jpg"
           alt="Front-page_doctor"
@@ -71,12 +75,9 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="">
-                    <Button
-                      className="font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      type="submit"
-                    >
+                    <Button size="lg" type="submit">
                       {isSubmitting ? "Submitting..." : "Search My Profile  "}
-                      <MdOutlineSearch size={25} className="ml-2" />
+                      <MdOutlineSearch className="mr-l h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -84,16 +85,85 @@ export default function Home() {
             )}
           </Formik>
           <div className="pt-1">
-            <Button
-              className="font-main w-fit text-base font-medium rounded text-white bg-dark-600 hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dark-500"
-              type="submit"
-            >
-              Are You A Doctor
-              <MdOutlineArrowForward size={25} className="ml-2" />
+            <Button type="submit" size="lg" variant={"secondary"}>
+              <Link href={"/sign-up/doctor"} className="flex items-center justify-center">
+                Are You A Doctor
+                <MdOutlineArrowForward className="mr-l h-4 w-4" />{" "}
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div> */}
+
+      <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row mt-10 rounded-lg bg-dark-700 bg-opacity-10">
+        {/* Right side picture */}
+        <div className="lg:w-3/4 lg:pr-8 ">
+          <Image
+            src="/image/bg1.jpg"
+            alt="bg"
+            className="rounded-lg auto shadow-lg"
+            width={500}
+            height={400}
+            priority
+          />
+        </div>
+        {/* Left side content */}
+        <div className="lg:w-1/2 lg:pr-8 flex flex-col justify-center">
+          <h1 className="text-6xl font-bold mb-4 text-secondary-700">
+            Your bridge to health
+          </h1>
+          <div className="text-xl sm:text-xl md:text-2xl lg:text-4xl font-bold text-primary-600 ">
+            Where Care Meets Convenience
+          </div>
+
+          <Formik
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            // validationSchema={SearchProfile}
+          >
+            {({ isValid, isSubmitting }) => (
+              <Form className="mt-1 space-y-6" action="#" method="POST">
+                <div className="flex flex-col mb-4">
+                  <div className="flex items-center  gap-2 mb-2">
+                    <div className="">
+                      <Input
+                        name="FirstName"
+                        type="text"
+                        placeholder="First Name"
+                      />
+                    </div>
+                    <div className="">
+                      <Input
+                        name="LastName"
+                        type="text"
+                        placeholder="Last Name"
+                      />
+                    </div>
+                  </div>
+                  <div className="">
+                    <Button size="lg" type="submit">
+                      Search My Profile
+                      <MdOutlineSearch className="mr-l h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
+          <div className="w-full flex items-center">
+            <Button type="submit" size="lg" variant={"secondary"} className="glow">
+              <Link
+                href={"/sign-up/doctor"}
+                className="flex items-center justify-center"
+              >
+                Are You A Doctor
+                <MdOutlineArrowForward className="mr-l h-4 w-4" />{" "}
+              </Link>
             </Button>
           </div>
         </div>
       </div>
+
       {/* features */}
       <div>
         <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">

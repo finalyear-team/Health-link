@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-// import { Header, Footer } from "@/component";
-import Layout from "@/component/Layout";
+import Layout from "@/components/theme/Layout";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
@@ -19,9 +18,7 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <Layout>
-            {/* <Header /> */}
             {children}
-            {/* <Footer /> */}
           </Layout>
         </body>
       </html>
