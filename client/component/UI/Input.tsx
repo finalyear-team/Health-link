@@ -1,44 +1,50 @@
+"use client";
+
 import React from "react";
+import { Field, ErrorMessage } from "formik";
 
 interface InputProps {
+  label?: string;
   value?: string;
-  onChange: (value: string) => void;
   className?: string;
   disabled?: boolean;
   placeholder?: string;
   type: string;
   name: string;
-  id: string;
+  idd?: string;
   autoComplete?: string;
+  accept?: string;
 }
 
-const Input = ({
-  id,
-  type,
-  name,
-  value,
-  onChange,
-  className,
-  disabled,
-  placeholder,
-  autoComplete,
-}: InputProps) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
-
+const Input = ({ label, name, type, ...rest }: InputProps) => {
   return (
-    <input
-      id={id}
-      type={type}
-      name={name}
-      value={value}
-      autoComplete={autoComplete}
-      onChange={handleChange}
-      disabled={disabled}
-      className={`custom-input ${className}`}
-      placeholder={placeholder}
-    />
+    <div>
+      {type === "checkbox" ? (
+        <Field
+          id={name}
+          name={name}
+          type={type}
+          {...rest}
+        />
+      ) : null}
+      <label
+        htmlFor={name}
+        className="font-main text-sm text-dark-700 font-medium"
+      >
+        {label}
+      </label>
+
+      {type !== "checkbox" ? (
+        <Field
+          id={name}
+          name={name}
+          type={type}
+          {...rest}
+          className="custome-input"
+        />
+      ) : null}
+      <ErrorMessage name={name} component="div" className="input__error" />
+    </div>
   );
 };
 

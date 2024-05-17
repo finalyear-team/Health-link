@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import {getStorage} from "firebase/storage"
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTHDOMAIN,
@@ -8,3 +9,4 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APPID
 };
 const app = initializeApp(firebaseConfig);
+const storage=getStorage(app)

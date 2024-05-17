@@ -8,12 +8,11 @@ generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
-
 
 enum UserType {
   doctor
@@ -23,13 +22,13 @@ enum UserType {
   organization
 }
 
-enum UserStatus{
+
+enum UserStatus {
   active
-  inactive   
+  inactive
   suspended
   blocked
   deleted
-
 }
 
 enum ItemType {
@@ -83,6 +82,11 @@ enum ConsultancyStatus {
   Cancelled
 }
 
+enum ChannelType {
+  DM
+  SupportGroup
+}
+
 enum Role {
   member
   moderator
@@ -100,83 +104,77 @@ enum CommentableType {
   forumAnswer
   post
 }
+
 enum FeedbackType {
   GeneralFeedback
   ProductReview
+  
   ServiceReview
 }
 
 model Users {
-  UserID        String                @id @default(uuid())
-  Username      String           @unique
-  Password      String
-  Email         String            @unique
-  Role          UserType
-  Status        UserStatus
-  Verified      Boolean              @default(false)
-  CreatedAt     DateTime             @default(now())
-  UpdatedAt     DateTime             @updatedAt
-  LastLogin     DateTime?
-  UserDetails   UserDetails?
-  MedicalRecord MedicalRecord[]
-  DoctorDetails DoctorDetails?
-  UserSessions  UserSessions[]
-  Reviews       DoctorReviews[]
-  Appointments  Appointments[]
-  AppointmentsCancelled Appointments[] @relation("appointmentCancelledby")
-  Consultancy   Consultancy[]
-  PatientBooking  Booking[]  @relation("patientBooking")
-  BookingCancelled       Booking[]
-  PeerSupportGroup  PeerSupportGroupMember[]
-  ForumPost     ForumPost[]
-  ForumAnswer   ForumAnswer[]
-  Comment       Comments[]
-  Like          Likes[]
-  Views         Views[]
-  Prescription  Prescription[]
-  Feedback      UserFeedback[]
-  FeedbackReply Reply[]
-  ChatMessage   ChatMessage[]
-  SupportChat   PeerSupportChatMessage[]
-
+  UserID                String              @id
+  Username              String              @unique
+  FirstName             String?
+  LastName              String?
+  Email                 String              @unique
+  DateOfBirth           DateTime?
+  Gender                Gender?
+  Bio                   String?             @db.LongText
+  PhoneNumber           String?
+  Address               String?
+  ProfilePicture        String?
+  Role                  UserType
+  Status                UserStatus
+  Verified              Boolean             @default(false)
+  CreatedAt             DateTime            @default(now())
+  UpdatedAt             DateTime            @updatedAt
+  LastLogin             DateTime?
+  MedicalRecord         MedicalRecord[]
+  DoctorDetails         DoctorDetails?
+  UserSessions          UserSessions[]
+  Reviews               DoctorReviews[]
+  Appointments          Appointments[]
+  AppointmentsCancelled Appointments[]      @relation("appointmentCancelledby")
+  Consultancy           Consultancy[]
+  PatientBooking        Booking[]           @relation("patientBooking")
+  BookingCancelled      Booking[]
+  ForumPost             ForumPost[]
+  ForumAnswer           ForumAnswer[]
+  Comment               Comments[]
+  Like                  Likes[]
+  Views                 Views[]
+  Prescription          Prescription[]
+  Feedback              UserFeedback[]
+  FeedbackReply         Reply[]
+  ChatMessage           ChatMessage[]
+  VideoChatMemebers     MemberInVideoChat[]
+  ChannelMemeber        ChannelMember[]
 
   @@index([Email], name: "email_index")
 }
 
-model UserDetails {
-  UserDetailID   String     @id @default(uuid())
-  UserID         String     @unique
-  FirstName      String?
-  LastName       String?
-  DateOfBirth    DateTime?
-  Gender         Gender?
-  Bio            String?   @db.LongText
-  PhoneNumber    String?
-  Address        String?
-  ProfilePicture String?
-  User           Users     @relation(fields: [UserID], references: [UserID])
-}
+
 
 model MedicalRecord {
-  RecordID      String     @id @default(uuid())
-  UserID        String
-  DateOfRecord  DateTime @default(now())
-  Diagnosis     Json?
-  Medications   Json?
-  Allergies     Json?  
-  Patient       Users    @relation(fields: [UserID], references: [UserID])
+  RecordID     String   @id @default(uuid())
+  UserID       String
+  DateOfRecord DateTime @default(now())
+  Diagnosis    Json?
+  Medications  Json?
+  Allergies    Json?
+  Patient      Users    @relation(fields: [UserID], references: [UserID])
 }
 
+
 model DoctorDetails {
-  DoctorID                  String            @id @default(uuid())
-  UserID                    String         @unique
-  Specialization            String?
+  DoctorID                  String          @id @unique
+  Speciality                 String?
   ConsultationFee           Decimal?
-  EducationalQualifications String?
+  EducationalQualifications Json?
   LicenseNumber             String?
   ExperienceYears           Int?
-  Specialties               String?
-  User                      Users            @relation(fields: [UserID], references: [UserID])
+  User                      Users            @relation(fields: [DoctorID], references: [UserID])
   Schedules                 DoctorSchedule[]
   Reviews                   DoctorReviews[]
   Appointments              Appointments[]
@@ -186,12 +184,12 @@ model DoctorDetails {
   Post                      Post[]
   Prescription              Prescription[]
   Payment                   Payment[]
-
-  @@index([Specialization], name: "specialization_index")
+  VideoChatRoom             VideoChatRoom[]
+  @@index([Speciality], name: "Speciality_index")
 }
 
 model DoctorSchedule {
-  ScheduleID      String           @id @default(uuid())
+  ScheduleID      String          @id @default(uuid())
   DoctorID        String
   ConsultancyType ConsultancyType
   Date            DateTime
@@ -206,7 +204,7 @@ model DoctorSchedule {
 }
 
 model Appointments {
-  AppointmentID   String              @id @default(uuid())
+  AppointmentID   String            @id @default(uuid())
   DoctorID        String
   PatientID       String
   AppointmentDate DateTime
@@ -216,11 +214,11 @@ model Appointments {
   Notes           String?
   CreatedAt       DateTime          @default(now())
   UpdatedAt       DateTime          @updatedAt
-  CancelledBy     String?   @unique
+  CancelledBy     String?           @unique
   CancelledReason String?
   Doctor          DoctorDetails     @relation(fields: [DoctorID], references: [DoctorID])
   Patient         Users             @relation(fields: [PatientID], references: [UserID])
-  Cancelled       Users ?            @relation("appointmentCancelledby",fields: [CancelledBy],references: [UserID])
+  Cancelled       Users?            @relation("appointmentCancelledby", fields: [CancelledBy], references: [UserID])
   Booking         Booking[]
   Payment         Payment?
 
@@ -229,144 +227,125 @@ model Appointments {
 }
 
 model Booking {
-  BookingID       String           @id @default(uuid())
+  BookingID       String        @id @default(uuid())
   CreatedAt       DateTime      @default(now())
   UpdatedAt       DateTime      @updatedAt
   Status          String        @default("Pending")
   PatientID       String
   DoctorID        String
-  AppointmentID   String          @unique
+  AppointmentID   String        @unique
   ReminderSent    Boolean       @default(false)
   ReminderDate    DateTime?
-  CancelledBy     String?   @unique
+  CancelledBy     String?       @unique
   CancelledReason String?
   Doctor          DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  Patient         Users         @relation("patientBooking",fields: [PatientID],references: [UserID])
+  Patient         Users         @relation("patientBooking", fields: [PatientID], references: [UserID])
   Appointment     Appointments? @relation(fields: [AppointmentID], references: [AppointmentID])
-  Cancelled       Users?       @relation(fields: [CancelledBy], references: [UserID])
+  Cancelled       Users?        @relation(fields: [CancelledBy], references: [UserID])
 
   @@index([DoctorID], name: "patient_doctor_index")
 }
 
 model Consultancy {
-  ConsultancyID        String                    @id @default(uuid())
-  DoctorID             String
-  PatientID            String
-  ConsultancyDate      DateTime
-  ConsultancyTime      DateTime
-  Duration             Int
-  Status               ConsultancyStatus
-  ConsultancyType      ConsultancyType
-  Notes                String?
-  CreatedAt            DateTime               @default(now())
-  UpdatedAt            DateTime               @updatedAt
-  CancelledBy          String?
-  CancelledReason      String?
-  Doctor               DoctorDetails          @relation(fields: [DoctorID], references: [DoctorID])
-  Patient              Users                  @relation(fields: [PatientID], references: [UserID])
-  CommunicationSession CommunicationSession[]
-  Payment              Payment?
+  ConsultancyID   String            @id @default(uuid())
+  DoctorID        String
+  PatientID       String
+  ConsultancyDate DateTime
+  ConsultancyTime DateTime
+  Duration        Int
+  Status          ConsultancyStatus
+  ConsultancyType ConsultancyType
+  Notes           String?           @db.LongText
+  CreatedAt       DateTime          @default(now())
+  UpdatedAt       DateTime          @updatedAt
+  CancelledBy     String?
+  CancelledReason String?
+  Doctor          DoctorDetails     @relation(fields: [DoctorID], references: [DoctorID])
+  Patient         Users             @relation(fields: [PatientID], references: [UserID])
+  Payment         Payment?
+  VideoChatRoom   VideoChatRoom[]
 
   @@index([Status], name: "consultancy_status_index")
 }
 
-model CommunicationSession {
-  CommunicationSessionID String         @id @default(uuid())
-  SessionType            String // "video", "chat", "audio"
-  StartTime              DateTime
-  EndTime                DateTime?
-  Status                 String // "scheduled", "in_progress", "completed", "cancelled"
-  CreatedAt              DateTime    @default(now())
-  UpdatedAt              DateTime    @updatedAt
-  ConsultancyID          String
-  Consultancy            Consultancy @relation(fields: [ConsultancyID], references: [ConsultancyID])
-  Sessions               Session[]
-  SessionID              String?
+model VideoChatRoom {
+  RoomID         String              @id
+  Name           String
+  HostId         String
+  MemberId       String
+  HostAuthToken  String              @db.LongText
+  ConstultancyID String?
+  CreatedAt      DateTime            @default(now())
+  UpdatedAt      DateTime            @updatedAt
+  Host           DoctorDetails       @relation(fields: [HostId], references: [DoctorID])
+  Constultation  Consultancy?        @relation(fields: [ConstultancyID], references: [ConsultancyID])
+  Members        MemberInVideoChat[]
 }
 
-model Session {
-  SessionID              String                  @id @default(uuid())
-  Token                  String               @unique
-  ChannelName            String               @unique
-  ExpireTime             DateTime
-  CreatedAt              DateTime             @default(now())
-  UpdatedAt              DateTime             @updatedAt
-  Duration               Int? // Duration of the session in seconds
-  CommunicationSessionID String
-  CommunicationSession   CommunicationSession @relation(fields: [CommunicationSessionID], references: [CommunicationSessionID])
-  Chat                   ChatMessage[]
+model MemberInVideoChat {
+  UserId          String        @unique
+  VideoChatRoomID String
+  MemberAuthToken String        @db.LongText
+  User            Users         @relation(fields: [UserId], references: [UserID])
+  VideoChatRoom   VideoChatRoom @relation(fields: [VideoChatRoomID], references: [RoomID])
+}
+
+// model that stores both dms and group chats it also stores PeerSupport group informations as channel
+model ChatChannel {
+  ChannelID   String          @unique
+  ChannelName String
+  Image       String?
+  Description String?         @db.Text
+  Disease     String?
+  ChannelType ChannelType
+  CreatedAt   DateTime        @default(now())
+  UpdatedAt   DateTime        @updatedAt
+  ChatMessage ChatMessage[]
+  Members     ChannelMember[]
 }
 
 model ChatMessage {
-  ChatID     String      @id @default(uuid())
-  Content    String
-  SenderType String // "doctor" or "patient"
-  SenderID   String
-  MediaUrl   String?
-  SentAt     DateTime @default(now())
-  IsSeen     Boolean  @default(false)
-  SessionID  String
-  Session    Session  @relation(fields: [SessionID], references: [SessionID])
-  Sender     Users    @relation(fields: [SenderID],references: [UserID])
+  ChatID    String      @id 
+  Content   String
+  SenderID  String
+  MediaUrl  String?
+  SentAt    DateTime    @default(now())
+  IsSeen    Boolean     @default(false)
+  ChannelID String
+  Sender    Users       @relation(fields: [SenderID], references: [UserID])
+  Channel   ChatChannel @relation(fields: [ChannelID], references: [ChannelID])
 }
 
-model PeerSupportGroup {
-  PeerSupportGroupID String                  @id @default(uuid())
-  Name           String
-  Description    String?
-  Disease        String
-  CreatedAt      DateTime             @default(now())
-  UpdatedAt      DateTime             @updatedAt
-  ProfilePic     String? // URL or path to the group's profile picture
-  Members        PeerSupportGroupMember[]
-  ChatMessage    PeerSupportChatMessage[]
-}
-
-model PeerSupportGroupMember {
-  PeerSupportGroupMemberID String          @id @default(uuid())
-  UserID               String
-  PeerSupportGroupID       String
-  Role                 Role         @default(member)
-  JoinedAt             DateTime     @default(now())
-  CreatedAt            DateTime     @default(now())
-  UpdatedAt            DateTime     @updatedAt
-  User                 Users        @relation(fields: [UserID], references: [UserID])
-  PeerSupportGroup         PeerSupportGroup @relation(fields: [PeerSupportGroupID], references: [PeerSupportGroupID])
-}
-
-model PeerSupportChatMessage {
-  ChatMessageID  String          @id @default(uuid())
-  Content        String
-  SenderType     String // "Patient" or "PeerSupportGroupAdmin" or similar
-  SenderID       String
-  MediaUrl       String?
-  SentAt         DateTime     @default(now())
-  IsSeen         Boolean      @default(false)
-  PeerSupportGroupID String
-  PeerSupportGroup   PeerSupportGroup @relation(fields: [PeerSupportGroupID], references: [PeerSupportGroupID])
-  Sender         Users        @relation(fields: [SenderID],references: [UserID])
+model ChannelMember {
+  UserID           String      @unique
+  ChannelID        String
+  AuthToken        String      @db.LongText
+  Role             Role        @default(member)
+  JoinedAt         DateTime?   @default(now())
+  CreatedAt        DateTime?   @default(now())
+  UpdatedAt        DateTime?   @updatedAt
+  User             Users       @relation(fields: [UserID], references: [UserID])
+  PeerSupportGroup ChatChannel @relation(fields: [ChannelID], references: [ChannelID])
 }
 
 model Payment {
-  PaymentID      String       @id @default(uuid())
-  DoctorID       String
-  Amount         Float
-  PaymentDate    DateTime  @default(now())
-  PaymentMethod  String   
-  Status         String   
-  AppointmentID  String?     @unique
-  ConsultancyID  String?     @unique
-  Doctor         DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  Appointment    Appointments? @relation(fields: [AppointmentID],references: [AppointmentID])
-  Consultancy    Consultancy? @relation(fields: [ConsultancyID],references: [ConsultancyID])
-  
+  PaymentID     String        @id @default(uuid())
+  DoctorID      String
+  Amount        Float
+  PaymentDate   DateTime      @default(now())
+  PaymentMethod String
+  Status        String
+  AppointmentID String?       @unique
+  ConsultancyID String?       @unique
+  Doctor        DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+  Appointment   Appointments? @relation(fields: [AppointmentID], references: [AppointmentID])
+  Consultancy   Consultancy?  @relation(fields: [ConsultancyID], references: [ConsultancyID])
 
   @@index([DoctorID], name: "doctor_payment_index")
 }
 
-
 model DoctorReviews {
-  ReviewID   String           @id @default(uuid())
+  ReviewID   String        @id @default(uuid())
   DoctorID   String
   ReviewerID String
   Rating     Int?
@@ -379,7 +358,7 @@ model DoctorReviews {
 }
 
 model BlogPost {
-  BlogID      String           @id @default(uuid())
+  BlogID      String        @id @default(uuid())
   Title       String
   Content     String
   CreatedAt   DateTime      @default(now())
@@ -387,11 +366,11 @@ model BlogPost {
   IsPublished Boolean       @default(false)
   DoctorID    String
   Doctor      DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  View        Views[]       
+  View        Views[]
 }
 
 model ForumPost {
-  ForumPostID String           @id @default(uuid())
+  ForumPostID String        @id @default(uuid())
   Content     String
   CreatedAt   DateTime      @default(now())
   UpdatedAt   DateTime      @updatedAt
@@ -401,73 +380,73 @@ model ForumPost {
 }
 
 model ForumAnswer {
-  ForumAnswerID String       @id @default(uuid())
+  ForumAnswerID String     @id @default(uuid())
   Content       String
-  CreatedAt     DateTime  @default(now())
-  UpdatedAt     DateTime  @updatedAt
+  CreatedAt     DateTime   @default(now())
+  UpdatedAt     DateTime   @updatedAt
   ForumPostID   String
-  ForumPost     ForumPost @relation(fields: [ForumPostID], references: [ForumPostID])
+  ForumPost     ForumPost  @relation(fields: [ForumPostID], references: [ForumPostID])
   UserID        String
-  User          Users     @relation(fields: [UserID], references: [UserID])
+  User          Users      @relation(fields: [UserID], references: [UserID])
   Comment       Comments[]
   Like          Likes[]
 }
 
 model Post {
-  PostID    String           @id @default(uuid())
+  PostID    String        @id @default(uuid())
   Content   String
   MediaUrl  String?
   CreatedAt DateTime      @default(now())
   UpdatedAt DateTime      @updatedAt
   DoctorID  String
   Doctor    DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  View      Views[]      
+  View      Views[]
   Comment   Comments[]
   Like      Likes[]
 }
 
 model Comments {
-  CommentID String             @id @default(uuid())
-  Content   String
-  CreatedAt DateTime        @default(now())
-  UpdatedAt DateTime        @updatedAt
-  UserID    String
-  User      Users           @relation(fields: [UserID], references: [UserID])
-  ItemID    String
-  ParentComment  Comments?   @relation("ParentComment", fields: [ParentCommentID], references: [CommentID])
+  CommentID       String          @id @default(uuid())
+  Content         String
+  CreatedAt       DateTime        @default(now())
+  UpdatedAt       DateTime        @updatedAt
+  UserID          String
+  User            Users           @relation(fields: [UserID], references: [UserID])
+  ItemID          String
+  ParentComment   Comments?       @relation("ParentComment", fields: [ParentCommentID], references: [CommentID])
   ParentCommentID String?
-  Replies        Comments[]  @relation("ParentComment")
-  Like      Likes[]
-  ItemType  CommentableType
-  Post      Post?            @relation(fields: [ItemID],references: [PostID])
-  ForumAnswer      ForumAnswer?            @relation(fields: [ItemID],references: [ForumAnswerID],map: "forumanswer_fkey")
+  Replies         Comments[]      @relation("ParentComment")
+  Like            Likes[]
+  ItemType        CommentableType
+  Post            Post?           @relation(fields: [ItemID], references: [PostID])
+  ForumAnswer     ForumAnswer?    @relation(fields: [ItemID], references: [ForumAnswerID], map: "forumanswer_fkey")
 }
 
 model Likes {
-  LikeID    String      @id @default(uuid())
-  UserID    String
-  User      Users    @relation(fields: [UserID], references: [UserID])
-  ItemID    String
-  ItemType  LikeType
-  CreatedAt DateTime @default(now())
-  Post        Post?   @relation(fields: [ItemID],references: [PostID])
-  ForumAnswer ForumAnswer? @relation(fields: [ItemID],references: [ForumAnswerID],map: "forum_answer_fkey")
-  Comment     Comments?    @relation(fields: [ItemID],references: [CommentID],map: "commet_fkey")
+  LikeID      String       @id @default(uuid())
+  UserID      String
+  User        Users        @relation(fields: [UserID], references: [UserID])
+  ItemID      String
+  ItemType    LikeType
+  CreatedAt   DateTime     @default(now())
+  Post        Post?        @relation(fields: [ItemID], references: [PostID])
+  ForumAnswer ForumAnswer? @relation(fields: [ItemID], references: [ForumAnswerID], map: "forum_answer_fkey")
+  Comment     Comments?    @relation(fields: [ItemID], references: [CommentID], map: "commet_fkey")
 }
 
 model Views {
-  ViewID    String             @id @default(uuid())
+  ViewID    String          @id @default(uuid())
   UserID    String?
   User      Users?          @relation(fields: [UserID], references: [UserID])
   ItemID    String
   ItemType  CommentableType
   CreatedAt DateTime        @default(now())
-  BlogPost  BlogPost?    @relation(fields: [ItemID],references: [BlogID])
-  Post      Post?    @relation(fields: [ItemID],references: [PostID],map: "post_view_fkey")
+  BlogPost  BlogPost?       @relation(fields: [ItemID], references: [BlogID])
+  Post      Post?           @relation(fields: [ItemID], references: [PostID], map: "post_view_fkey")
 }
 
 model FAQ {
-  FAQID     String      @id @default(uuid())
+  FAQID     String   @id @default(uuid())
   Question  String
   Answer    String
   Order     Int      @default(0)
@@ -475,10 +454,8 @@ model FAQ {
   UpdatedAt DateTime @updatedAt
 }
 
-
-
 model UserFeedback {
-  FeedbackID String          @id @default(uuid())
+  FeedbackID String       @id @default(uuid())
   UserID     String
   User       Users        @relation(fields: [UserID], references: [UserID])
   Content    String
@@ -491,7 +468,7 @@ model UserFeedback {
 }
 
 model Reply {
-  ReplyID    String          @id @default(uuid())
+  ReplyID    String       @id @default(uuid())
   FeedbackID String
   Feedback   UserFeedback @relation(fields: [FeedbackID], references: [FeedbackID])
   Content    String
@@ -502,12 +479,12 @@ model Reply {
 }
 
 model Prescription {
-  PrescriptionID    String                @id @default(uuid())
+  PrescriptionID    String                   @id @default(uuid())
   DoctorID          String
-  Doctor            DoctorDetails      @relation(fields: [DoctorID], references: [DoctorID])
+  Doctor            DoctorDetails            @relation(fields: [DoctorID], references: [DoctorID])
   PatientID         String
-  Patient           Users              @relation(fields: [PatientID], references: [UserID])
-  IssuedAt          DateTime           @default(now())
+  Patient           Users                    @relation(fields: [PatientID], references: [UserID])
+  IssuedAt          DateTime                 @default(now())
   ValidUntil        DateTime?
   Notes             String?
   Status            String?
@@ -516,7 +493,7 @@ model Prescription {
 }
 
 model PrescriptionItem {
-  PrescriptionItemID String          @id @default(uuid())
+  PrescriptionItemID String       @id @default(uuid())
   PrescriptionID     String
   Prescription       Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
   MedicationName     String
@@ -526,19 +503,20 @@ model PrescriptionItem {
   Frequency          String?
   Duration           String?
 }
+
 model PrescriptionAttachment {
- AttachmentID   String      @id @default(uuid())
- PrescriptionID String
- Prescription   Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
- URL            String
- Filename       String
- Size           Int
- Caption        String?
- FileType       String
+  AttachmentID   String       @id @default(uuid())
+  PrescriptionID String
+  Prescription   Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
+  URL            String
+  Filename       String
+  Size           Int
+  Caption        String?
+  FileType       String
 }
 
 model UserSessions {
-  SessionID    String       @id @default(uuid())
+  SessionID    String    @id @default(uuid())
   UserID       String
   SessionToken String
   SessionStart DateTime  @default(now())

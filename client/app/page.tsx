@@ -1,79 +1,134 @@
-"use client"
-import React, { useState } from 'react';
-import { ApolloProvider, gql, useMutation } from '@apollo/client';
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
-import client from '@/graphql/apollo-client';
-import Link from 'next/link';
+"use client";
 
+import Image from "next/image";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import { Input, Button } from "@/component";
+import { MdOutlineSearch, MdOutlineArrowForward } from "react-icons/md";
+import Features from "@/component/Landing-common/Features";
+import features from "@/public/data/feature";
+import TopDoctors from "@/component/Landing-common/TopDoctors";
+import {Header, Footer} from '@/component';
+export default function Home() {
+  // const SearchProfile = Yup.object().shape({
+  //   FirstName: Yup.string().required("Email is required!"),
+  //   LastName: Yup.string().required("Password is required!"),
+  // });
+  //initializing the value
+  const initialValues = {
+    FirstName: "",
+    LastName: "",
+  };
 
-
-
-
-const LOGIN_USER = gql`
-  mutation login($email:String!,$password:String!) {
-    login(signinInput: { UsernameOrEmail: $email, Password: $password }) {
-      access_token,
-      
-       
-    }
-  }
-`;
-
-const LoginForm = () => {
-  const [login, { data, loading, error }] = useMutation(LOGIN_USER);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    
-    e.preventDefault();
-    if (email && password){
-    try {
-      const { data } = await login({
-        variables: {
-          email: email,
-          password: password,
-        },
-      });
-      console.log('Login result:', data.login);
-    } catch (error) {
-      console.error('Login error:', error);
-    }}
+  // handilng the submit
+  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+    console.log("Form values:", values);
+    setSubmitting(false);
+    resetForm();
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-1/3'>
-        <input
-          type='text'
-          placeholder='Email or Username'
-          className='border border-gray-500 p-4 outline-none'
-          value={email}
-          required
-          onChange={(e) => setEmail(e.target.value)}
+      <Header />
+      <div className="relative w-full">
+        <Image
+          src="/image/bg.jpg"
+          alt="Front-page_doctor"
+          width={400}
+          height={400}
+          priority
+          className="w-full h-full object-cover object-center filter blur-sm mt-10"
         />
-        <input
-          type='password'
-          placeholder='Password'
-          className='border border-gray-500 p-4 outline-none'
-          value={password}
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type='submit' className='border rounded-md'>
-          Submit
-        </button>
-      <Link href={"/forget-password"}>forget password</Link>
-      </form>
-      {data &&  <div>
-        <p>{data.Username}</p>
-
-
-      </div>  }
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error.message}</p>}
+        <div className="absolute left-5 font-main" style={{ top: "10%" }}>
+          <div className="text-2xl md:text-4xl lg:text-6xl text-secondary-600 font-bold">
+            Your Bridge to Health
+          </div>
+          <div className="text-md sm:text-lg md:text-xl lg:text-4xl font-bold text-primary-600 ">
+            Where Care Meets Convenience
+          </div>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            // validationSchema={SearchProfile}
+          >
+            {({ isValid, isSubmitting }) => (
+              <Form className="mt-1 space-y-6" action="#" method="POST">
+                <div className="flex flex-wrap items-center text-base space-y-1 space-x-1">
+                  <div className="flex items-center justify-center space-x-1">
+                    <div className="">
+                      <Input
+                        name="FirstName"
+                        type="text"
+                        placeholder="First Name"
+                      />
+                    </div>
+                    <div className="">
+                      <Input
+                        name="LastName"
+                        type="text"
+                        placeholder="Last Name"
+                      />
+                    </div>
+                  </div>
+                  <div className="">
+                    <Button
+                      className="font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      type="submit"
+                    >
+                      {isSubmitting ? "Submitting..." : "Search My Profile  "}
+                      <MdOutlineSearch size={25} className="ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
+          <div className="pt-1">
+            <Button
+              className="font-main w-fit text-base font-medium rounded text-white bg-dark-600 hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dark-500"
+              type="submit"
+            >
+              Are You A Doctor
+              <MdOutlineArrowForward size={25} className="ml-2" />
+            </Button>
+          </div>
+        </div>
+      </div>
+      {/* features */}
+      <div>
+        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+          Insights to Our Features
+        </div>
+        <div className="flex flex-wrap justify-center mt-3">
+          {features.map(
+            (
+              feature: {
+                title: string;
+                description: string;
+                icon: string;
+              },
+              index
+            ) => (
+              <Features
+                key={index}
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+              />
+            )
+          )}
+        </div>
+      </div>
+      {/* Top Doctors */}
+      <div>
+        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+          Our Top Doctors
+        </div>
+        <TopDoctors />
+      </div>
+      <Footer />
     </div>
   );
 };
 
-export default LoginForm;
+

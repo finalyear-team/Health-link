@@ -16,12 +16,15 @@ enum UserStatus{
 
 }
 
-type ResetToken{
-token:String
+enum Gender {
+  Male
+  Female
 }
 
+scalar Date
+
 type User{
-     UserID: String!
+   UserID: String!
    Username: String!
    Email: String
    FirstName: String
@@ -29,59 +32,64 @@ type User{
    Bio: String
    PhoneNumber: String
    Address: String
+   ProfilePicture:String
    Role: UserType!
    Status: UserStatus!
    Verified: Boolean!
-
 }
-type authResponse {
-  access_token:String!
+
+type Doctor{
   User:User!
-
+  Speciality:String
+  ExperienceYears:Int
+  ConsultationFee:Float
+  Education:String
 }
 
-
-
-input CreateUserInput {
-  # Example field (placeholder)
-  exampleField: Int
+input UserDetailsInput {
+  UserID:String!
+  FirstName: String
+  LastName: String
+  Username: String
+  Email: String!
+  DateOfBirth: Date
+  Gender: Gender
+  Bio: String
+  PhoneNumber: String
+  Address: String 
+  ProfilePicture: String
+  Role:UserType!
 }
 
-input UpdateUserInput {
-  id: Int!
-}
-
-input LoginInput{
-  UsernameOrEmail:String!
-  Password:String!
-}
-
-input ResetPasswordInput{
-  email:String!
-  newPassword:String!
-
-}
-input SignupInput{
-    Username:String!
-    Email:String!
-    Password:String!
-    Role:UserType
+input DoctorDetailInput {
+  UserDetails: UserDetailsInput
+  Speciality: String
+  LicenseNumber: String
+  ExperienceYears:Int
 }
 
 type Query {
   users: [User]!
-  me(id: Int!): User
+  user(id: Int!): User
 }
-
 
 
 type Mutation {
-  login(signinInput:LoginInput!):authResponse!
-  register(signupInput:SignupInput):User!
-  resetPassword(resetPasswordInput:ResetPasswordInput!):User!
-  resetEmail(resetEmail:String!):ResetToken!
-  verifyResetCode(verifyCode:Int!):Boolean!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User
+  RegisterUser(RegisterInput: UserDetailsInput!): User!
+  DoctorRegister(DoctorDetailInput:DoctorDetailInput!):Doctor!
+  removeUser(id: Int!): User!
 }
+
+
+input LoginInput {
+  UsernameOrEmail: String!
+  Password: String!
+}
+
+
+
+
+
+
+
+

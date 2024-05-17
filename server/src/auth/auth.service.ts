@@ -1,6 +1,5 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginInput, LoginSchema, RegisterInput, RegisterSchema } from './dto/auth-input';
 import { ZodError, date } from 'zod';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -19,239 +18,239 @@ export class AuthService {
         
     }
 
-    @UseGuards(ClerkAuthGuard)
+    // @UseGuards(ClerkAuthGuard)
 
-    async clerkUser(){
-        return clerkClient.users.getUserList()
+    // async clerkUser(){
+    //     return clerkClient.users.getUserList()
     
-    }
+    // }
    
-      validatePassword (Password:string,hashedPassword:any)  {
-         const hashedInputPassword =  this.HashPassword(Password)
-        console.log(hashedInputPassword === hashedPassword)
-        return hashedInputPassword === hashedPassword;
-      };
+    //   validatePassword (Password:string,hashedPassword:any)  {
+    //      const hashedInputPassword =  this.HashPassword(Password)
+    //     console.log(hashedInputPassword === hashedPassword)
+    //     return hashedInputPassword === hashedPassword;
+    //   };
 
-     HashPassword(Password: string) {
-        const hashedPassword = crypto.pbkdf2Sync(Password, this.salt, 1000, 64, "sha512").toString('hex');
-        return  hashedPassword    
+    //  HashPassword(Password: string) {
+    //     const hashedPassword = crypto.pbkdf2Sync(Password, this.salt, 1000, 64, "sha512").toString('hex');
+    //     return  hashedPassword    
         
-    }
+    // }
 
-    generateJWTToken(secretkey: string, payload: any, exp: string) {
-        console.log(secretkey)
-        return this.jwtService.sign(payload, {
-            expiresIn: exp,
-            secret: secretkey,
-        });
+    // generateJWTToken(secretkey: string, payload: any, exp: string) {
+    //     console.log(secretkey)
+    //     return this.jwtService.sign(payload, {
+    //         expiresIn: exp,
+    //         secret: secretkey,
+    //     });
 
 
-    }
+    // }
 
-    validateToken(token: string,secret:string) {
-        console.log("come on man")
-        try {
+    // validateToken(token: string,secret:string) {
+    //     console.log("come on man")
+    //     try {
             
-            const decodedToken= this.jwtService.verify(token,{
-               secret
-            })
-            return decodedToken
-        } catch (error) {
-            console.log(error)
+    //         const decodedToken= this.jwtService.verify(token,{
+    //            secret
+    //         })
+    //         return decodedToken
+    //     } catch (error) {
+    //         console.log(error)
             
-        }
+    //     }
 
-    }
-     isTokenExpired(expirationTimestamp: number) {
-        const now = Date.now() / 1000;
-        return now >= expirationTimestamp;
-      }
+    // }
+    //  isTokenExpired(expirationTimestamp: number) {
+    //     const now = Date.now() / 1000;
+    //     return now >= expirationTimestamp;
+    //   }
 
 
 
-    async Login({ UsernameOrEmail, Password }: LoginInput){      
+    // async Login({ UsernameOrEmail, Password }: LoginInput){      
 
-        try {
-            const validatedUser = LoginSchema.parse({ UsernameOrEmail, Password })
-            const userByEmail = await this.prisma.users.findUnique({
-                where: {
+    //     try {
+    //         const validatedUser = LoginSchema.parse({ UsernameOrEmail, Password })
+    //         const userByEmail = await this.prisma.users.findUnique({
+    //             where: {
                     
-                         Email: UsernameOrEmail
+    //                      Email: UsernameOrEmail
                             
                         
-                },
-                include: {
-                    UserDetails: true
-                }
+    //             },
+    //             include: {
+    //                 UserDetails: true
+    //             }
 
-            })
-            const userByUsername=await this.prisma.users.findUnique({
-                where: {
+    //         })
+    //         const userByUsername=await this.prisma.users.findUnique({
+    //             where: {
                     
-                         Username: UsernameOrEmail
+    //                      Username: UsernameOrEmail
                             
                         
-                },
-                include: {
-                    UserDetails: true
-                }
+    //             },
+    //             include: {
+    //                 UserDetails: true
+    //             }
 
-            })
-            if (!userByEmail && !userByUsername)
-                throw new UnauthorizedException("Invalid credentials.check your username or password!!")
-            const user=userByEmail?userByEmail:userByUsername
-            if (!await this.validatePassword(Password, user.Password))
-                throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
-          const updatedUser= await this.prisma.users.update({
-                where:{
-                    UserID:user.UserID
-                },
-                data:{
-                    LastLogin:new Date(Date.now())
-                }
-            })
-            const { UserDetailID, LastLogin, Password: userPassword, CreatedAt, UpdatedAt, ...others } = { ...user, ...user.UserDetails }
-            const payload = {
-                sub: user.UserID,
-                username: user.Username,
-                role: user.Role,
-                status: user.Status
-            }
-            const access_token = this.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m")
-            const refresh_token = this.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
+    //         })
+    //         if (!userByEmail && !userByUsername)
+    //             throw new UnauthorizedException("Invalid credentials.check your username or password!!")
+    //         const user=userByEmail?userByEmail:userByUsername
+    //         if (!await this.validatePassword(Password, user.Password))
+    //             throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
+    //       const updatedUser= await this.prisma.users.update({
+    //             where:{
+    //                 UserID:user.UserID
+    //             },
+    //             data:{
+    //                 LastLogin:new Date(Date.now())
+    //             }
+    //         })
+    //         const { UserDetailID, LastLogin, Password: userPassword, CreatedAt, UpdatedAt, ...others } = { ...user, ...user.UserDetails }
+    //         const payload = {
+    //             sub: user.UserID,
+    //             username: user.Username,
+    //             role: user.Role,
+    //             status: user.Status
+    //         }
+    //         const access_token = this.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m")
+    //         const refresh_token = this.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
 
-            return {
-                access_token: access_token,
-                refresh_token: refresh_token,
-                user: { ...others }
+    //         return {
+    //             access_token: access_token,
+    //             refresh_token: refresh_token,
+    //             user: { ...others }
 
-            }
+    //         }
 
-        } catch (error) {
-            if (error instanceof ZodError) {
-                const errorMessages = error.issues.map(issue => issue.message);
-                console.log(errorMessages); // This will log an array of error messages
-                throw new BadRequestException(errorMessages.join(', '));
-            }
-            if (error instanceof UnauthorizedException)
-                throw error
-            else {
-                throw new HttpException("An Unexpected error occurred.Please try again!!!", HttpStatus.INTERNAL_SERVER_ERROR)
-            }
-        }
-        finally {
-            this.prisma.$disconnect()
-        }
-    }
+    //     } catch (error) {
+    //         if (error instanceof ZodError) {
+    //             const errorMessages = error.issues.map(issue => issue.message);
+    //             console.log(errorMessages); // This will log an array of error messages
+    //             throw new BadRequestException(errorMessages.join(', '));
+    //         }
+    //         if (error instanceof UnauthorizedException)
+    //             throw error
+    //         else {
+    //             throw new HttpException("An Unexpected error occurred.Please try again!!!", HttpStatus.INTERNAL_SERVER_ERROR)
+    //         }
+    //     }
+    //     finally {
+    //         this.prisma.$disconnect()
+    //     }
+    // }
 
-    async Register({ Username, Email, Password, Role, UserDetails }: RegisterInput) {
-        console.log(Password)
-        try {
-            RegisterSchema.parse({ Username, Email, Password, Role })
+    // async Register({ Username, Email, Password, Role, UserDetails }: RegisterInput) {
+    //     console.log(Password)
+    //     try {
+    //         RegisterSchema.parse({ Username, Email, Password, Role })
 
-            const userByEmail = await this.prisma.users.findUnique({
-                where: {
-                    Email: Email
-                }
-            }) 
-            const userByUsername = await this.prisma.users.findUnique({
-                where: {
-                    Username: Username
-                }
-            })
-            if (userByEmail)
-                throw new HttpException("User already exist.Please use different email", HttpStatus.BAD_REQUEST)
-            if (userByUsername)
-                throw new HttpException("User already exist.Please use different username", HttpStatus.BAD_REQUEST)
+    //         const userByEmail = await this.prisma.users.findUnique({
+    //             where: {
+    //                 Email: Email
+    //             }
+    //         }) 
+    //         const userByUsername = await this.prisma.users.findUnique({
+    //             where: {
+    //                 Username: Username
+    //             }
+    //         })
+    //         if (userByEmail)
+    //             throw new HttpException("User already exist.Please use different email", HttpStatus.BAD_REQUEST)
+    //         if (userByUsername)
+    //             throw new HttpException("User already exist.Please use different username", HttpStatus.BAD_REQUEST)
 
                 
-            const hashedPassword = await this.HashPassword(Password)
+    //         const hashedPassword = await this.HashPassword(Password)
             
-            const newUser = await this.prisma.users.create({
-                data: {
-                    Username, Email,
-                    Password: hashedPassword,
-                    Status: "active",
-                    Role,
-                    LastLogin:new Date(Date.now())
-                }
-            })
-            const userId = newUser.UserID;
-            const newUserDetails = await this.prisma.userDetails.create({
-                data: {
-                    User: {
-                        connect: {
-                            UserID: userId
-                        }
-                    },
-                    ...UserDetails
-                }
+    //         const newUser = await this.prisma.users.create({
+    //             data: {
+    //                 Username, Email,
+    //                 Password: hashedPassword,
+    //                 Status: "active",
+    //                 Role,
+    //                 LastLogin:new Date(Date.now())
+    //             }
+    //         })
+    //         const userId = newUser.UserID;
+    //         const newUserDetails = await this.prisma.userDetails.create({
+    //             data: {
+    //                 User: {
+    //                     connect: {
+    //                         UserID: userId
+    //                     }
+    //                 },
+    //                 ...UserDetails
+    //             }
 
-            })
+    //         })
             
-            const payload = {
-                sub: newUser.UserID,
-                username: newUser.Username,
-                role: newUser.Role,
-                status: newUser.Status
-            }
+    //         const payload = {
+    //             sub: newUser.UserID,
+    //             username: newUser.Username,
+    //             role: newUser.Role,
+    //             status: newUser.Status
+    //         }
 
 
-            const access_token = this.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m")
-            const refresh_token = this.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
-            const { UserDetailID, LastLogin, Password: userPassword, CreatedAt, UpdatedAt, ...others } = { ...newUser, ...newUserDetails }
+    //         const access_token = this.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m")
+    //         const refresh_token = this.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
+    //         const { UserDetailID, LastLogin, Password: userPassword, CreatedAt, UpdatedAt, ...others } = { ...newUser, ...newUserDetails }
 
-            return {
-                access_token: access_token,
-                refresh_token: refresh_token,
-                user: { ...others }
+    //         return {
+    //             access_token: access_token,
+    //             refresh_token: refresh_token,
+    //             user: { ...others }
 
-            }
+    //         }
 
-        } catch (error) {
-            console.log(error)
-            if (error instanceof ZodError) {
-                const errorMessages = error.issues.map(issue => issue.message);
-                console.log(errorMessages);
-                throw new BadRequestException(errorMessages.join(', '));
-            }
-            if (error instanceof HttpException)
-                throw error
-            else {
-                throw new HttpException("An Unexpected error occurred.Please try again!!!", HttpStatus.INTERNAL_SERVER_ERROR)
-            }
+    //     } catch (error) {
+    //         console.log(error)
+    //         if (error instanceof ZodError) {
+    //             const errorMessages = error.issues.map(issue => issue.message);
+    //             console.log(errorMessages);
+    //             throw new BadRequestException(errorMessages.join(', '));
+    //         }
+    //         if (error instanceof HttpException)
+    //             throw error
+    //         else {
+    //             throw new HttpException("An Unexpected error occurred.Please try again!!!", HttpStatus.INTERNAL_SERVER_ERROR)
+    //         }
 
-        } finally {
-            this.prisma.$disconnect()
-        }
-    }
+    //     } finally {
+    //         this.prisma.$disconnect()
+    //     }
+    // }
 
-    async resetEmail(email:string) {
-        try {
-            const user=await this.prisma.users.findUnique({
-                where:{
-                    Email:email
-                }
-            })
-          if(!user)
-          throw new HttpException("Email not registered",HttpStatus.NOT_FOUND)
-        const verificationToken=this.generateJWTToken(process.env.PASSWORD_RESET_SECRET,{sub:user.UserID,username:user.Username,email:user.Email},"15m")  
-        const verificationLink=`${process.env.API}/auth/reset-password?token=${verificationToken}`
-        this.eventEmitter.emit("Reset-password",{
-            username:user.Username,
-            email:user.Email,
-            verificationLink
-                    })  
-        return {token:verificationToken} 
+    // async resetEmail(email:string) {
+    //     try {
+    //         const user=await this.prisma.users.findUnique({
+    //             where:{
+    //                 Email:email
+    //             }
+    //         })
+    //       if(!user)
+    //       throw new HttpException("Email not registered",HttpStatus.NOT_FOUND)
+    //     const verificationToken=this.generateJWTToken(process.env.PASSWORD_RESET_SECRET,{sub:user.UserID,username:user.Username,email:user.Email},"15m")  
+    //     const verificationLink=`${process.env.API}/auth/reset-password?token=${verificationToken}`
+    //     this.eventEmitter.emit("Reset-password",{
+    //         username:user.Username,
+    //         email:user.Email,
+    //         verificationLink
+    //                 })  
+    //     return {token:verificationToken} 
         
             
-        } catch (error) {
-            throw error
+    //     } catch (error) {
+    //         throw error
             
-        }
+    //     }
 
 
-    }
+    // }
     
 
 }

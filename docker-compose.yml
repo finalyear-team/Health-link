@@ -31,7 +31,7 @@ services:
     env_file:
       - ./server/.env
     environment:
-      DATABASE_URL: mysql://root:thisisabebe@mysql:3306/health_link_test1db
+      DATABASE_URL: mysql://root:thisisabebe@mysql:3306/Health_link_db 
     networks:
       - demo-network
 
@@ -40,7 +40,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: thisisabebe
-      MYSQL_DATABASE: health_link_test1db
+      MYSQL_DATABASE: Health_link_db 
     ports:
       - "3306:3306"
     volumes:

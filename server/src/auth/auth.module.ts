@@ -6,7 +6,6 @@ import { UserService } from 'src/user/user.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { MailService } from 'src/mail/mail.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConfigModule } from '@nestjs/config';
 
