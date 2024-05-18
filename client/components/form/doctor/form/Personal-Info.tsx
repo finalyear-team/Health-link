@@ -34,6 +34,7 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
   });
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    console.log(values)
     localStorage.setItem("personalInfo", JSON.stringify(values));
     setSubmitting(false);
     onNext();
@@ -55,7 +56,9 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
             onSubmit={handleSubmit}
             validationSchema={validationSchema}
           >
-            {({ isValid, isSubmitting }) => (
+            {({ isValid, isSubmitting }) => {
+              console.log(isValid)
+              return(
               <Form className="mt-8 space-y-6" action="#" method="POST">
                 <div className="">
                   {/* First Name */}
@@ -108,12 +111,13 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
                   </div>
                   <div>
                     <Button disabled={!isValid} type="submit">
+                      
                       {isSubmitting ? "Submitting..." : "Next"}
                     </Button>
                   </div>
                 </div>
               </Form>
-            )}
+            )}}
           </Formik>
         </div>
         <div>

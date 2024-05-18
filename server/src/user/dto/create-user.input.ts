@@ -1,55 +1,45 @@
+import { PhoneNumber } from "@clerk/clerk-sdk-node";
 import { Field, InputType } from "@nestjs/graphql";
-import { UserType ,Gender} from "@prisma/client";
+import { Gender, UserType } from "@prisma/client";
 import { nullable, z} from "zod"
 
 const RoleValues=Object.values(UserType) as [string,...string[]]
+const GenderValues=Object.values(Gender) as [string,...string[]]
 
 export const RegisterSchema=z.object({
     FirstName:z.string(),
     LastName:z.string(),
     Username:z.string(),
     Email:z.string().email(),    
-    Role:z.enum(RoleValues)
+    Role:z.enum(RoleValues),
+    Gender:z.enum(GenderValues),
+    DateOfBirth:z.date(),
+    PhoneNumber:z.string().optional().refine((PhoneNumber)=>{
+     if( /^\+251[79]\d{8}$|^(07|09)\d{8}$/.test(PhoneNumber))
+        return true     
+    },"Invalid Ethiopian Number")
 })
-
-export const LoginSchema=z.object({
-    UsernameOrEmail:z.string(),   
-    Password:z.string()
-})
-
-
-@InputType()
-export class LoginInput{
-    @Field()
-    UsernameOrEmail:string
-    @Field()
-    Password:string
-
-}
-
-
-
 
 @InputType()
 export class UserDetailsInput {
     @Field()
     UserID:string;
-    @Field({nullable:true}) 
+    @Field() 
     FirstName: string;
 
-    @Field({nullable:true}) 
+    @Field() 
     LastName: string;
 
-    @Field({nullable:true})
+    @Field()
     Username:string;
     
-    @Field({nullable:false})
+    @Field()
     Email:string;
 
-    @Field({nullable:true}) 
+    @Field() 
     DateOfBirth: Date;
 
-    @Field({nullable:true}) 
+    @Field() 
     Gender: Gender;
 
     @Field({ nullable: true }) 
@@ -69,8 +59,6 @@ export class UserDetailsInput {
 }
 
 
-
-
 @InputType()
 export class DoctorDetailInput {
     @Field({nullable:true}) 
@@ -85,4 +73,6 @@ export class DoctorDetailInput {
     @Field({nullable:true}) 
     ExperienceYears : number;    
 }
+
+
 

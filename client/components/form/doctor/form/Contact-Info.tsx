@@ -34,6 +34,7 @@ const ContactInfoForm = ({
   });
 
   const [storedValues, setStoredValues] = useState<any>(() => {
+
     const storedBasicInfo = localStorage.getItem("contactInfo");
     return storedBasicInfo
       ? JSON.parse(storedBasicInfo)
@@ -124,7 +125,7 @@ const ContactInfoForm = ({
                       disabled={!isValid}
                       // className="font-main w-fit text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                       type="submit"
-                    >
+                    >                      
                       {isSubmitting ? "Submitting..." : "Next"}
                     </Button>
                   </div>

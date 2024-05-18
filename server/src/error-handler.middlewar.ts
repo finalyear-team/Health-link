@@ -42,7 +42,7 @@ export class ErrorHandlingMiddleware implements NestMiddleware {
       } else {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Internal server error',
+          message: 'something went wrong!!',
         });
       }
       originalJson.apply(res, arguments);

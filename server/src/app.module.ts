@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AgoraModule } from './agora/agora.module';
 import { AuthService } from './auth/auth.service';
 import { PaymentController } from './payment/payment.controller';
 import { UserService } from './user/user.service';
@@ -17,6 +16,8 @@ import { AccessControlService } from './access-control/access-control.service';
 import { VideoCallModule } from './video-call/video-call.module';
 import { StreamChatModule } from './stream-chat/stream-chat.module';
 import { ClerkMiddleware} from './clerk.middleware';
+import { JwtModule } from '@nestjs/jwt';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -27,8 +28,8 @@ import { ClerkMiddleware} from './clerk.middleware';
   }),
   EventEmitterModule.forRoot()
   ,
-  AgoraModule, UserModule, AuthModule, VideoCallModule, StreamChatModule],
-  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService, ],
+   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule],
+  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService],
   controllers: [PaymentController],
 })
 export class AppModule implements NestModule {

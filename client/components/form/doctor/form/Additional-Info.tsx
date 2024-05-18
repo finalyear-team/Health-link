@@ -146,6 +146,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code: e.code,
       });
+      
 
       if (completeSignUp.status !== "complete") {
         console.log(JSON.stringify(completeSignUp, null, 2));

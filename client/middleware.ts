@@ -14,6 +14,7 @@ export default authMiddleware({
     "/security",
     "/terms-of-services",
     "/sign-up(.*)",
+    "/sign-in",
   ],
   afterAuth(auth, req, evt) {
 

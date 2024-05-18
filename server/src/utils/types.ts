@@ -1,89 +1,93 @@
 export enum UserType {
-    doctor,
-    patient,
-    admin,
-    moderator,
-    organization
-  }
-  
-  export enum UserStatus{
-    active,
-    inactive  , 
-    suspended,
-    blocked,
-    deleted,  
-  }
-  
-  export enum ItemType {
-    post,
-    forum
-  }
-  
-  export enum AttachmentType {
-    image,
-    video,
-    file
-  }
-  
-  export enum GroupChatRole {
-    member,
-    admin,
-    owner
-  }
-  
-  export enum MessageType {
-    one_to_one,
-    group
-  }
-  
-  export enum Gender {
-    Male,
-    Female
-  }
-  
-  export enum AppointmentStatus {
-    Scheduled,
-    Completed,
-    Cancelled
-  }
-  
-  export enum ConsultancyType {
-    InitialConsultation,
-    FollowUp,
-    Emergency
-  }
-  
-  export enum ScheduleStatus {
-    Active,
-    Inactive,
-    TemporarilyUnavailable
-  }
-  
-  export enum ConsultancyStatus {
-    Scheduled,
-    Completed,
-    Cancelled
-  }
-  
-  export enum Role {
-    member,
-    moderator,
-    admin,
-    guest,
-    banned
-  }
-  
-  export enum LikeType {
-    forumAnswer,
-    post
-  }
-  
-  export enum CommentableType {
-    forumAnswer,
-    post
-  }
-  export enum FeedbackType {
-    GeneralFeedback,
-    ProductReview,
-    ServiceReview
-  }
+  DOCTOR = 'doctor',
+  PATIENT = 'patient',
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
+}
+
+export enum UserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  BLOCKED = 'blocked',
+  DELETED = 'deleted',
+}
+
+export enum SuspendType {
+  SUSPEND = 'suspend',
+  UNSUSPEND = 'unsuspend',
+}
+
+export enum ItemType {
+  POST = 'post',
+  FORUM = 'forum',
+}
+
+export enum AttachmentType {
+  IMAGE = 'image',
+  VIDEO = 'video',
+  FILE = 'file',
+}
+
+export enum GroupChatRole {
+  MEMBER = 'member',
+  ADMIN = 'admin',
+  OWNER = 'owner',
+}
+
+export enum MessageType {
+  ONE_TO_ONE = 'one_to_one',
+  GROUP = 'group',
+}
+
+export enum Gender {
+  MALE = 'Male',
+  FEMALE = 'Female',
+}
+
+export enum AppointmentStatus {
+  SCHEDULED = 'Scheduled',
+  COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+}
+
+export enum ConsultancyType {
+  INITIAL_CONSULTATION = 'InitialConsultation',
+  FOLLOW_UP = 'FollowUp',
+  EMERGENCY = 'Emergency',
+}
+
+export enum ScheduleStatus {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+  TEMPORARILY_UNAVAILABLE = 'TemporarilyUnavailable',
+}
+
+export enum ConsultancyStatus {
+  SCHEDULED = 'Scheduled',
+  COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+}
+
+export enum Role {
+  MEMBER = 'member',
+  MODERATOR = 'moderator',
+  ADMIN = 'admin',
+  GUEST = 'guest',
+}
+
+export enum LikeType {
+  FORUM_ANSWER = 'forumAnswer',
+  POST = 'post',
+}
+
+export enum CommentableType {
+  FORUM_ANSWER = 'forumAnswer',
+  POST = 'post',
+}
+
+export enum FeedbackType {
+  GENERAL_FEEDBACK = 'GeneralFeedback',
+  PRODUCT_REVIEW = 'ProductReview',
+  SERVICE_REVIEW = 'ServiceReview',
+}

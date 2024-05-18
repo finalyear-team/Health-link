@@ -22,7 +22,6 @@ enum UserType {
   organization
 }
 
-
 enum UserStatus {
   active
   inactive
@@ -89,7 +88,7 @@ enum ChannelType {
 
 enum Role {
   member
-  moderator
+  owner
   admin
   guest
   banned
@@ -108,7 +107,7 @@ enum CommentableType {
 enum FeedbackType {
   GeneralFeedback
   ProductReview
-  
+
   ServiceReview
 }
 
@@ -168,23 +167,24 @@ model MedicalRecord {
 
 
 model DoctorDetails {
-  DoctorID                  String          @id @unique
-  Speciality                 String?
-  ConsultationFee           Decimal?
-  EducationalQualifications Json?
-  LicenseNumber             String?
-  ExperienceYears           Int?
-  User                      Users            @relation(fields: [DoctorID], references: [UserID])
-  Schedules                 DoctorSchedule[]
-  Reviews                   DoctorReviews[]
-  Appointments              Appointments[]
-  Consultancy               Consultancy[]
-  Booking                   Booking[]
-  Blog                      BlogPost[]
-  Post                      Post[]
-  Prescription              Prescription[]
-  Payment                   Payment[]
-  VideoChatRoom             VideoChatRoom[]
+  DoctorID              String           @id @unique
+  Speciality            String?
+  ConsultationFee       Decimal?
+  EducationalBackground Json?
+  LicenseNumber         String?
+  ExperienceYears       Int?
+  User                  Users            @relation(fields: [DoctorID], references: [UserID])
+  Schedules             DoctorSchedule[]
+  Reviews               DoctorReviews[]
+  Appointments          Appointments[]
+  Consultancy           Consultancy[]
+  Booking               Booking[]
+  Blog                  BlogPost[]
+  Post                  Post[]
+  Prescription          Prescription[]
+  Payment               Payment[]
+  VideoChatRoom         VideoChatRoom[]
+
   @@index([Speciality], name: "Speciality_index")
 }
 
@@ -305,7 +305,7 @@ model ChatChannel {
 }
 
 model ChatMessage {
-  ChatID    String      @id 
+  ChatID    String      @id
   Content   String
   SenderID  String
   MediaUrl  String?

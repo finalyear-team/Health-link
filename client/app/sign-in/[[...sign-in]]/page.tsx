@@ -1,6 +1,5 @@
 "use client";
 
-import { Container } from "@/component";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -12,7 +11,9 @@ import Link from "next/link";
 import * as Yup from "yup";
 import { useState } from "react";
 import { InfinitySpin } from "react-loader-spinner";
-import { Header, Footer } from "@/component";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Container from "@/components/container/container";
 
 const LoginPage = () => {
   const [error, setError] = useState(null);
