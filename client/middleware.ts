@@ -14,10 +14,23 @@ export default authMiddleware({
     "/privacy-policy",
     "/security",
     "/terms-of-services",
-    "/sign-up(.*)",
+    // "/sign-up(.*)",
   ],
   afterAuth: async (auth, req, evt) => {
-    // Fetch user asynchronously and handle errors
+    if (!auth.userId && !auth.isPublicRoute) {
+      return redirectToSignIn({ returnBackUrl: req.url });
+    }
+
+    // public routes
+    if (auth.isPublicRoute) {
+      return NextResponse.next();
+    }
+
+    // If the user is signed in and trying to access a protected route, allow them to access route
+    if (auth.userId && !auth.isPublicRoute) {
+      return NextResponse.next();
+    }
+
     try {
       const user = await clerkClient.users.getUser(auth.userId as string);
       const role = user.unsafeMetadata.role;
@@ -29,26 +42,21 @@ export default authMiddleware({
         } else {
           return NextResponse.rewrite(new URL("/dashboard/doctor", req.url));
         }
-      }
-
-      if (role === "patient") {
+      } else if (role === "patient") {
         if (req.url.startsWith("/dashboard/patient")) {
           return NextResponse.next();
         } else {
           return NextResponse.rewrite(new URL("/dashboard/patient", req.url));
         }
+      } else {
+        // role does not match expected values
+        console.error("Unknown role:", role);
+        return NextResponse.rewrite(new URL("/error", req.url)); // Redirect to an error page or another route
       }
     } catch (error) {
       console.error("Failed to fetch user:", error);
-      // Handle error appropriately (e.g., redirect to an error page)
+      return NextResponse.rewrite(new URL("/error", req.url)); // Redirect to an error page or another route
     }
-
-    // If the user is signed in and trying to access a protected route, allow them to access route
-    if (auth.userId && !auth.isPublicRoute) {
-      return NextResponse.next();
-    }
-    // Allow users visiting public routes to access them
-    return NextResponse.next();
   },
 });
 
