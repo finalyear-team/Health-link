@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Layout from "@/components/theme/Layout";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "HealthLink",
@@ -17,9 +18,15 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <Layout>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
-          </Layout>
+            <Toaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

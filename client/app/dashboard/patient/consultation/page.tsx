@@ -2,7 +2,7 @@ import React from 'react'
 
 const Consultation = () => {
   return (
-    <div>Consultation Page</div>
+    <div className='text-3xl font-bold'>Your Consultation Page</div>
   )
 }
 

@@ -19,7 +19,6 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [pendingVerification, setPendingVerification] = useState(false);
@@ -151,6 +150,13 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
         console.log(JSON.stringify(completeSignUp, null, 2));
       }
       if (completeSignUp.status === "complete") {
+        // Add unsafeMetadata to the user to read later
+        await signUp.update({
+          unsafeMetadata: {
+            role: "provider",
+            verified: true,
+          },
+        });
         await setActive({ session: completeSignUp.createdSessionId });
         router.push("/dashboard/doctor");
       }

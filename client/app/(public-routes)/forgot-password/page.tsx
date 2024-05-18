@@ -200,12 +200,6 @@ const ForgetPassword = () => {
               {({ isValid, isSubmitting }) => (
                 <Form className="mt-12 space-y-6" action="#" method="POST">
                   <>
-                    {/* <Input
-                      name="code"
-                      type="number"
-                      label="Enter the password reset code that was sent to your email"
-                      placeholder="Enter your Code"
-                    /> */}
                     <label className="font-main text-sm text-dark-700 font-medium mt-3">
                       Enter the Verification code sent to your Email.
                     </label>
@@ -234,6 +228,7 @@ const ForgetPassword = () => {
                         name="password"
                         type="password"
                         label="New Password"
+                        placeholder="Enter New Password"
                       />
                     </div>
 
@@ -242,6 +237,7 @@ const ForgetPassword = () => {
                         name="confirm"
                         type="password"
                         label="Confirm Password"
+                        placeholder="Confirm the Password"
                       />
                     </div>
                     <div className="pb-4">
@@ -250,12 +246,6 @@ const ForgetPassword = () => {
                     <Button
                       disabled={!isValid || isSubmitting}
                       className="w-full"
-                      // className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
-                      //           ${
-                      //             true
-                      //               ? "disabled:bg-gray-300 disabled:text-dark-200"
-                      //               : ""
-                      //           }`}
                       type="submit"
                     >
                       {isSubmitting ? (

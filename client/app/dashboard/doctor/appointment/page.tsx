@@ -2,7 +2,7 @@ import React from 'react'
 
 const Appointment = () => {
   return (
-    <div>Appointment page</div>
+    <div className='text-3xl font-bold'>Your Appointment page</div>
   )
 }
 

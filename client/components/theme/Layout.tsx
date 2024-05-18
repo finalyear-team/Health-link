@@ -28,7 +28,7 @@ const Layout = ({ children }: any) => {
     <div className={darkMode ? "dark" : ""}>
       <nav className="dark:bg-dark-700 flex items-end justify-end">
         <div className="flex items-center ">
-          {/* <button
+          <button
             className="text-dark-700 hover:text-gray-300 focus:outline-none"
             onClick={toggleDarkMode}
           >
@@ -37,7 +37,7 @@ const Layout = ({ children }: any) => {
             ) : (
               <MdOutlineDarkMode />
             )}
-          </button> */}
+          </button>
         </div>
       </nav>
       <main>{children}</main>

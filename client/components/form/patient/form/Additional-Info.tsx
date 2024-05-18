@@ -129,6 +129,13 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
         console.log(JSON.stringify(completeSignUp, null, 2));
       }
       if (completeSignUp.status === "complete") {
+        // Add unsafeMetadata to the user for later use
+        await signUp.update({
+          unsafeMetadata: {
+            role: "patient",
+            verified: true,
+          },
+        });
         await setActive({ session: completeSignUp.createdSessionId });
         router.push("/dashboard/patient");
       }
