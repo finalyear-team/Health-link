@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { authMiddleware, redirectToSignIn } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export default authMiddleware({
   publicRoutes: [
@@ -15,33 +16,31 @@ export default authMiddleware({
     "/terms-of-services",
     "/sign-up(.*)",
   ],
-  afterAuth(auth, req, evt) {
+  afterAuth: async (auth, req, evt) => {
+    // Fetch user asynchronously and handle errors
+    try {
+      const user = await clerkClient.users.getUser(auth.userId as string);
+      const role = user.unsafeMetadata.role;
+      console.log("===============>", role);
 
-    // Handle users who aren't authenticated
-    if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
-    }
-
-    // console.log("User Role:", auth.user?.unsafeMetadata.role);
-
-    if (auth.user?.unsafeMetadata.role === "provider") {
-      // Allow provider to access dashboard/doctor
-      if (req.url.startsWith("/dashboard/doctor")) {
-        return NextResponse.next();
-      } else {
-        // Redirect doctor to their dashboard
-        return NextResponse.redirect("/dashboard/doctor");
+      if (role === "provider") {
+        if (req.url.startsWith("/dashboard/doctor")) {
+          return NextResponse.next();
+        } else {
+          return NextResponse.rewrite(new URL("/dashboard/doctor", req.url));
+        }
       }
-    }
 
-    if (auth.user?.unsafeMetadata.role === "patient") {
-      // Allow patient to access dashboard/patient
-      if (req.url.startsWith("/dashboard/patient")) {
-        return NextResponse.next();
-      } else {
-        // Redirect patient to their dashboard
-        return NextResponse.redirect("/dashboard/patient");
+      if (role === "patient") {
+        if (req.url.startsWith("/dashboard/patient")) {
+          return NextResponse.next();
+        } else {
+          return NextResponse.rewrite(new URL("/dashboard/patient", req.url));
+        }
       }
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      // Handle error appropriately (e.g., redirect to an error page)
     }
 
     // If the user is signed in and trying to access a protected route, allow them to access route
