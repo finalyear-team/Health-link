@@ -6,7 +6,7 @@ import { NextFunction, Request } from 'express';
 import { ClerkMiddleware } from 'src/clerk.middleware';
 
 @Resolver('blog')
-export class PostResolver {
+export class BlogResolver {
   constructor(private readonly postService: PostService) {}
 
   @Mutation('createBlog')

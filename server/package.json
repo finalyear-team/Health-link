@@ -20,11 +20,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@100mslive/server-sdk": "^0.3.0",
+    "@100mslive/server-sdk": "^0.0.1",
     "@apollo/server": "^4.10.1",
     "@clerk/clerk-sdk-node": "^5.0.7",
     "@hookform/resolvers": "^3.3.4",
-    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/apollo": "^12.1.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",

@@ -134,7 +134,7 @@ type Mutation {
   DoctorRegister(DoctorDetailInput:DoctorRegisterInput!):User!
   RemoveUser(id: Int!): User!
   UpdateUser(updateUserInput:updateUserInput):User!
-  SuspendUser(id:String,suspendType:SuspendType):User
+  SuspendUser(id:String,suspendType:SuspendType!):User
 }
 
 

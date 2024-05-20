@@ -46,7 +46,6 @@ export class UserService {
       })
       return { ...UsersDetail, ...DoctorDetails }
     } catch (error) {
-      console.log(error)
       throw error
 
     }
@@ -60,12 +59,9 @@ export class UserService {
           DoctorDetails: true
         }
       })
-      console.log(Users)
       return Users
-
     } catch (error) {
       throw error
-
     }
   }
 
@@ -79,7 +75,6 @@ export class UserService {
           DoctorDetails: true
         }
       })
-      console.log(User)
       return User
     } catch (error) {
       throw error
@@ -96,6 +91,8 @@ export class UserService {
         where: {
           OR: [
             { UserID: { contains: searchQuery } },
+            { FirstName: { contains: searchQuery } },
+            { LastName: { contains: searchQuery } },
             { Username: { contains: searchQuery } },
             { Email: { contains: searchQuery } },
             { PhoneNumber: { contains: searchQuery } },
@@ -106,8 +103,7 @@ export class UserService {
           DoctorDetails: true
         }
       })
-      console.log(Users)
-      return Users
+      return Promise.all(Users.map((user)=>({...user.DoctorDetails,...user})))
     } catch (error) {
       throw error
     }
@@ -115,39 +111,36 @@ export class UserService {
 
   async searchDoctors(searchQuery: string): Promise<Users[]> {
     try {
-      const users = await this.prisma.users.findMany({
+      const Users = await this.prisma.users.findMany({
         where: {
-          AND: [
-            { Role: "doctor" },
+          Role: "doctor",
+          OR: [
             {
               OR: [
-                {
-                  OR: [
-                    { FirstName: { contains: searchQuery } },
-                    { LastName: { contains: searchQuery } },
-                    { Address: { contains: searchQuery } },
-                  ]
-                },
-                {
-                  DoctorDetails: {
-                    Speciality: { contains: searchQuery }
-
-                  }
-                }
+                { FirstName: { contains: searchQuery } },
+                { Username: { contains: searchQuery } },
+                { LastName: { contains: searchQuery } },
+                { Address: { contains: searchQuery } },
               ]
+            },
+            {
+              DoctorDetails: {
+                Speciality: { contains: searchQuery }
+              }
             }
           ]
         },
         include: {
           DoctorDetails: true
         }
-      });
-
-      return users;
+      });  
+      return Promise.all(Users.map((user)=>({...user,...user?.DoctorDetails})));
     } catch (error) {
       throw error;
     }
   }
+
+
 
   async updateUser(updateUserInput: UpdateUserInput) {
     const { UserID, DoctorDetails: DoctorUpdateDetails, ...otherUserDetails } = updateUserInput
@@ -197,13 +190,18 @@ export class UserService {
       },     
       
     )
-    console.log(User)
       return User
       
     } catch (error) {
       throw error
       
     }
+  }
+
+
+  async VerifyLicenseNumber(){
+    
+
   }
 
 }

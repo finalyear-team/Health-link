@@ -1,7 +1,12 @@
+scalar Date
+
+
 type Appointment {
-  # Example field (placeholder)
-  exampleField: Int
+  AppointmentID:String!
 }
+
+
+
 
 input CreateAppointmentInput {
   # Example field (placeholder)

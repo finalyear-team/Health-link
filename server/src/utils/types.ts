@@ -45,25 +45,20 @@ export enum Gender {
   FEMALE = 'Female',
 }
 
-export enum AppointmentStatus {
-  SCHEDULED = 'Scheduled',
-  COMPLETED = 'Completed',
-  CANCELLED = 'Cancelled',
-}
 
-export enum ConsultancyType {
-  INITIAL_CONSULTATION = 'InitialConsultation',
-  FOLLOW_UP = 'FollowUp',
-  EMERGENCY = 'Emergency',
+
+export enum AppointmentType {
+  INITIAL_CONSULTATION = 'initialConsultation',
+  FOLLOW_UP = 'followUp',
+  EMERGENCY = 'emergency',
 }
 
 export enum ScheduleStatus {
-  ACTIVE = 'Active',
-  INACTIVE = 'Inactive',
-  TEMPORARILY_UNAVAILABLE = 'TemporarilyUnavailable',
+  AVAILABLE = 'available',
+  UNAVAILABLE = 'unavailable',
 }
 
-export enum ConsultancyStatus {
+export enum AppointmentStatus {
   SCHEDULED = 'Scheduled',
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
@@ -87,7 +82,22 @@ export enum CommentableType {
 }
 
 export enum FeedbackType {
-  GENERAL_FEEDBACK = 'GeneralFeedback',
-  PRODUCT_REVIEW = 'ProductReview',
-  SERVICE_REVIEW = 'ServiceReview',
+  GENERAL_FEEDBACK = 'generalFeedBack',
+  PRODUCT_REVIEW = 'productReview',
+  SERVICE_REVIEW = 'serviceReview',
+}
+export enum WeekDay {
+  MONDAY = 'monday',
+  TUESDAY = 'tuesday',
+  WEDNESDAY = 'wednesday',
+  THURSDAY = "thursday",
+  FIRDAY = "firday",
+  SATURDAY = "saturday",
+  SUNDAY = "sunday"
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+
 }

@@ -18,6 +18,7 @@ import { StreamChatModule } from './stream-chat/stream-chat.module';
 import { ClerkMiddleware} from './clerk.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { AppointmentModule } from './appointment/appointment.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -28,7 +29,7 @@ import { AppointmentModule } from './appointment/appointment.module';
   }),
   EventEmitterModule.forRoot()
   ,
-   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule],
+   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule],
   providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService],
   controllers: [PaymentController],
 })

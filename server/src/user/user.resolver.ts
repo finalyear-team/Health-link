@@ -60,18 +60,13 @@ export class UserResolver {
 
   @Query('SearchUsers')
   async searchUsers(@Args('searchQuery') searchQuery:string){
-    console.log(searchQuery)  
-   
     const users=await this.userService.searchUsers(searchQuery)    
-    console.log(users)
     return users
   }
   
   @Query('SearchDoctors')
   async searchDoctors(@Args('searchQuery') searchQuery:string){
-    console.log(searchQuery)      
     const users=await this.userService.searchDoctors(searchQuery)    
-    console.log(users)
     return users
   }
 
@@ -81,15 +76,15 @@ export class UserResolver {
   //  @UseGuards(ClerkAuthGuard)
  async update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {  
     const user=await this.userService.updateUser(updateUserInput)
-    console.log()
     const Education=JSON.parse(`${user.EducationalBackground}`)
-    console.log(Education)
     return {EducationalBackground:Education,...user}
     
   }
 
   @Mutation('SuspendUser')
   //  @UseGuards(ClerkAuthGuard)
+  // @UseGuards(RoleGuard)
+  // @UserRoles(UserType.ADMIN)
  async SuspendUser(@Args('id') UserID: string,@Args("suspendType") suspendType:SuspendType) {  
     const user=await this.userService.suspendUser(UserID,suspendType)   
     return user
