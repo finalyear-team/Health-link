@@ -158,7 +158,7 @@
 }
 
 .bg-container {
-  background-image: url("/image/Login.jpg");
+  background-image: url(/image/Login.jpg);
   background-size: cover;
   background-position: center;
 }

@@ -66,6 +66,7 @@ const ForgetPassword = () => {
 
   // If the user is already signed in,
   // redirect them to the home page
+
   if (isSignedIn) {
     router.push("/dashboard");
   }
@@ -108,6 +109,7 @@ const ForgetPassword = () => {
           // the newly created session (user is now signed in)
           setActive({ session: result.createdSessionId });
           setError("");
+          // router.push("/dashboard");
         } else {
           console.log(result);
         }
@@ -168,8 +170,9 @@ const ForgetPassword = () => {
                           {isSubmitting ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            "Forgot Password"
-                          )}
+                            ""
+                          )}{" "}
+                          Forgot Password
                         </Button>
                         <Link
                           href={"/sign-in"}
@@ -248,8 +251,9 @@ const ForgetPassword = () => {
                       {isSubmitting ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        "Reset Password"
-                      )}
+                        ""
+                      )}{" "}
+                      Reset Password
                     </Button>
                   </>
                 </Form>
