@@ -1,10 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAppointmentInput } from './dto/create-appointment.input';
 import { UpdateAppointmentInput } from './dto/update-appointment.input';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AppointmentService {
-  create(createAppointmentInput: CreateAppointmentInput) {
+  constructor(private readonly prisma:PrismaService){}
+
+  async create(createAppointmentInput: CreateAppointmentInput) {
+    try {
+       
+    } catch (error) {
+      
+    }
+    
     return 'This action adds a new appointent';
   }
 

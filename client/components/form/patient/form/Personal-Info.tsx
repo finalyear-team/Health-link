@@ -40,6 +40,7 @@ const PersonalInfo = ({
   });
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    console.log(values)
     localStorage.setItem("patient_personalInfo", JSON.stringify(values));
     setSubmitting(false);
     onNext();

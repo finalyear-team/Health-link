@@ -35,6 +35,7 @@ export class UserService {
           Status: "active",
           DoctorDetails: {
             create: {
+              
               ...others
             }
           }

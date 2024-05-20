@@ -198,47 +198,51 @@ model DoctorDetails {
 
   @@index([Speciality], name: "Speciality_index")
 }
+
 model DoctorSchedule {
   ScheduleID   String         @id @default(uuid())
-  DoctorID     String         
-  Date         DateTime?
-  WeekDay      Weekday?
+  DoctorID     String
+  Date         DateTime?      @db.Date()
+  WeekDay      Weekday?     
   StartTime    DateTime       @db.Time()
   EndTime      DateTime       @db.Time()
   ScheduleType ScheduleType   @default(normal)
   Status       ScheduleStatus @default(available)
-  Notes        String?
+  Note         String?
   CreatedAt    DateTime       @default(now())
   UpdatedAt    DateTime       @updatedAt
   Appointments Appointments[]
-  Doctor       Users          @relation(fields: [DoctorID], references: [UserID])
+  Doctor       Users          @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
 }
 
 model Appointments {
   AppointmentID   String            @id @default(uuid())
-  DoctorID        String              
-  PatientID       String            
-  ScheduleID      String            
-  AppointmentDate DateTime?
+  DoctorID        String
+  PatientID       String
+  ScheduleID      String 
+  AppointmentDate DateTime?         @db.Date()
   AppointmentTime DateTime?         @db.Time()
   Duration        Int?
   Status          AppointmentStatus @default(pending)
-  AppointmentType AppointmentType    @default(initialConsultation)
-  Notes           String?           @db.Text
+  AppointmentType AppointmentType   @default(initialConsultation)
+  Note            String?           @db.Text
   CreatedAt       DateTime          @default(now())
   UpdatedAt       DateTime          @updatedAt
   CancelledBy     String?           @unique
   CancelledReason String?
   VideoChatRoomID String
-  Doctor          Users             @relation("doctor_appointment", fields: [DoctorID], references: [UserID])
-  Patient         Users             @relation("patient_appointment", fields: [PatientID], references: [UserID])
-  Cancelled       Users?            @relation("appointmentCancelledby", fields: [CancelledBy], references: [UserID])
+  Doctor          Users             @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
+  Patient         Users             @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
+  Cancelled       Users?            @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
 
-  Schedule        DoctorSchedule    @relation(fields: [ScheduleID], references: [ScheduleID])
-  Payment         Payment?
-  VideoChatRoom   VideoChatRoom     @relation(fields: [VideoChatRoomID], references: [RoomID])
+  Schedule      DoctorSchedule @relation(onDelete: Cascade, fields: [ScheduleID], references: [ScheduleID])
+  // Booking         Booking[]
+  Payment       Payment?
+  VideoChatRoom VideoChatRoom  @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
+
+  @@index([Status], name: "status_index")
+  @@index([DoctorID, PatientID], name: "doctor_patient_index")
 }
-
 
 // model Booking {
 //   BookingID       String        @id @default(uuid())
@@ -270,7 +274,7 @@ model Appointments {
 //   Duration        Int
 //   Status          AppointmentStatus
 //   AppointmentType AppointmentType
-//   Notes           String?           @db.LongText
+//   Note           String?           @db.LongText
 //   CreatedAt       DateTime          @default(now())
 //   UpdatedAt       DateTime          @updatedAt
 //   CancelledBy     String?
@@ -305,7 +309,7 @@ model MemberInVideoChat {
 
 // model that stores both dms and group chats it also stores PeerSupport group informations as channel
 model ChatChannel {
-  ChannelID   String        @id   
+  ChannelID   String          @id
   ChannelName String
   Image       String?
   Description String?         @db.Text
@@ -330,7 +334,7 @@ model ChatMessage {
 }
 
 model ChannelMember {
-  UserID           String      @id 
+  UserID           String      @id
   ChannelID        String
   AuthToken        String      @db.LongText
   Role             Role        @default(member)
@@ -476,7 +480,7 @@ model UserFeedback {
   Content    String
   CreatedAt  DateTime     @default(now())
   UpdatedAt  DateTime     @updatedAt
-  Type       FeedbackType  @default(generalFeedback)
+  Type       FeedbackType @default(generalFeedback)
   Rating     Int? // Optional, for reviews
   Review     String? // Optional, for reviews
   Replies    Reply[]
@@ -500,7 +504,7 @@ model Prescription {
   PatientID         String
   IssuedAt          DateTime                 @default(now())
   ValidUntil        DateTime?
-  Notes             String?
+  Note              String?
   Status            String?
   Doctor            Users                    @relation(onDelete: Cascade, "doctor_prescription", fields: [DoctorID], references: [UserID])
   Patient           Users                    @relation(onDelete: Cascade, "patient_prescription", fields: [PatientID], references: [UserID])

@@ -9,15 +9,12 @@ export class PaymentController {
     @Post("/webhook")
     async Webhook(@Req() req:Request,@Res() res:Response){
         console.log("payment success")
-        console.log(req.body)
-        
-        
+        console.log(req.body)         
 
     }
 
     @Post("/callback")
-    async callback(@Req() req:Request,@Res() res:Response){
-        
+    async callback(@Req() req:Request,@Res() res:Response){       
     }
 
     @Post("/pay")

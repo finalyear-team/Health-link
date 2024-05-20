@@ -25,17 +25,19 @@ type Schedule {
 }
 
 
-
 input CreateScheduleInput{
   DoctorID:String!
   WeekDay:WeekDay
   Date:Date
-  StartTime:Date
-  EndTime:Date
+  StartTime:Date!
+  EndTime:Date!
   Note:String
-  
 }
 
+input EmergencyScheduleInput{
+  DoctorID:String!
+  EndTime:Date
+}
 
 input UpdateScheduleInput{
   ScheduleID:String!
@@ -54,8 +56,9 @@ input SearchScheduleInput{
 }
 
 
-type Query {
+type Query {  
   Schedules(DoctorID:String!): [Schedule]!
+  LatestSlotForEmergency(DoctorID:String):Schedule
   EmergencySchedules:[Schedule]
 }
 
@@ -63,5 +66,6 @@ type Query {
 type Mutation {
   CreateSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
   UpdateSchedule(updateScheduleInput: UpdateScheduleInput!): Schedule!
+  CreateEmergencySchedule(emergencyScheduleInput: EmergencyScheduleInput!): Schedule!
   RemoveSchedule(id: Int!): Schedule
 }

@@ -1,8 +1,9 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { ScheduleStatus, WeekDay } from "src/utils/types";
+import { Weekday } from "@prisma/client";
+import { ScheduleStatus,  } from "src/utils/types";
 import { object, z } from "zod";
 
-const WeekdayValue = Object.values(WeekDay) as [string, ...string[]]
+const WeekdayValue = Object.values(Weekday) as [string, ...string[]]
 const GenderValues = Object.values(ScheduleStatus) as [string, ...string[]]
 
 
@@ -29,7 +30,7 @@ export class CreateScheduleInput {
     @Field()
     DoctorID:string
     @Field()
-    WeekDay?: WeekDay
+    WeekDay?: Weekday
     @Field()
     Date?:Date
     @Field()
@@ -43,11 +44,8 @@ export class CreateScheduleInput {
 @InputType()
 export class EmergencyScheduleInput {
     @Field()
-    DoctorID:string
-    @Field()
-    StartTime:Date
+    DoctorID:string 
     @Field()
     EndTime:Date
-    @Field()
-    Note?:string
+   
 }
