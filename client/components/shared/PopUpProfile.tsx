@@ -39,7 +39,7 @@ const UserProfileCard: React.FC<UserProfile> = ({
   onMakeAppointment,
 }) => {
   return (
-    <div className="top-doctors font-main">
+    <div className="top-doctors">
       <div className="flex items-center justify-between flex-wrap">
         <div className="flex items-center justify-center flex-nowrap">
           <Image

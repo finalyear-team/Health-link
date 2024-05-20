@@ -4,14 +4,14 @@ import Container from "@/components/container/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useSignIn, useUser } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs";
 import { MdCircle } from "react-icons/md";
 import React from "react";
 import { Formik, Form } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
 import { useState } from "react";
-import { InfinitySpin } from "react-loader-spinner";
+import { Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -149,12 +149,11 @@ const LoginPage = () => {
                     type="submit"
                   >
                     {isSubmitting ? (
-                      <div className="text-center">
-                        <InfinitySpin width="40" color="#1b1f2f" />
-                      </div>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      "Login"
-                    )}
+                      ""
+                    )}{" "}
+                    Login
                   </Button>
 
                   <div className="text-sm mt-4 text-center">

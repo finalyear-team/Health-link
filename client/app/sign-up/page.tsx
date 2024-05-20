@@ -20,7 +20,7 @@ const SignUp = () => {
       <Header />
       <Container>
         <div className="custom-container font-main">
-          <h2 className="text-xl font-extrabold text-dark-700 font-main">
+          <h2 className="text-xl font-extrabold text-dark-700 dark:text-slate-50">
             Create an Account
           </h2>
           <span className="text-sm font-normal">

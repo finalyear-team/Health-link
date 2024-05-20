@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <div>
       <Header />
-      {/* <div className="relative w-full">
+      <div className="relative w-full">
         <Image
           src="/image/bg.jpg"
           alt="Front-page_doctor"
@@ -93,10 +93,11 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </div> */}
+      </div>
 
-      <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row mt-10 rounded-lg bg-dark-700 bg-opacity-10">
-        {/* Right side picture */}
+{/* 
+     <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row mt-10 rounded-lg bg-dark-700 bg-opacity-10">
+      //  right side content
         <div className="lg:w-3/4 lg:pr-8 ">
           <Image
             src="/image/bg1.jpg"
@@ -107,7 +108,7 @@ export default function Home() {
             priority
           />
         </div>
-        {/* Left side content */}
+        //  Left side content 
         <div className="lg:w-1/2 lg:pr-8 flex flex-col justify-center">
           <h1 className="text-6xl font-bold mb-4 text-secondary-700">
             Your bridge to health
@@ -163,6 +164,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+*/}
+ 
 
       {/* features */}
       <div>

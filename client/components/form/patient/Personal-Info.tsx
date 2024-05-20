@@ -3,48 +3,45 @@ import { Formik, Form } from "formik";
 import GenderSelect from "@/components/genderSelect/genderSelect";
 import { MdCircle } from "react-icons/md";
 import Image from "next/image";
-import { useState } from "react";
-import * as Yup from "yup";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { validationSchemaPersInfo } from "@/utils/validationSchema";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { Loader2 } from "lucide-react";
 
-const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("*First Name is required"),
-    lastName: Yup.string().required("*Last Name is required"),
-    userName: Yup.string().required("*User Name is required"),
-    DOB: Yup.date().required("*Date of Birth is required").nullable(),
-    gender: Yup.string()
-      .oneOf(["male", "female"])
-      .required("*Gender is required"),
-  });
-
-  const [storedValues, setStoredValues] = useState<any>(() => {
-    const storedBasicInfo = localStorage.getItem("personalInfo");
-    return storedBasicInfo
-      ? JSON.parse(storedBasicInfo)
-      : {
-          firstName: "",
-          lastName: "",
-          userName: "",
-          DOB: "",
-          gender: "",
-        };
-  });
+const PersonalInfo = ({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) => {
+  const [storedValues, setStoredValues] = useLocalStorage(
+    "patient_personalInfo",
+    {
+      firstName: "",
+      lastName: "",
+      userName: "",
+      DOB: "",
+      gender: "",
+    }
+  );
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
-    localStorage.setItem("personalInfo", JSON.stringify(values));
-    setSubmitting(false);
-    onNext();
+    setTimeout(() => {
+      setStoredValues(values);
+      setSubmitting(false);
+      onNext();
+    }, 1000);
   };
 
   return (
     <Container>
-      <div className="custom-container flex items-center justify-center flex-wrap space-x-5 my-8">
+      <div className="custom-container flex flex-col lg:flex-row items-center justify-center lg:space-x-8">
         <div>
           <MdCircle size={50} color="#C4C4C4" />
-          <h2 className="text-2xl font-extrabold text-dark-700">
+          <h2 className="text-2xl font-extrabold text-dark-700 dark:text-slate-50">
             Create Your Account
           </h2>
           <h2 className="text-base font-bold text-primary-600">
@@ -53,7 +50,7 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
           <Formik
             initialValues={storedValues}
             onSubmit={handleSubmit}
-            validationSchema={validationSchema}
+            validationSchema={validationSchemaPersInfo}
           >
             {({ isValid, isSubmitting }) => (
               <Form className="mt-8 space-y-6" action="#" method="POST">
@@ -76,7 +73,7 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
                       label="Last Name"
                     />
                   </div>
-                  {/* username */}
+                  {/* User Name */}
                   <div className="mt-3">
                     <Input
                       name="userName"
@@ -108,7 +105,12 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
                   </div>
                   <div>
                     <Button disabled={!isValid} type="submit">
-                      {isSubmitting ? "Submitting..." : "Next"}
+                      {isSubmitting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        ""
+                      )}{" "}
+                      Next
                     </Button>
                   </div>
                 </div>
@@ -131,4 +133,4 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
   );
 };
 
-export default BasicInfoForm;
+export default PersonalInfo;
