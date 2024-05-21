@@ -173,6 +173,8 @@ model Users {
   Payment               Payment[]           @relation("patient_payment")
   DoctorPayment         Payment[]           @relation("doctor_payment")
   VideoChatRoom         VideoChatRoom[]
+   FollowersFollowing    Followers[]         @relation("following")
+  FollowersFollowers    Followers[]         @relation("followers")
 
   @@index([Email], name: "email_index")
 }
@@ -202,10 +204,10 @@ model DoctorDetails {
 model DoctorSchedule {
   ScheduleID   String         @id @default(uuid())
   DoctorID     String
-  Date         DateTime?      @db.Date()
+  Date         DateTime?      @db.Date
   WeekDay      Weekday?     
-  StartTime    DateTime       @db.Time()
-  EndTime      DateTime       @db.Time()
+  StartTime    DateTime       @db.Time
+  EndTime      DateTime       @db.Time
   ScheduleType ScheduleType   @default(normal)
   Status       ScheduleStatus @default(available)
   Note         String?
@@ -220,8 +222,8 @@ model Appointments {
   DoctorID        String
   PatientID       String
   ScheduleID      String 
-  AppointmentDate DateTime?         @db.Date()
-  AppointmentTime DateTime?         @db.Time()
+  AppointmentDate DateTime        @db.Date
+  AppointmentTime DateTime        @db.Time
   Duration        Int?
   Status          AppointmentStatus @default(pending)
   AppointmentType AppointmentType   @default(initialConsultation)
@@ -533,4 +535,14 @@ model PrescriptionAttachment {
   Caption        String?
   FileType       String
   Prescription   Prescription @relation(onDelete: Cascade, fields: [PrescriptionID], references: [PrescriptionID])
+}
+
+model Followers {
+  FollowerID   String   @id
+  Follower     Users    @relation("following", fields: [FollowerID], references: [UserID])
+  FollowingID  String
+  Following    Users    @relation("followers", fields: [FollowingID], references: [UserID])
+  CreatedAt    DateTime @default(now())
+
+  @@index([FollowerID, FollowingID], name: "follower_following_unique")
 }

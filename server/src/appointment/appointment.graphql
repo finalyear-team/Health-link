@@ -1,29 +1,78 @@
-scalar Date
+enum AppointmentType {
+  initialConsultation
+  followUp
+  emergency
+}
+enum AppointmentStatus {
+  pending
+  booked
+  completed
+  cancelled
+}
 
+scalar Date
 
 type Appointment {
   AppointmentID:String!
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String!
+  AppointmentDate:Date!
+  AppointmentTime:Date!
+  Duration:Int
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String
 }
 
 
 
 
 input CreateAppointmentInput {
-  # Example field (placeholder)
-  exampleField: Int
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String!
+  AppointmentDate:Date!
+  AppointmentTime:Date!
+  Duration:Int
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String   
 }
 
 input UpdateAppointmentInput {
-  id: Int!
+  AppointmentID:String!
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String
+  AppointmentDate:Date
+  AppointmentTime:Date
+  Duration:Int
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String   
+  CancelledBy:String
+  CancelledReson:String    
 }
 
+input EmergencyAppointmentInput{
+    ScheduleID:String!
+    DoctorID:String!
+    PatientID:String!
+    AppointmentTime:Date!
+    Duration:Int 
+    }
+
 type Query {
-  appointments: [Appointment]!
-  appointment(id: Int!): Appointment
+  UserAppointments(UserID:String!):[Appointment]
+  FilterAppoinments(FilterQuery:String): [Appointment]
+  GetAppointmentByID(AppointmentID:String!):Appointment
 }
 
 type Mutation {
-  createAppointment(createAppointmentInput: CreateAppointmentInput!): Appointment!
-  updateAppointment(updateAppointmentInput: UpdateAppointmentInput!): Appointment!
-  removeAppointment(id: Int!): Appointment
+  CreateAppointment(createAppointmentInput: CreateAppointmentInput!): Appointment!
+  UpdateAppointment(updateAppointmentInput: UpdateAppointmentInput!): Appointment!
+  CreateEmergencyAppointment(emergencyAppointmentInput:EmergencyAppointmentInput):Appointment
+    
+  RemoveAppointment(AppointmentID: String!): Appointment
 }

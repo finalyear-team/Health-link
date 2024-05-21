@@ -7,28 +7,37 @@ import { UpdateAppointmentInput } from './dto/update-appointment.input';
 export class AppointmentResolver {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @Mutation('createAppointment')
-  create(@Args('createAppointmentInput') createAppointmentInput: CreateAppointmentInput) {
-    return this.appointmentService.create(createAppointmentInput);
+  @Mutation('CreateAppointment')
+  async createAppointment(@Args('createAppointmentInput') createAppointmentInput: CreateAppointmentInput) {
+    const input=new CreateAppointmentInput(createAppointmentInput)
+    console.log(input)
   }
 
-  @Query('appointment')
-  findAll() {
-    return this.appointmentService.findAll();
+
+//
+  @Query('UserAppointments')
+  async findUserAppointments() {
+
+  }
+  //
+   @Query('FilterAppoinments')
+  async filterAppointments() {
+
+  } 
+  
+  //
+  @Query('GetAppointmentByID')
+  getAppointment() {
+
   }
 
-  @Query('appointment')
-  findOne(@Args('id') id: number) {
-    return this.appointmentService.findOne(id);
-  }
 
-  @Mutation('updateAppointment')
+  @Mutation('UpdateAppointment')
   update(@Args('updateAppointmentInput') updateAppointmentInput: UpdateAppointmentInput) {
-    return this.appointmentService.update(updateAppointmentInput.id, updateAppointmentInput);
   }
 
-  @Mutation('removeAppointment')
-  remove(@Args('id') id: number) {
-    return this.appointmentService.remove(id);
-  }
+  // @Mutation('removeAppointment')
+  // remove(@Args('id') id: number) {
+  //   return this.appointmentService.remove(id);
+  // }
 }

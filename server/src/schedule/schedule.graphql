@@ -17,7 +17,8 @@ scalar Date
 
 type Schedule {
   ScheduleID:String
-  Day: Date
+  WeekDay:WeekDay
+  Date: Date
   StartTime:Date
   EndTime:Date
   Note:String
@@ -57,9 +58,9 @@ input SearchScheduleInput{
 
 
 type Query {  
-  Schedules(DoctorID:String!): [Schedule]!
-  LatestSlotForEmergency(DoctorID:String):Schedule
+  Schedules(DoctorID:String!): [Schedule]
   EmergencySchedules:[Schedule]
+  GetScheduleByDate(Date:String!):[Schedule]
 }
 
 

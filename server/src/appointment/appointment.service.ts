@@ -7,14 +7,28 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class AppointmentService {
   constructor(private readonly prisma:PrismaService){}
 
-  async create(createAppointmentInput: CreateAppointmentInput) {
-    try {
-       
-    } catch (error) {
-      
-    }
+  
+  async createAppointment(createAppointmentInput: CreateAppointmentInput) {
+    console.log(createAppointmentInput)
+
+    // try {
+    //    const Appointment=await this.prisma.appointments.create({  
+    //       data:{
+    //        VideoChatRoom:{
+    //         create:{
+
+
+    //         }
+    //        }
+    //       }
+
+    //    })
+
+    // } catch (error) {
+    //   throw error
+    // }
     
-    return 'This action adds a new appointent';
+    // return 'This action adds a new appointent';
   }
 
   findAll() {

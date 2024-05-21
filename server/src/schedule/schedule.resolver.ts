@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleInput, EmergencyScheduleInput } from './dto/create-schedule.input';
 import { UpdateScheduleInput } from './dto/update-schedule.input';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Resolver('Schedule')
 export class ScheduleResolver {
@@ -12,7 +13,9 @@ export class ScheduleResolver {
   // @UserRoles(UserType.ADMIN)
   @Mutation('CreateSchedule')
  async createSchedule(@Args('createScheduleInput') createScheduleInput: CreateScheduleInput) {
-    const schedule=await this.scheduleService.createSchedule(createScheduleInput)
+    const input=new CreateScheduleInput(createScheduleInput)
+    console.log(input)
+    const schedule=await this.scheduleService.createSchedule(input)
     return schedule
   }
 
@@ -20,18 +23,29 @@ export class ScheduleResolver {
   // @UserRoles(UserType.ADMIN)
   @Mutation('UpdateSchedule')
   async updateSchedule(@Args('updateScheduleInput') updateScheduleInput: UpdateScheduleInput) {
-      const schedule=await this.scheduleService.updateSchedule(updateScheduleInput)
+       console.log(updateScheduleInput)
+      const input=new UpdateScheduleInput(updateScheduleInput)
+      console.log(input)       
+      const schedule=await this.scheduleService.updateSchedule(input)
       return schedule
   }
  
 
   // @UseGuards(RoleGuard)
-  // @UserRoles(UserType.ADMIN)
+  // @UserRoles(UserType.DOCTOR)
  @Mutation('CreateEmergencySchedule')
   async createEmergencySchedule(@Args("emergencyScheduleInput") emergencyScheduleInput:EmergencyScheduleInput) {
-    console.log(emergencyScheduleInput)
-      const schedule=await this.scheduleService.createEmergencySchedule(emergencyScheduleInput)
+      const input=new EmergencyScheduleInput(emergencyScheduleInput)
+      const schedule=await this.scheduleService.createEmergencySchedule(input)
       return schedule
+  }
+
+
+  // updates the emergency schedule status to unavailable when the current day ended
+  @Cron("59 23 * * *")
+  async handleCron() {
+    console.log("come on man")
+    await this.scheduleService.updateEmergencySchedule();
   }
 
 
@@ -41,26 +55,14 @@ export class ScheduleResolver {
     return scheduels
   }
 
-  
 
   @Query('EmergencySchedules')
   async findEmergencySchedules() {
-    const emergencySchedules=await this.scheduleService.EmergencySchedules()
-    console.log(emergencySchedules)
+    const emergencySchedules=await this.scheduleService.emergencySchedules()
     return emergencySchedules
   }
 
-
-
-  @Query("LatestSlotForEmergency")
-  async findEmergencySlot(@Args("DoctorID") DoctorID:string){
-      const latestSlot=await this.scheduleService.findNextEmergencySlot(DoctorID)
-      console.log(latestSlot)
-      return latestSlot
-  }
-
-  
-
+ 
   @Mutation('RemoveSchedule')
   remove(@Args('id') id: number) {
   }

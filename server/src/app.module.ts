@@ -19,6 +19,8 @@ import { ClerkMiddleware} from './clerk.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import * as nestSchedule from '@nestjs/schedule';
+
 
 @Module({
   imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -27,6 +29,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     playground: true,
     typePaths:["./**/*.graphql"],
   }),
+  nestSchedule.ScheduleModule.forRoot(),
   EventEmitterModule.forRoot()
   ,
    UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule],
@@ -35,7 +38,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ClerkMiddleware).forRoutes('/video-call/*');
+    // consumer.apply(ClerkMiddleware).forRoutes('/video-call/*');
     consumer.apply(ClerkMiddleware).forRoutes('/stream-chat/*');
   }
  
