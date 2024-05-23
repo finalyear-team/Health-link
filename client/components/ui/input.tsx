@@ -13,7 +13,8 @@ interface InputProps {
   idd?: string;
   autoComplete?: string;
   accept?: string;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  showError?: boolean;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -27,7 +28,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           htmlFor={name}
           className="font-main text-sm text-dark-700 dark:text-slate-50 font-medium"
         >
-          {label} <span className="text-red-600">*</span>
+          {label ? (
+            <div>
+              {label} <span className="text-red-600">*</span>{" "}
+            </div>
+          ) : (
+            ""
+          )}
         </label>
 
         {type !== "checkbox" ? (

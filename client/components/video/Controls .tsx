@@ -255,7 +255,7 @@ const Controls = () => {
         <AudioSettings />
         {/* microphone control */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button onClick={toggleAudio} variant={"video"}>
               {isMicOn ? (
                 <MdMicNone size={20} />
@@ -271,7 +271,7 @@ const Controls = () => {
 
         {/* camera control */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button onClick={toggleVideo} variant={"video"}>
               {isVideoOn ? (
                 <MdOutlineVideocam size={20} />
@@ -288,7 +288,7 @@ const Controls = () => {
         {role === "provider" ? (
           // end call control
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button onClick={endCall} variant={"destructive"}>
                 <MdOutlineCallEnd size={20} />
               </Button>
@@ -300,7 +300,7 @@ const Controls = () => {
         ) : role === "patient" ? (
           // Leave call control
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button onClick={endCall} variant={"destructive"}>
                 <MdLogout size={20} />
               </Button>
@@ -315,9 +315,9 @@ const Controls = () => {
 
         {/* Settings control */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button variant={"video"}>
                   <MdOutlineSettings size={20} />
                 </Button>
@@ -337,7 +337,7 @@ const Controls = () => {
 
         {/* Full screen control */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button onClick={toggleFullScreen} variant={"video"}>
               {isFullScreen ? (
                 <MdFullscreenExit size={20} />

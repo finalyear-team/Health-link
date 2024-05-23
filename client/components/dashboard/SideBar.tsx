@@ -23,6 +23,8 @@ import {
 
 export const Sidebar = () => {
   const [showText, setShowText] = useState(true);
+  const [sideBarOff, setSidebarOff] = useState(false);
+
   const pathname = usePathname();
   const [role, setRole] = useState("");
   const { user } = useUser();
@@ -37,8 +39,29 @@ export const Sidebar = () => {
     }
   }, [user, pathname]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setShowText(false);
+      } else {
+        setShowText(true);
+      }
+    };
+
+    // Add event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Call the handler once to set the initial state
+    handleResize();
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <div className="z-50 h-screen w-fit border border-stroke bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm z-">
+    <div className="z-50 h-screen w-fit border border-stroke dark:border-slate-600 bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm z-">
       <div className="p-4 relative">
         <div className="absolute top-0 -right-9">
           <button

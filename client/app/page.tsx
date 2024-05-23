@@ -12,6 +12,7 @@ import TopDoctors from "@/components/Landing-common/TopDoctors";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import users from "@/public/data/users";
 
 export default function Home() {
   // const SearchProfile = Yup.object().shape({
@@ -197,7 +198,7 @@ export default function Home() {
         <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
           Our Top Doctors
         </div>
-        <TopDoctors />
+        <TopDoctors items={users} />
       </div>
       <Footer />
     </div>

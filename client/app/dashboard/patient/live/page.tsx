@@ -1,9 +1,10 @@
 import React from "react";
+import VideoChatInitiation from "@/components/layout/video-chat";
 
 const Video = () => {
   return (
     <div>
-      <div className="text-3xl font-bold">Your Video Consultation Page</div>
+      <VideoChatInitiation />
     </div>
   );
 };

@@ -8,7 +8,6 @@ const Home = () => {
         <title>Video Chat Interface</title>
         <meta
           name="description"
-          content="A video chat interface built with Next.js and Tailwind CSS"
           title="HealthLink Live"
         />
         <link rel="icon" href="/favicon.ico" />
