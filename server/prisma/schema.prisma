@@ -175,6 +175,7 @@ model Users {
   VideoChatRoom         VideoChatRoom[]
    FollowersFollowing    Followers[]         @relation("following")
   FollowersFollowers    Followers[]         @relation("followers")
+  Notification           Notification[]
 
   @@index([Email], name: "email_index")
 }
@@ -291,21 +292,20 @@ model Appointments {
 model VideoChatRoom {
   RoomID        String              @id
   Name          String
-  HostId        String
-  MemberId      String
+  HostID        String
   HostAuthToken String              @db.LongText
   CreatedAt     DateTime            @default(now())
   UpdatedAt     DateTime            @updatedAt
-  Host          Users               @relation(onDelete: Cascade, fields: [HostId], references: [UserID])
+  Host          Users               @relation(onDelete: Cascade, fields: [HostID], references: [UserID])
   Appointment   Appointments[]
   Members       MemberInVideoChat[]
 }
 
 model MemberInVideoChat {
-  UserId          String        @id @unique
+  MemberID          String        @id @unique
   VideoChatRoomID String
   MemberAuthToken String        @db.LongText
-  User            Users         @relation(onDelete: Cascade, fields: [UserId], references: [UserID])
+  User            Users         @relation(onDelete: Cascade, fields: [MemberID], references: [UserID])
   VideoChatRoom   VideoChatRoom @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
 }
 
@@ -546,3 +546,14 @@ model Followers {
 
   @@index([FollowerID, FollowingID], name: "follower_following_unique")
 }
+
+model Notification{
+  NotificationID String @id @default(uuid())
+  UserID     String
+  Message    String @db.Text()
+  CreatedAt  DateTime  @default(now())
+  UpdatedAt  DateTime  @updatedAt
+  User       Users    @relation(fields: [UserID] ,references: [UserID])
+}
+
+

@@ -45,7 +45,7 @@ export class ScheduleResolver {
   @Cron("59 23 * * *")
   async handleCron() {
     console.log("come on man")
-    await this.scheduleService.updateEmergencySchedule();
+    await this.scheduleService.autoEmergencyScheduleUpdate();
   }
 
 
@@ -61,6 +61,16 @@ export class ScheduleResolver {
     const emergencySchedules=await this.scheduleService.emergencySchedules()
     return emergencySchedules
   }
+
+  @Query('GetScheduleByDate')
+  async GetScheduleByDate(@Args("DoctorID") DoctorID:string,@Args("Date") Date:string) {
+    console.log(DoctorID)
+    console.log(Date)
+    const emergencySchedules=await this.scheduleService.getScheduleByDate(DoctorID,Date)
+    return emergencySchedules
+  }
+
+ 
 
  
   @Mutation('RemoveSchedule')
