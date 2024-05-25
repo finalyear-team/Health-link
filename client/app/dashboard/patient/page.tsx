@@ -111,7 +111,10 @@ const PatientDahboard = () => {
         </div>
       </div>
       {/* small cards to display more detail */}
-      <div className="flex flex-wrap items-center mt-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+        <DashboardCard />
+        <DashboardCard />
+        <DashboardCard />
         <DashboardCard />
       </div>
     </div>
