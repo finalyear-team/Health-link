@@ -1,0 +1,79 @@
+enum AppointmentType {
+  initialConsultation
+  followUp
+  emergency
+}
+enum AppointmentStatus {
+  pending
+  booked
+  completed
+  cancelled
+}
+
+scalar Date
+
+type Appointment {
+  AppointmentID:String!
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String!
+  AppointmentDate:Date!
+  AppointmentTime:Date!
+  Duration:Int
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String
+}
+
+
+
+
+input CreateAppointmentInput {
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String!
+  AppointmentDate:Date!
+  AppointmentTime:Date!
+  VideoChatRoomID:String
+  Duration:Int
+  AppointmentType:AppointmentType
+  Note:String   
+}
+
+input UpdateAppointmentInput {
+  AppointmentID:String!
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String
+  AppointmentDate:Date
+  AppointmentTime:Date
+  VideoChatRoomID:String
+  Duration:Int
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String   
+  CancelledBy:String
+  CancelledReson:String    
+}
+
+input EmergencyAppointmentInput{
+    ScheduleID:String!
+    DoctorID:String!
+    PatientID:String!
+    AppointmentTime:Date!
+    Duration:Int 
+    }
+
+type Query {
+  UserAppointments(UserID:String!):[Appointment]
+  FilterAppoinments(FilterQuery:String): [Appointment]
+  GetAppointmentByID(Id:String!):Appointment
+}
+
+type Mutation {
+  CreateAppointment(createAppointmentInput: CreateAppointmentInput!): Appointment!
+  UpdateAppointment(updateAppointmentInput: UpdateAppointmentInput!): Appointment!
+  CreateEmergencyAppointment(emergencyAppointmentInput:EmergencyAppointmentInput):Appointment  
+  AcceptAppointment(DoctorID:String!,AppointmentID:String!,Duration:Int!):Appointment
+  RemoveAppointment(Id: String!): Appointment
+}

@@ -9,6 +9,10 @@
   font-family: "Poppins";
 }
 
+body{
+  @apply bg-white dark:bg-slate-800
+}
+
 .glow {
   animation: glowing 1500ms infinite;
 }
@@ -90,7 +94,7 @@
 }
 
 .footer {
-  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100  dark:text-gray-100 dark:bg-dark-600 backdrop-blur-sm;
+  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100  dark:text-gray-100 dark:bg-slate-900 backdrop-blur-sm;
 }
 
 .footer__custom {
@@ -122,11 +126,11 @@
 }
 
 .features_container {
-  @apply bg-white shadow-lg rounded-lg overflow-hidden w-full h-fit md:w-1/2 lg:w-1/3 xl:w-1/4 p-6 m-4 flex flex-col items-center;
+  @apply bg-white dark:bg-slate-900 border dark:border-slate-500 border-slate-100 shadow-lg rounded-lg overflow-hidden w-full h-fit md:w-1/2 lg:w-1/3 xl:w-1/4 p-6 m-4 flex flex-col items-center;
 }
 
 .top-doctors {
-  @apply bg-white dark:bg-slate-900 dark:text-slate-50 shadow-sm rounded-lg overflow-hidden w-[350px] p-4 m-4 h-[340px];
+  @apply bg-white dark:bg-slate-900 dark:text-slate-50 border dark:border-slate-500 border-slate-100 shadow-sm rounded-lg overflow-hidden w-[350px] p-4 m-4 h-[340px];
 }
 
 .proffesional-type {

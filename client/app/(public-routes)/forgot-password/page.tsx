@@ -12,6 +12,7 @@ import { useAuth, useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   InputOTP,
@@ -23,6 +24,7 @@ const ForgetPassword = () => {
   const [successfulCreation, setSuccessfulCreation] = useState(false);
   const [secondFactor, setSecondFactor] = useState(false);
   const [error, setError] = useState("");
+  const { toast } = useToast();
 
   const router = useRouter();
   const { isSignedIn } = useAuth();
@@ -109,7 +111,11 @@ const ForgetPassword = () => {
           // the newly created session (user is now signed in)
           setActive({ session: result.createdSessionId });
           setError("");
-          // router.push("/dashboard");
+          toast({
+            title: "Successful Reset",
+            description: "You have Successfully reset your password!",
+            variant: "success",
+          });
         } else {
           console.log(result);
         }
@@ -123,7 +129,7 @@ const ForgetPassword = () => {
   return (
     <div className="bg-container">
       <Container>
-        <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white bg-opacity-50 backdrop-blur-sm">
+        <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white dark:bg-slate-800 bg-opacity-50 backdrop-blur-sm">
           <span className="flex justify-center">
             <MdCircle size={50} className="text-gray-300" />
           </span>

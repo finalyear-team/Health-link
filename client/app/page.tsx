@@ -19,6 +19,8 @@ export default function Home() {
   //   FirstName: Yup.string().required("Email is required!"),
   //   LastName: Yup.string().required("Password is required!"),
   // });
+
+  const filteredUsers = users.slice(0, 6);
   //initializing the value
   const initialValues = {
     FirstName: "",
@@ -170,7 +172,7 @@ export default function Home() {
 
       {/* features */}
       <div>
-        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+        <div className="font-main font-bold text-slate-900 dark:text-slate-50 text-center text-3xl mt-5">
           Insights to Our Features
         </div>
         <div className="flex flex-wrap justify-center mt-3">
@@ -195,12 +197,14 @@ export default function Home() {
       </div>
       {/* Top Doctors */}
       <div>
-        <div className="font-main font-bold text-dark-700 text-center text-3xl mt-5">
+        <div className="font-main font-bold text-dark-700 dark:text-slate-50 text-center text-3xl mt-5">
           Our Top Doctors
         </div>
-        <TopDoctors items={users} />
+        <TopDoctors items={filteredUsers} />
       </div>
       <Footer />
     </div>
   );
-}
+};
+
+

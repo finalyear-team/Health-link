@@ -1,0 +1,78 @@
+enum WeekDay{
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+enum Status{
+  available,
+  unavailable
+}
+
+enum ScheduleType{
+  emergency
+  normal
+}
+
+scalar Date
+
+
+type Schedule {
+  ScheduleID:String
+  WeekDay:WeekDay
+  Date: Date
+  StartTime:Date
+  EndTime:Date
+  Note:String
+  Status:Status
+  ScheduleType:ScheduleType
+}
+
+
+input CreateScheduleInput{
+  DoctorID:String!
+  WeekDay:WeekDay
+  Date:Date
+  StartTime:Date!
+  EndTime:Date!
+  Note:String
+}
+
+input EmergencyScheduleInput{
+  DoctorID:String!
+  EndTime:Date
+}
+
+input UpdateScheduleInput{
+  ScheduleID:String!
+  DoctorID:String!
+  WeekDay:WeekDay
+  Date:Date
+  StartTime:Date
+  EndTime:Date
+  Note:String
+  Status:Status
+}
+
+
+input SearchScheduleInput{
+  DoctorID:String!
+}
+
+
+type Query {  
+  Schedules(DoctorID:String!): [Schedule]
+  EmergencySchedules:[Schedule]
+  GetScheduleByDate(Date:String!,DoctorID:String!):[Schedule]
+}
+
+
+type Mutation {
+  CreateSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
+  UpdateSchedule(updateScheduleInput: UpdateScheduleInput!): Schedule!
+  CreateEmergencySchedule(emergencyScheduleInput: EmergencyScheduleInput!): Schedule!
+  RemoveSchedule(id: Int!): Schedule
+}

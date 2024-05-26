@@ -1,0 +1,148 @@
+
+enum UserType {
+    doctor,
+    patient,
+    admin,
+    moderator,
+    organization
+  }
+
+enum UserStatus{
+  active
+  inactive   
+  suspended
+  blocked
+  deleted
+}
+
+enum SuspendType{
+  suspend,
+  unsuspend
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+scalar Date
+
+type EducationalBackground{
+  Institution: String
+  Degree: String
+  Specialization: String
+  GraduationYear: Int
+  AdditionalCertifications: [String]
+
+}
+
+type User{
+   UserID: String
+   Username: String
+   Email: String
+   FirstName: String
+   LastName: String
+   Bio: String
+   PhoneNumber: String
+   Address: String
+   ProfilePicture:String
+   Role: UserType
+   Status: UserStatus
+   Speciality:String
+   ExperienceYears:Int
+   ConsultationFee:Float
+   EducationalBackground:EducationalBackground
+}
+
+
+
+input UserDetailsInput {
+  UserID:String!
+  FirstName: String!
+  LastName: String!
+  Username: String!
+  Email: String!
+  DateOfBirth: Date!
+  Gender: Gender!
+  Bio: String
+  PhoneNumber: String
+  Address: String 
+  ProfilePicture: String
+  Role:UserType!
+}
+
+input EducationalBackgroundInput {
+  Institution: String!
+  Degree: String!
+  Specialization: String
+  GraduationYear: Int
+  AdditionalCertifications: [String]
+}
+
+input DoctorDetails{
+  Speciality: String
+  LicenseNumber: String
+  ExperienceYears:Int
+  EducationalBackground:String
+  }
+
+
+
+input DoctorRegisterInput {
+  UserDetails: UserDetailsInput
+  Speciality: String
+  LicenseNumber: String
+  ExperienceYears:Int
+  EducationalBackground:EducationalBackgroundInput
+}
+
+input DoctorUpdateInput{
+  Speciality: String
+  LicenseNumber: String
+  ExperienceYears:Int
+  EducationalBackground:EducationalBackgroundInput
+}
+
+input updateUserInput{
+  UserID:String!
+  FirstName: String
+  LastName: String
+  Username: String
+  Gender: Gender
+  DateOfBirth:Date,
+  Bio: String
+  PhoneNumber: String
+  Address: String 
+  ProfilePicture: String
+  DoctorDetails:DoctorUpdateInput
+ 
+}
+
+
+
+
+type Query {
+  GetUsers: [User!]
+  GetUser(id: String!): User
+  SearchUsers(searchQuery:String):[User]
+  SearchDoctors(searchQuery:String):[User]
+}
+
+
+type Mutation {
+  RegisterUser(RegisterInput: UserDetailsInput!): User!
+  DoctorRegister(DoctorDetailInput:DoctorRegisterInput!):User!
+  RemoveUser(id: Int!): User!
+  UpdateUser(updateUserInput:updateUserInput):User!
+  SuspendUser(id:String,suspendType:SuspendType!):User
+}
+
+
+
+
+
+
+
+
+
+

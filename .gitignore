@@ -30,6 +30,7 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+.env*.prod
 
 # vercel
 .vercel
@@ -44,3 +45,4 @@ __pycache__/
 
 # Ignore the virtual environment directory
 client/api/venv/
+dist/

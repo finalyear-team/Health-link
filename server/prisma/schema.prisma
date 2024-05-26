@@ -5,12 +5,18 @@
 // // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+  pending
+  completed
 }
 
 enum UserType {
@@ -19,6 +25,14 @@ enum UserType {
   admin
   moderator
   organization
+}
+
+enum UserStatus {
+  active
+  inactive
+  suspended
+  blocked
+  deleted
 }
 
 enum ItemType {
@@ -48,33 +62,38 @@ enum Gender {
   Female
 }
 
-enum AppointmentStatus {
-  Scheduled
-  Completed
-  Cancelled
-}
-
-enum ConsultancyType {
-  InitialConsultation
-  FollowUp
-  Emergency
+enum AppointmentType {
+  initialConsultation
+  followup
+  emergency
 }
 
 enum ScheduleStatus {
-  Active
-  Inactive
-  TemporarilyUnavailable
+  available
+  unavailable
 }
 
-enum ConsultancyStatus {
-  Scheduled
-  Completed
-  Cancelled
+enum ScheduleType {
+  emergency
+  personal
+  normal
+}
+
+enum AppointmentStatus {
+  pending
+  booked
+  completed
+  cancelled
+}
+
+enum ChannelType {
+  dm
+  supportGroup
 }
 
 enum Role {
   member
-  moderator
+  owner
   admin
   guest
   banned
@@ -89,329 +108,367 @@ enum CommentableType {
   forumAnswer
   post
 }
+
 enum FeedbackType {
-  GeneralFeedback
-  ProductReview
-  ServiceReview
+  generalFeedback
+  productReview
+  serviceReview
+}
+
+enum Weekday {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
 }
 
 model Users {
-  UserID        Int                  @id @default(autoincrement())
-  Username      String
-  Password      String
-  Email         String            @unique
-  Role          String
-  Status        String
-  CreatedAt     DateTime             @default(now())
-  UpdatedAt     DateTime             @updatedAt
-  LastLogin     DateTime?
-  UserDetails   UserDetails?
-  MedicalRecord MedicalRecords[]
-  DoctorDetails DoctorDetails[]
-  UserSessions  UserSessions[]
-  Reviews       DoctorReviews[]
-  Appointments  Appointments[]
-  Consultancy   Consultancy[]
-  Booking       Booking[]
-  SupportGroup  SupportGroupMember[]
-  ForumPost     ForumPost[]
-  ForumAnswer   ForumAnswer[]
-  Comment       Comments[]
-  Like          Likes[]
-  Views         Views[]
-  Prescription  Prescription[]
-  Feedback      UserFeedback[]
-  FeedbackReply Reply[]
-
+  UserID                String              @id
+  Username              String              @unique
+  FirstName             String?
+  LastName              String?
+  Email                 String              @unique
+  DateOfBirth           DateTime?
+  Gender                Gender?
+  Bio                   String?             @db.LongText
+  PhoneNumber           String?
+  Address               String?
+  ProfilePicture        String?
+  Role                  UserType
+  Status                UserStatus
+  Verified              Boolean             @default(false)
+  CreatedAt             DateTime            @default(now())
+  UpdatedAt             DateTime            @updatedAt
+  LastLogin             DateTime?
+  MedicalRecord         MedicalRecord[]
+  DoctorDetails         DoctorDetails?
+  Reviews               DoctorReviews[]     @relation("patient_review")
+  Appointments          Appointments[]      @relation("patient_appointment")
+  AppointmentsCancelled Appointments[]      @relation("appointmentCancelledby")
+  // Consultancy           Consultancy[]
+  // PatientBooking        Booking[]           @relation("patientBooking")
+  // BookingCancelled      Booking[]
+  ForumPost             ForumPost[]
+  ForumAnswer           ForumAnswer[]
+  Comment               Comments[]
+  Like                  Likes[]
+  Views                 Views[]
+  Prescription          Prescription[]      @relation("patient_prescription")
+  Feedback              UserFeedback[]
+  FeedbackReply         Reply[]
+  ChatMessage           ChatMessage[]
+  VideoChatMembers      MemberInVideoChat[]
+  ChannelMembers        ChannelMember[]
+  Schedules             DoctorSchedule[]
+  DoctorReviews         DoctorReviews[]     @relation("doctor_review")
+  DoctorAppointments    Appointments[]      @relation("doctor_appointment")
+  // Consultancy           Consultancy[]
+  // Booking               Booking[]
+  Blog                  BlogPost[]
+  Post                  Post[]
+  DoctorPrescription    Prescription[]      @relation("doctor_prescription")
+  Payment               Payment[]           @relation("patient_payment")
+  DoctorPayment         Payment[]           @relation("doctor_payment")
+  VideoChatRoom         VideoChatRoom[]
+   FollowersFollowing    Followers[]         @relation("following")
+  FollowersFollowers    Followers[]         @relation("followers")
+  Notification           Notification[]
 
   @@index([Email], name: "email_index")
 }
 
-model UserDetails {
-  UserDetailID   Int       @id @default(autoincrement())
-  UserID         Int       @unique
-  FirstName      String?
-  LastName       String?
-  DateOfBirth    DateTime?
-  Gender         Gender?
-  Bio            String?   @db.LongText
-  PhoneNumber    String?
-  Address        String?
-  ProfilePicture String?
-  User           Users     @relation(fields: [UserID], references: [UserID])
-}
-
-model MedicalRecords {
-  RecordID      Int      @id @default(autoincrement())
-  UserID        Int
-  DateOfRecord  DateTime @default(now())
-  Diagnosis     Json?
-  TreatmentPlan Json?
-  Medications   Json?
-  Allergies     Json?
-  VitalSigns    Json?
-  Patient       Users    @relation(fields: [UserID], references: [UserID])
+model MedicalRecord {
+  RecordID     String   @id @default(uuid())
+  UserID       String
+  DateOfRecord DateTime @default(now())
+  Diagnosis    Json?
+  Medications  Json?
+  Allergies    Json?
+  Patient      Users    @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
 }
 
 model DoctorDetails {
-  DoctorID                  Int              @id @default(autoincrement())
-  UserID                    Int
-  Specialization            String?
-  ConsultationFee           Decimal?
-  EducationalQualifications String?
-  LicenseNumber             String?
-  ExperienceYears           Int?
-  Specialties               String?
-  User                      Users            @relation(fields: [UserID], references: [UserID])
-  Schedules                 DoctorSchedule[]
-  Reviews                   DoctorReviews[]
-  Appointments              Appointments[]
-  Consultancy               Consultancy[]
-  Booking                   Booking[]
-  Blog                      BlogPost[]
-  Post                      Post[]
-  Prescription              Prescription[]
+  DoctorID              String   @id
+  Speciality            String?
+  ConsultationFee       Decimal?
+  EducationalBackground Json?
+  LicenseNumber         String?
+  ExperienceYears       Int?
+  User                  Users    @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
 
-  @@index([Specialization], name: "specialization_index")
+  @@index([Speciality], name: "Speciality_index")
 }
 
 model DoctorSchedule {
-  ScheduleID      Int             @id @default(autoincrement())
-  DoctorID        Int
-  ConsultancyType ConsultancyType
-  Date            DateTime
-  AvailableTimes  Json?
-  Duration        Int?
-  Status          ScheduleStatus?
-  Priority        Int?
-  Notes           String?
-  CreatedAt       DateTime        @default(now())
-  UpdatedAt       DateTime        @updatedAt
-  Doctor          DoctorDetails   @relation(fields: [DoctorID], references: [DoctorID])
+  ScheduleID   String         @id @default(uuid())
+  DoctorID     String
+  Date         DateTime?      @db.Date
+  WeekDay      Weekday?     
+  StartTime    DateTime       @db.Time
+  EndTime      DateTime       @db.Time
+  ScheduleType ScheduleType   @default(normal)
+  Status       ScheduleStatus @default(available)
+  Note         String?
+  CreatedAt    DateTime       @default(now())
+  UpdatedAt    DateTime       @updatedAt
+  Appointments Appointments[]
+  Doctor       Users          @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
 }
 
 model Appointments {
-  AppointmentID   Int               @id @default(autoincrement())
-  DoctorID        Int
-  PatientID       Int
-  AppointmentDate DateTime
-  AppointmentTime DateTime
-  Duration        Int
-  Status          AppointmentStatus
-  Notes           String?
+  AppointmentID   String            @id @default(uuid())
+  DoctorID        String
+  PatientID       String
+  ScheduleID      String 
+  AppointmentDate DateTime        @db.Date
+  AppointmentTime DateTime        @db.Time
+  Duration        Int?
+  Status          AppointmentStatus @default(pending)
+  AppointmentType AppointmentType   @default(initialConsultation)
+  Note            String?           @db.Text
   CreatedAt       DateTime          @default(now())
   UpdatedAt       DateTime          @updatedAt
-  CancelledBy     String?
+  CancelledBy     String?           @unique
   CancelledReason String?
-  Doctor          DoctorDetails     @relation(fields: [DoctorID], references: [DoctorID])
-  Patient         Users             @relation(fields: [PatientID], references: [UserID])
-  Booking         Booking[]
+  VideoChatRoomID String
+  Doctor          Users             @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
+  Patient         Users             @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
+  Cancelled       Users?            @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
+
+  Schedule      DoctorSchedule @relation(onDelete: Cascade, fields: [ScheduleID], references: [ScheduleID])
+  // Booking         Booking[]
+  Payment       Payment?
+  VideoChatRoom VideoChatRoom  @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
 
   @@index([Status], name: "status_index")
   @@index([DoctorID, PatientID], name: "doctor_patient_index")
 }
 
-model Booking {
-  BookingID       Int           @id @default(autoincrement())
-  CreatedAt       DateTime      @default(now())
-  UpdatedAt       DateTime      @updatedAt
-  Status          String        @default("Pending")
-  PatientID       Int
-  DoctorID        Int
-  AppointmentID   Int?          @unique
-  ReminderSent    Boolean       @default(false)
-  ReminderDate    DateTime?
-  CancelledBy     Int?
-  CancelledReason String?
-  Doctor          DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  Appointment     Appointments? @relation(fields: [AppointmentID], references: [AppointmentID])
-  Cancelled       Users?        @relation(fields: [CancelledBy], references: [UserID])
+// model Booking {
+//   BookingID       String        @id @default(uuid())
+//   CreatedAt       DateTime      @default(now())
+//   UpdatedAt       DateTime      @updatedAt
+//   Status          String        @default("Pending")
+//   PatientID       String
+//   DoctorID        String
+//   AppointmentID   String        @unique
+//   ReminderSent    Boolean       @default(false)
+//   ReminderDate    DateTime?
+//   CancelledBy     String?       @unique
+//   CancelledReason String?
+//   Doctor          DoctorDetails @relation(onDelete: Cascade,fields: [DoctorID], references: [DoctorID])
+//   Patient         Users         @relation(onDelete: Cascade,"patientBooking", fields: [PatientID], references: [UserID])
+//   Appointment     Appointments? @relation(onDelete: Cascade,fields: [AppointmentID], references: [AppointmentID])
+//   Cancelled       Users?        @relation(onDelete: Cascade,fields: [CancelledBy], references: [UserID])
 
-  @@index([DoctorID], name: "patient_doctor_index")
+//   @@index([DoctorID], name: "patient_doctor_index")
+// }
+
+// model Consultancy {
+//   ConsultancyID   String            @id @default(uuid())
+//   DoctorID        String
+//   PatientID       String
+//   Appointment     String
+//   ConsultancyDate DateTime   
+//   ConsultancyTime DateTime   @db.Time()
+//   Duration        Int
+//   Status          AppointmentStatus
+//   AppointmentType AppointmentType
+//   Note           String?           @db.LongText
+//   CreatedAt       DateTime          @default(now())
+//   UpdatedAt       DateTime          @updatedAt
+//   CancelledBy     String?
+//   CancelledReason String?
+//   Doctor          DoctorDetails     @relation(onDelete: Cascade,fields: [DoctorID], references: [DoctorID])
+//   Patient         Users             @relation(onDelete: Cascade,fields: [PatientID], references: [UserID])
+//   Payment         Payment?
+
+//   @@index([Status], name: "consultancy_status_index")
+// }
+
+model VideoChatRoom {
+  RoomID        String              @id
+  Name          String
+  HostID        String
+  HostAuthToken String              @db.LongText
+  CreatedAt     DateTime            @default(now())
+  UpdatedAt     DateTime            @updatedAt
+  Host          Users               @relation(onDelete: Cascade, fields: [HostID], references: [UserID])
+  Appointment   Appointments[]
+  Members       MemberInVideoChat[]
 }
 
-model Consultancy {
-  ConsultancyID        Int                    @id @default(autoincrement())
-  DoctorID             Int
-  PatientID            Int
-  ConsultancyDate      DateTime
-  ConsultancyTime      DateTime
-  Duration             Int
-  Status               ConsultancyStatus
-  ConsultancyType      ConsultancyType
-  Notes                String?
-  CreatedAt            DateTime               @default(now())
-  UpdatedAt            DateTime               @updatedAt
-  CancelledBy          String?
-  CancelledReason      String?
-  Doctor               DoctorDetails          @relation(fields: [DoctorID], references: [DoctorID])
-  Patient              Users                  @relation(fields: [PatientID], references: [UserID])
-  CommunicationSession CommunicationSession[]
-
-  @@index([Status], name: "consultancy_status_index")
+model MemberInVideoChat {
+  MemberID          String        @id @unique
+  VideoChatRoomID String
+  MemberAuthToken String        @db.LongText
+  User            Users         @relation(onDelete: Cascade, fields: [MemberID], references: [UserID])
+  VideoChatRoom   VideoChatRoom @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
 }
 
-model CommunicationSession {
-  CommunicationSessionID Int         @id @default(autoincrement())
-  SessionType            String // "video", "chat", "audio"
-  StartTime              DateTime
-  EndTime                DateTime?
-  Status                 String // "scheduled", "in_progress", "completed", "cancelled"
-  CreatedAt              DateTime    @default(now())
-  UpdatedAt              DateTime    @updatedAt
-  ConsultancyID          Int
-  Consultancy            Consultancy @relation(fields: [ConsultancyID], references: [ConsultancyID])
-  Sessions               Session[]
-  SessionID              Int?
-}
-
-model Session {
-  SessionID              Int                  @id @default(autoincrement())
-  Token                  String               @unique
-  ChannelName            String               @unique
-  ExpireTime             DateTime
-  CreatedAt              DateTime             @default(now())
-  UpdatedAt              DateTime             @updatedAt
-  Duration               Int? // Duration of the session in seconds
-  CommunicationSessionID Int
-  CommunicationSession   CommunicationSession @relation(fields: [CommunicationSessionID], references: [CommunicationSessionID])
-  Chat                   ChatMessage[]
+// model that stores both dms and group chats it also stores PeerSupport group informations as channel
+model ChatChannel {
+  ChannelID   String          @id
+  ChannelName String
+  Image       String?
+  Description String?         @db.Text
+  Disease     String?
+  ChannelType ChannelType
+  CreatedAt   DateTime        @default(now())
+  UpdatedAt   DateTime        @updatedAt
+  ChatMessage ChatMessage[]
+  Members     ChannelMember[]
 }
 
 model ChatMessage {
-  ChatID     Int      @id @default(autoincrement())
-  Content    String
-  SenderType String // "doctor" or "patient"
-  SenderID   Int
-  MediaUrl   String?
-  SentAt     DateTime @default(now())
-  IsSeen     Boolean  @default(false)
-  SessionID  Int
-  Session    Session  @relation(fields: [SessionID], references: [SessionID])
+  ChatID    String      @id
+  Content   String
+  SenderID  String
+  MediaUrl  String?
+  SentAt    DateTime    @default(now())
+  IsSeen    Boolean     @default(false)
+  ChannelID String
+  Sender    Users       @relation(onDelete: Cascade, fields: [SenderID], references: [UserID])
+  Channel   ChatChannel @relation(onDelete: Cascade, fields: [ChannelID], references: [ChannelID])
 }
 
-model SupportGroup {
-  SupportGroupID Int                  @id @default(autoincrement())
-  Name           String
-  Description    String?
-  Disease        String
-  CreatedAt      DateTime             @default(now())
-  UpdatedAt      DateTime             @updatedAt
-  ProfilePic     String? // URL or path to the group's profile picture
-  Members        SupportGroupMember[]
-  ChatMessage    SupportChatMessage[]
+model ChannelMember {
+  UserID           String      @id
+  ChannelID        String
+  AuthToken        String      @db.LongText
+  Role             Role        @default(member)
+  JoinedAt         DateTime?   @default(now())
+  CreatedAt        DateTime?   @default(now())
+  UpdatedAt        DateTime?   @updatedAt
+  User             Users       @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  PeerSupportGroup ChatChannel @relation(onDelete: Cascade, fields: [ChannelID], references: [ChannelID])
 }
 
-model SupportGroupMember {
-  SupportGroupMemberID Int          @id @default(autoincrement())
-  UserID               Int
-  SupportGroupID       Int
-  Role                 Role         @default(member)
-  JoinedAt             DateTime     @default(now())
-  CreatedAt            DateTime     @default(now())
-  UpdatedAt            DateTime     @updatedAt
-  User                 Users        @relation(fields: [UserID], references: [UserID])
-  SupportGroup         SupportGroup @relation(fields: [SupportGroupID], references: [SupportGroupID])
-}
+model Payment {
+  PaymentID     String        @id @default(uuid())
+  DoctorID      String
+  PatientID     String
+  Amount        Float
+  PaymentDate   DateTime      @default(now())
+  PaymentMethod String?
+  Status        String
+  AppointmentID String?       @unique
+  // ConsultancyID String?       @unique
+  PaymentStatus PaymentStatus
+  Patient       Users         @relation(onDelete: Cascade, "patient_payment", fields: [PatientID], references: [UserID])
+  Doctor        Users         @relation(onDelete: Cascade, "doctor_payment", fields: [DoctorID], references: [UserID])
+  Appointment   Appointments? @relation(onDelete: Cascade, fields: [AppointmentID], references: [AppointmentID])
+  // Consultancy   Consultancy?  @relation(onDelete: Cascade,fields: [ConsultancyID], references: [ConsultancyID])
 
-model SupportChatMessage {
-  ChatMessageID  Int          @id @default(autoincrement())
-  Content        String
-  SenderType     String // "Patient" or "SupportGroupAdmin" or similar
-  SenderID       Int
-  MediaUrl       String?
-  SentAt         DateTime     @default(now())
-  IsSeen         Boolean      @default(false)
-  SupportGroupID Int
-  SupportGroup   SupportGroup @relation(fields: [SupportGroupID], references: [SupportGroupID])
+  @@index([DoctorID], name: "doctor_payment_index")
 }
 
 model DoctorReviews {
-  ReviewID   Int           @id @default(autoincrement())
-  DoctorID   Int
-  ReviewerID Int
+  ReviewID   String   @id @default(uuid())
+  DoctorID   String
+  ReviewerID String
   Rating     Int?
-  ReviewText String?
-  ReviewDate DateTime      @default(now())
-  Doctor     DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
-  Reviewer   Users         @relation(fields: [ReviewerID], references: [UserID])
+  ReviewText String?  @db.LongText
+  ReviewDate DateTime @default(now())
+  Doctor     Users    @relation(onDelete: Cascade, "doctor_review", fields: [DoctorID], references: [UserID])
+  Reviewer   Users    @relation(onDelete: Cascade, "patient_review", fields: [ReviewerID], references: [UserID])
 
   @@index([DoctorID], name: "doctor_review_index")
 }
 
 model BlogPost {
-  BlogID      Int           @id @default(autoincrement())
+  BlogID      String   @id @default(uuid())
   Title       String
-  Content     String
-  CreatedAt   DateTime      @default(now())
-  UpdatedAt   DateTime      @updatedAt
-  IsPublished Boolean       @default(false)
-  DoctorID    Int
-  Doctor      DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+  Content     String   @db.LongText
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @updatedAt
+  IsPublished Boolean  @default(false)
+  DoctorID    String
+  Doctor      Users    @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
+  View        Views[]
 }
 
 model ForumPost {
-  ForumPostID Int           @id @default(autoincrement())
-  Content     String
+  ForumPostID String        @id @default(uuid())
+  Content     String        @db.LongText
   CreatedAt   DateTime      @default(now())
   UpdatedAt   DateTime      @updatedAt
-  UserID      Int
-  User        Users         @relation(fields: [UserID], references: [UserID])
+  UserID      String
+  User        Users         @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
   Answers     ForumAnswer[]
 }
 
 model ForumAnswer {
-  ForumAnswerID Int       @id @default(autoincrement())
+  ForumAnswerID String     @id @default(uuid())
   Content       String
-  CreatedAt     DateTime  @default(now())
-  UpdatedAt     DateTime  @updatedAt
-  ForumPostID   Int
-  ForumPost     ForumPost @relation(fields: [ForumPostID], references: [ForumPostID])
-  UserID        Int
-  User          Users     @relation(fields: [UserID], references: [UserID])
+  CreatedAt     DateTime   @default(now())
+  UpdatedAt     DateTime   @updatedAt
+  ForumPostID   String
+  UserID        String
+  ForumPost     ForumPost  @relation(onDelete: Cascade, fields: [ForumPostID], references: [ForumPostID])
+  User          Users      @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  Comment       Comments[]
+  Like          Likes[]
 }
 
 model Post {
-  PostID    Int           @id @default(autoincrement())
+  PostID    String     @id @default(uuid())
   Content   String
   MediaUrl  String?
-  CreatedAt DateTime      @default(now())
-  UpdatedAt DateTime      @updatedAt
-  DoctorID  Int
-  Doctor    DoctorDetails @relation(fields: [DoctorID], references: [DoctorID])
+  CreatedAt DateTime   @default(now())
+  UpdatedAt DateTime   @updatedAt
+  DoctorID  String
+  Doctor    Users      @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
+  View      Views[]
+  Comment   Comments[]
+  Like      Likes[]
 }
 
 model Comments {
-  CommentID Int             @id @default(autoincrement())
-  Content   String
-  CreatedAt DateTime        @default(now())
-  UpdatedAt DateTime        @updatedAt
-  UserID    Int
-  User      Users           @relation(fields: [UserID], references: [UserID])
-  ItemID    Int
-  ItemType  CommentableType
+  CommentID       String          @id @default(uuid())
+  Content         String
+  CreatedAt       DateTime        @default(now())
+  UpdatedAt       DateTime        @updatedAt
+  UserID          String
+  ItemID          String
+  ParentCommentID String?
+  User            Users           @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  ParentComment   Comments?       @relation(onDelete: Cascade, "ParentComment", fields: [ParentCommentID], references: [CommentID])
+  Replies         Comments[]      @relation("ParentComment")
+  Like            Likes[]
+  ItemType        CommentableType
+  Post            Post?           @relation(onDelete: Cascade, fields: [ItemID], references: [PostID])
+  ForumAnswer     ForumAnswer?    @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forumanswer_fkey")
 }
 
 model Likes {
-  LikeID    Int      @id @default(autoincrement())
-  UserID    Int
-  User      Users    @relation(fields: [UserID], references: [UserID])
-  ItemID    Int
-  ItemType  LikeType
-  CreatedAt DateTime @default(now())
+  LikeID      String       @id @default(uuid())
+  UserID      String
+  ItemID      String
+  ItemType    LikeType
+  CreatedAt   DateTime     @default(now())
+  User        Users        @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  Post        Post?        @relation(onDelete: Cascade, fields: [ItemID], references: [PostID])
+  ForumAnswer ForumAnswer? @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forum_answer_fkey")
+  Comment     Comments?    @relation(onDelete: Cascade, fields: [ItemID], references: [CommentID], map: "commet_fkey")
 }
 
 model Views {
-  ViewID    Int             @id @default(autoincrement())
-  UserID    Int?
-  User      Users?          @relation(fields: [UserID], references: [UserID])
-  ItemID    Int
+  ViewID    String          @id @default(uuid())
+  UserID    String?
+  ItemID    String
   ItemType  CommentableType
   CreatedAt DateTime        @default(now())
+  User      Users?          @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  BlogPost  BlogPost?       @relation(onDelete: Cascade, fields: [ItemID], references: [BlogID])
+  Post      Post?           @relation(onDelete: Cascade, fields: [ItemID], references: [PostID], map: "post_view_fkey")
 }
 
 model FAQ {
-  FAQID     Int      @id @default(autoincrement())
+  FAQID     String   @id @default(uuid())
   Question  String
   Answer    String
   Order     Int      @default(0)
@@ -419,77 +476,84 @@ model FAQ {
   UpdatedAt DateTime @updatedAt
 }
 
-
-
 model UserFeedback {
-  FeedbackID Int          @id @default(autoincrement())
-  UserID     Int
-  User       Users        @relation(fields: [UserID], references: [UserID])
+  FeedbackID String       @id @default(uuid())
+  UserID     String
   Content    String
   CreatedAt  DateTime     @default(now())
   UpdatedAt  DateTime     @updatedAt
-  Type       FeedbackType
+  Type       FeedbackType @default(generalFeedback)
   Rating     Int? // Optional, for reviews
   Review     String? // Optional, for reviews
   Replies    Reply[]
+  User       Users        @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
 }
 
 model Reply {
-  ReplyID    Int          @id @default(autoincrement())
-  FeedbackID Int
-  Feedback   UserFeedback @relation(fields: [FeedbackID], references: [FeedbackID])
+  ReplyID    String       @id @default(uuid())
+  FeedbackID String
   Content    String
   CreatedAt  DateTime     @default(now())
   UpdatedAt  DateTime     @updatedAt
-  UserID     Int
-  User       Users        @relation(fields: [UserID], references: [UserID])
+  UserID     String
+  Feedback   UserFeedback @relation(onDelete: Cascade, fields: [FeedbackID], references: [FeedbackID])
+  User       Users        @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
 }
 
 model Prescription {
-  PrescriptionID    Int                @id @default(autoincrement())
-  DoctorID          Int
-  Doctor            DoctorDetails      @relation(fields: [DoctorID], references: [DoctorID])
-  PatientID         Int
-  Patient           Users              @relation(fields: [PatientID], references: [UserID])
-  IssuedAt          DateTime           @default(now())
+  PrescriptionID    String                   @id @default(uuid())
+  DoctorID          String
+  PatientID         String
+  IssuedAt          DateTime                 @default(now())
   ValidUntil        DateTime?
-  Notes             String?
+  Note              String?
   Status            String?
+  Doctor            Users                    @relation(onDelete: Cascade, "doctor_prescription", fields: [DoctorID], references: [UserID])
+  Patient           Users                    @relation(onDelete: Cascade, "patient_prescription", fields: [PatientID], references: [UserID])
   PrescriptionItems PrescriptionItem[]
-  Attachment        Attachment[]
+  Attachment        PrescriptionAttachment[]
 }
 
 model PrescriptionItem {
-  PrescriptionItemID Int          @id @default(autoincrement())
-  PrescriptionID     Int
-  Prescription       Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
+  PrescriptionItemID String       @id @default(uuid())
+  PrescriptionID     String
   MedicationName     String
   Dosage             String
   Instructions       String?
   Quantity           Int?
   Frequency          String?
   Duration           String?
-}
-model Attachment {
- AttachmentID   Int      @id @default(autoincrement())
- PrescriptionID Int
- Prescription   Prescription @relation(fields: [PrescriptionID], references: [PrescriptionID])
- URL            String
- Filename       String
- Size           Int
- Caption        String?
- FileType       String
+  Prescription       Prescription @relation(onDelete: Cascade, fields: [PrescriptionID], references: [PrescriptionID])
 }
 
-model UserSessions {
-  SessionID    Int       @id @default(autoincrement())
-  UserID       Int
-  SessionToken String
-  SessionStart DateTime  @default(now())
-  SessionEnd   DateTime?
-  IPAddress    String?
-  UserAgent    String?
-  User         Users     @relation(fields: [UserID], references: [UserID])
-
-  @@index([UserID], name: "user_session_index")
+model PrescriptionAttachment {
+  AttachmentID   String       @id @default(uuid())
+  PrescriptionID String
+  URL            String
+  Filename       String
+  Size           Int
+  Caption        String?
+  FileType       String
+  Prescription   Prescription @relation(onDelete: Cascade, fields: [PrescriptionID], references: [PrescriptionID])
 }
+
+model Followers {
+  FollowerID   String   @id
+  Follower     Users    @relation("following", fields: [FollowerID], references: [UserID])
+  FollowingID  String
+  Following    Users    @relation("followers", fields: [FollowingID], references: [UserID])
+  CreatedAt    DateTime @default(now())
+
+  @@index([FollowerID, FollowingID], name: "follower_following_unique")
+}
+
+model Notification{
+  NotificationID String @id @default(uuid())
+  UserID     String
+  Message    String @db.Text()
+  CreatedAt  DateTime  @default(now())
+  UpdatedAt  DateTime  @updatedAt
+  User       Users    @relation(fields: [UserID] ,references: [UserID])
+}
+
+

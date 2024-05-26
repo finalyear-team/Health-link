@@ -3,7 +3,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 const settingsOptions = [
-  { id: "darkMode", label: "Dark Mode" },
   { id: "showNotifications", label: "Show Notifications" },
   { id: "showPatientList", label: "Show Patient List" },
   { id: "showAppointmentCalendar", label: "Show Appointment Calendar" },
