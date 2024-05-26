@@ -9,7 +9,7 @@ interface GenderSelectorProps {
 const GenderSelect = ({ label, name }: GenderSelectorProps) => {
   return (
     <div>
-      <label htmlFor={name} className="font-main text-sm text-dark-700 font-medium">
+      <label htmlFor={name} className="font-main text-sm text-dark-700 dark:text-slate-50 font-medium">
         {label}
       </label>
       <Field as="select" id={name} name={name} className="custome-input text-dark-300 text-sm">

@@ -39,4 +39,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Ignore Python byte-code files, which are created by the Python interpreter
+*.pyc
+__pycache__/
+
+# Ignore the virtual environment directory
+client/api/venv/
 dist/

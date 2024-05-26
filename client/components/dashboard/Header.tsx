@@ -1,84 +1,50 @@
 "use client";
 
 import React from "react";
-import {
-  MdNotificationsNone,
-  MdOutlineCalendarMonth,
-  MdOutlineSettings,
-  MdOutlineSearch,
-} from "react-icons/md";
-import { UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Formik, Form } from "formik";
-import Link from "next/link";
-import Image from "next/image";
-import { Switch } from "@/components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import Profile from "../shared/profile";
+import { ModeToggle } from "../shared/toggle";
+import { Command, CommandInput } from "@/components/ui/command";
+
+import Appointment from "../shared/appointment";
+import Notification from "../shared/notification";
+import Setting from "../shared/setting";
+import Search from "../shared/search";
 
 const Header = () => {
-  const initialValues = {
-    header_search: "",
+  const [showResults, setShowResults] = React.useState(false);
+
+  const onFocusHandler = () => {
+    setShowResults(true);
   };
 
-  // handilng the submit
-  const handleSubmit = (values: any, { setSubmitting, resetForm }: any) => {
-    console.log("Search Values:", values);
-    setSubmitting(false);
-    resetForm();
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowResults(false);
+    }, 100);
   };
 
   return (
-    <div className="fixed right-0 flex w-full items-center justify-end bg-primary-600 py-1 px-3 text-sm ">
+    <div className="fixed right-0 z-40 flex w-full items-center justify-end bg-primary-600 dark:bg-primary-700 py-1 px-3 text-sm h-14">
       <span className="w-1/6"></span>
       <div className="db-header-left ml-6">
-        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-          {({ isValid, isSubmitting }) => (
-            <Form className="relative w-1/2" action="#" method="POST">
-              <Input name="header_search" type="text" placeholder="Search" />
-              <Button
-                type="submit"
-                variant={"ghost"}
-                size={"sm"}
-                className="absolute top-1/2 transform -translate-y-1/2 right-2 cursor-pointer text-gray-700"
-              >
-                <MdOutlineSearch size={20} />
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </div>
-      <TooltipProvider>
-        <div className="db-header-right space-x-6 text-white">
-          <div className="flex items-center">
-            <Switch id="darkMode" aria-setsize={20}/>
-          </div>
-          <Tooltip>
-            <TooltipTrigger>
-              <MdOutlineCalendarMonth size={20} />
-            </TooltipTrigger>
-            <TooltipContent>Appointment</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger>
-              <MdNotificationsNone size={20} />
-            </TooltipTrigger>
-            <TooltipContent>Notification</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger>
-              <MdOutlineSettings size={20} />
-            </TooltipTrigger>
-            <TooltipContent>Setting</TooltipContent>
-          </Tooltip>
-          <UserButton afterSignOutUrl="/sign-in" />
+        <div className="relative w-1/2">
+          <Command className="rounded-lg border shadow-md h-fit absolute z-50 -top-6">
+            <CommandInput
+              placeholder="search..."
+              onFocus={onFocusHandler}
+              onBlur={handleBlur}
+            />
+            {showResults ? <Search /> : ""}
+          </Command>
         </div>
-      </TooltipProvider>
+      </div>
+      <div className="db-header-right space-x-6 text-white">
+        <ModeToggle />
+        <Appointment />
+        <Notification />
+        <Setting />
+        <Profile />
+      </div>
     </div>
   );
 };

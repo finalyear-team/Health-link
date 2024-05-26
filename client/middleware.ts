@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { authMiddleware, redirectToSignIn } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export default authMiddleware({
   publicRoutes: [
@@ -13,47 +14,36 @@ export default authMiddleware({
     "/privacy-policy",
     "/security",
     "/terms-of-services",
-    "/sign-up(.*)",
-    "/sign-in",
   ],
-  afterAuth(auth, req, evt) {
+  afterAuth: async (auth, req, evt) => {
+    const url = new URL(req.url);
 
-    // Handle users who aren't authenticated
-    if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
-    }
+    if (auth.userId) {
+      try {
+        const user = await clerkClient.users.getUser(auth.userId);
+        const role = user.unsafeMetadata.role;
 
-    // console.log("User Role:", auth.user?.unsafeMetadata.role);
+        if (role === "provider" && !url.pathname.startsWith("/dashboard/doctor")) {
+          return NextResponse.rewrite(new URL("/dashboard/doctor", req.url));
+        } else if (role === "patient" && !url.pathname.startsWith("/dashboard/patient")) {
+          return NextResponse.rewrite(new URL("/dashboard/patient", req.url));
+        }
 
-    if (auth.user?.unsafeMetadata.role === "provider") {
-      // Allow provider to access dashboard/doctor
-      if (req.url.startsWith("/dashboard/doctor")) {
+        return NextResponse.next();
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        return NextResponse.rewrite(new URL("/error", req.url));
+      }
+    } else {
+      if (auth.isPublicRoute) {
         return NextResponse.next();
       } else {
-        // Redirect doctor to their dashboard
-        return NextResponse.redirect("/dashboard/doctor");
+        return redirectToSignIn({ returnBackUrl: req.url });
       }
     }
-
-    if (auth.user?.unsafeMetadata.role === "patient") {
-      // Allow patient to access dashboard/patient
-      if (req.url.startsWith("/dashboard/patient")) {
-        return NextResponse.next();
-      } else {
-        // Redirect patient to their dashboard
-        return NextResponse.redirect("/dashboard/patient");
-      }
-    }
-
-    // If the user is signed in and trying to access a protected route, allow them to access route
-    if (auth.userId && !auth.isPublicRoute) {
-      return NextResponse.next();
-    }
-    // Allow users visiting public routes to access them
-    return NextResponse.next();
   },
 });
 
 export const config = {
-  matcher: ["/((?!.+.[w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

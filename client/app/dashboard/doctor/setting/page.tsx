@@ -2,7 +2,7 @@ import React from 'react'
 
 const Setting = () => {
   return (
-    <div>Setting page</div>
+    <div className='text-3xl font-bold'>Your Setting page</div>
   )
 }
 

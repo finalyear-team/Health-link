@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import BasicInfoForm from "@/components/form/doctor/form/Personal-Info";
-import ContactInfoForm from "@/components/form/doctor/form/Contact-Info";
-import SpecializationForm from "@/components/form/doctor/form/Additional-Info";
+import BasicInfoForm from "@/components/form/doctor/Personal-Info";
+import ContactInfoForm from "@/components/form/doctor/Contact-Info";
+import SpecializationForm from "@/components/form/doctor/Additional-Info";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 

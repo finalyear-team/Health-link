@@ -4,14 +4,15 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MdArrowBack, MdCircle } from "react-icons/md";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field } from "formik";
 import Link from "next/link";
 import Container from "@/components/container/container";
 import * as Yup from "yup";
 import { useAuth, useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { InfinitySpin } from "react-loader-spinner";
+import { Loader2 } from "lucide-react";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   InputOTP,
@@ -23,6 +24,7 @@ const ForgetPassword = () => {
   const [successfulCreation, setSuccessfulCreation] = useState(false);
   const [secondFactor, setSecondFactor] = useState(false);
   const [error, setError] = useState("");
+  const { toast } = useToast();
 
   const router = useRouter();
   const { isSignedIn } = useAuth();
@@ -66,6 +68,7 @@ const ForgetPassword = () => {
 
   // If the user is already signed in,
   // redirect them to the home page
+
   if (isSignedIn) {
     router.push("/dashboard");
   }
@@ -92,7 +95,6 @@ const ForgetPassword = () => {
   // Upon successful reset, the user will be
   // signed in and redirected to the its corresponding page
   async function reset(values: any, { setSubmitting, resetForm }: any) {
-    // e.preventDefault();
     await signIn
       ?.attemptFirstFactor({
         strategy: "reset_password_email_code",
@@ -109,6 +111,11 @@ const ForgetPassword = () => {
           // the newly created session (user is now signed in)
           setActive({ session: result.createdSessionId });
           setError("");
+          toast({
+            title: "Successful Reset",
+            description: "You have Successfully reset your password!",
+            variant: "success",
+          });
         } else {
           console.log(result);
         }
@@ -122,7 +129,7 @@ const ForgetPassword = () => {
   return (
     <div className="bg-container">
       <Container>
-        <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white bg-opacity-50 backdrop-blur-sm">
+        <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white dark:bg-slate-800 bg-opacity-50 backdrop-blur-sm">
           <span className="flex justify-center">
             <MdCircle size={50} className="text-gray-300" />
           </span>
@@ -167,12 +174,11 @@ const ForgetPassword = () => {
                           type="submit"
                         >
                           {isSubmitting ? (
-                            <div className="mr-4">
-                              <InfinitySpin width="40" color="#1b1f2f" />
-                            </div>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            "Forgot Password"
-                          )}
+                            ""
+                          )}{" "}
+                          Forgot Password
                         </Button>
                         <Link
                           href={"/sign-in"}
@@ -200,14 +206,8 @@ const ForgetPassword = () => {
               {({ isValid, isSubmitting }) => (
                 <Form className="mt-12 space-y-6" action="#" method="POST">
                   <>
-                    {/* <Input
-                      name="code"
-                      type="number"
-                      label="Enter the password reset code that was sent to your email"
-                      placeholder="Enter your Code"
-                    /> */}
-                    <label className="font-main text-sm text-dark-700 font-medium mt-3">
-                      Enter the Verification code sent to your Email.
+                    <label className="text-sm text-dark-700 dark:text-slate-50 font-medium mt-3">
+                      Enter the Reset code sent to your Email.
                     </label>
 
                     <Field name="code">
@@ -234,6 +234,7 @@ const ForgetPassword = () => {
                         name="password"
                         type="password"
                         label="New Password"
+                        placeholder="Enter New Password"
                       />
                     </div>
 
@@ -242,6 +243,7 @@ const ForgetPassword = () => {
                         name="confirm"
                         type="password"
                         label="Confirm Password"
+                        placeholder="Confirm the Password"
                       />
                     </div>
                     <div className="pb-4">
@@ -250,21 +252,14 @@ const ForgetPassword = () => {
                     <Button
                       disabled={!isValid || isSubmitting}
                       className="w-full"
-                      // className={`font-main w-full text-base font-semibold rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
-                      //           ${
-                      //             true
-                      //               ? "disabled:bg-gray-300 disabled:text-dark-200"
-                      //               : ""
-                      //           }`}
                       type="submit"
                     >
                       {isSubmitting ? (
-                        <div className="mr-4">
-                          <InfinitySpin width="40" color="#1b1f2f" />
-                        </div>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        "Reset Password"
-                      )}
+                        ""
+                      )}{" "}
+                      Reset Password
                     </Button>
                   </>
                 </Form>

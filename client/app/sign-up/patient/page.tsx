@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import AdditionalInfo from "@/components/form/patient/form/Additional-Info";
-import ContactInfo from "@/components/form/patient/form/Contact-Info";
-import PersonalInfo from "@/components/form/patient/form/Personal-Info";
+import AdditionalInfo from "@/components/form/patient/Additional-Info";
+import ContactInfo from "@/components/form/patient/Contact-Info";
+import PersonalInfo from "@/components/form/patient/Personal-Info";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
