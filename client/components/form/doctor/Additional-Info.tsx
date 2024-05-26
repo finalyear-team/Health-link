@@ -33,6 +33,9 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     license: "",
     experiance: "",
     agreedToTerms: true,
+    institution: "",
+    additionalInfo: null,
+    graduationYear: "",
   });
 
   const {
@@ -62,30 +65,17 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
             >
               {({ isValid, isSubmitting }) => (
                 <Form className="mt-8 space-y-6" action="#" method="POST">
-                  {/* specialization form */}
-                  <div className="mt-3">
-                    <SpecializationPopover
-                      specializationValue={specializationValue}
-                      setSpecializationValue={setSpecializationValue}
-                    />
-                    {!specializationValue ? (
-                      <span className="input__error mr-3">*</span>
-                    ) : (
-                      ""
-                    )}
-                  </div>
+                  {/* institution */}
                   <div className="mt-3">
                     <Input
-                      name="consultationFee"
-                      type="number"
-                      onKeyDown={handleKeyDown}
-                      placeholder="Enter Charge(per Hour)"
-                      label="Consultation Charge"
+                      name="institution"
+                      type="text"
+                      placeholder="Academic Institution"
+                      label="Enter Your Academic Institution"
                     />
                   </div>
-
-                  {/* Educational qualification */}
-                  <div className="mt-3">
+                  {/* Educational qualification/Degree */}
+                  <div className="mt-3 flex space-x-2">
                     <EducationPopover
                       educationValue={educationValue}
                       setEducationValue={setEducationValue}
@@ -96,6 +86,29 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       ""
                     )}
                   </div>
+                  {/* specialization form */}
+                  <div className="mt-3 flex space-x-2">
+                    <SpecializationPopover
+                      specializationValue={specializationValue}
+                      setSpecializationValue={setSpecializationValue}
+                    />
+                    {!specializationValue ? (
+                      <span className="input__error mr-3">*</span>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  {/*  Graduation Year */}
+                  <div className="mt-3">
+                    <Input
+                      name="graduationYear"
+                      type="number"
+                      onKeyDown={handleKeyDown}
+                      placeholder="Graduation Year"
+                      label="Enter your Graduation year"
+                    />
+                  </div>
+                  {/* license */}
                   <div className="mt-3">
                     <Input
                       name="license"
@@ -105,6 +118,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       label="License Number"
                     />
                   </div>
+                  {/* experiance */}
                   <div className="mt-3">
                     <Input
                       name="experiance"
@@ -112,6 +126,26 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       onKeyDown={handleKeyDown}
                       placeholder="Experiance Year"
                       label="Experiance Year"
+                    />
+                  </div>
+                  {/* consultation fee */}
+                  <div className="mt-3">
+                    <Input
+                      name="consultationFee"
+                      type="number"
+                      onKeyDown={handleKeyDown}
+                      placeholder="Enter Charge(per Hour)"
+                      label="Consultation Charge"
+                    />
+                  </div>
+                  {/* Additional Certification */}
+                  <div className="mt-3">
+                    <Input
+                      name="additionalInfo"
+                      type="file"
+                      placeholder="Additional Certification"
+                      label="Drop any Certification"
+                      optional={true}
                     />
                   </div>
                   <div className="mt-3">

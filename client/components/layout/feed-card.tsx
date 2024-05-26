@@ -43,7 +43,7 @@ const SocialMediaCard: FC<SocialMediaCardProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <Card className="shadow rounded-lg p-4 mb-4 max-w-lg">
+    <Card className="shadow rounded-lg p-4 mb-4 max-w-lg dark:bg-slate-900">
       <div className="flex items-center">
         <img
           src={profilePicture}

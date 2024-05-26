@@ -38,19 +38,21 @@ export default function Home() {
     <div>
       <Header />
       <div className="relative w-full">
-        <Image
-          src="/image/bg.jpg"
-          alt="Front-page_doctor"
-          width={400}
-          height={400}
-          priority
-          className="w-full h-full object-cover object-center filter blur-sm mt-10"
-        />
+        <div>
+          <Image
+            src="/image/bg.jpg"
+            alt="Front-page_doctor"
+            width={400}
+            height={400}
+            priority
+            className="w-full h-full object-cover object-center filter blur-sm mt-10"
+          />
+        </div>
         <div className="absolute left-5 font-main" style={{ top: "10%" }}>
           <div className="text-2xl md:text-4xl lg:text-6xl text-secondary-600 font-bold">
             Your Bridge to Health
           </div>
-          <div className="text-md sm:text-lg md:text-xl lg:text-4xl font-bold text-primary-600 ">
+          <div className="text-md sm:text-lg md:text-xl lg:text-4xl font-bold text-primary-600 mt-4 ">
             Where Care Meets Convenience
           </div>
           <Formik
@@ -89,7 +91,10 @@ export default function Home() {
           </Formik>
           <div className="pt-1">
             <Button type="submit" size="lg" variant={"secondary"}>
-              <Link href={"/sign-up/doctor"} className="flex items-center justify-center">
+              <Link
+                href={"/sign-up/doctor"}
+                className="flex items-center justify-center"
+              >
                 Are You A Doctor
                 <MdOutlineArrowForward className="mr-l h-4 w-4" />{" "}
               </Link>
@@ -98,7 +103,7 @@ export default function Home() {
         </div>
       </div>
 
-{/* 
+      {/* 
      <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row mt-10 rounded-lg bg-dark-700 bg-opacity-10">
       //  right side content
         <div className="lg:w-3/4 lg:pr-8 ">
@@ -168,7 +173,6 @@ export default function Home() {
         </div>
       </div>
 */}
- 
 
       {/* features */}
       <div>
@@ -205,6 +209,4 @@ export default function Home() {
       <Footer />
     </div>
   );
-};
-
-
+}

@@ -14,11 +14,12 @@ interface InputProps {
   autoComplete?: string;
   accept?: string;
   showError?: boolean;
+  optional?: boolean;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, className, name, type, ...rest }, ref) => {
+  ({ label, optional, className, name, type, ...rest }, ref) => {
     return (
       <div>
         {type === "checkbox" ? (
@@ -30,7 +31,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         >
           {label ? (
             <div>
-              {label} <span className="text-red-600">*</span>{" "}
+              {label}{" "}
+              {optional ? (
+                <span>(optional) </span>
+              ) : (
+                <span className="text-sm text-red-600"> * </span>
+              )}
             </div>
           ) : (
             ""

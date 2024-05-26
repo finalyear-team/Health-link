@@ -1,5 +1,7 @@
 import * as Yup from "yup";
 
+const currentYear = new Date().getFullYear();
+
 export const validationSchemaAddInfo = Yup.object().shape({
   consultationFee: Yup.number()
     .typeError("Consultation fee must be a number")
@@ -21,6 +23,12 @@ export const validationSchemaAddInfo = Yup.object().shape({
       "You must agree to the terms and conditions",
       (value) => value === true
     ),
+  graduationYear: Yup.number()
+    .typeError("Graduation year must be a number")
+    .min(1900, "Graduation year cannot be earlier than 1900")
+    .max(currentYear, `Graduation year cannot be later than ${currentYear}`)
+    .required("Graduation year is required"),
+  institution: Yup.string().required("Institution is required"),
 });
 
 export const validationSchemaContInfo = Yup.object().shape({
@@ -136,9 +144,9 @@ export const validatePaymentInformation: any = Yup.object().shape({
   lastName: Yup.string().required("*Last Name is required"),
   email: Yup.string().email("Invalid email").required("*Email is required!"),
   phone: Yup.string()
-  .matches(
-    /^\+251[79]\d{8}$|^(07|09)\d{8}$/,
-    "*Invalid Ethiopian phone number"
-  )
-  .required("*Phone number is required")
-})
+    .matches(
+      /^\+251[79]\d{8}$|^(07|09)\d{8}$/,
+      "*Invalid Ethiopian phone number"
+    )
+    .required("*Phone number is required"),
+});
