@@ -56,7 +56,14 @@ export class UserDetailsInput {
 
     @Field()
     Role:UserType
+
+    constructor(input:UserDetailsInput){
+        const validatedData=RegisterSchema.parse(input)
+         Object.assign(this,validatedData)
+    }
 }
+
+
 
 
 @InputType()

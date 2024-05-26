@@ -19,6 +19,7 @@ import { ClerkMiddleware} from './clerk.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { SymptomCheckerModule } from './symptom-checker/symptom-checker.module';
 import * as nestSchedule from '@nestjs/schedule';
 
 
@@ -32,7 +33,7 @@ import * as nestSchedule from '@nestjs/schedule';
   nestSchedule.ScheduleModule.forRoot(),
   EventEmitterModule.forRoot()
   ,
-   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule],
+   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule],
   providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService],
   controllers: [PaymentController],
 })

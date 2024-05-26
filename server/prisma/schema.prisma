@@ -339,7 +339,7 @@ model ChannelMember {
   UserID           String      @id
   ChannelID        String
   AuthToken        String      @db.LongText
-  Role             Role        @default(member)
+  Role             Role?        @default(member)
   JoinedAt         DateTime?   @default(now())
   CreatedAt        DateTime?   @default(now())
   UpdatedAt        DateTime?   @updatedAt
