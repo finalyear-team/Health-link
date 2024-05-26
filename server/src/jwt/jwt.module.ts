@@ -1,4 +1,9 @@
 import { Module } from '@nestjs/common';
+import { JwtStrategy } from './jwt.strategy';
 
-@Module({})
-export class JwtModule {}
+@Module({
+    providers:[JwtStrategy]
+})
+export class JwtModule {
+    
+}

@@ -30,6 +30,7 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+.env*.prod
 
 # vercel
 .vercel
@@ -37,3 +38,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ignore Python byte-code files, which are created by the Python interpreter
+*.pyc
+__pycache__/
+
+# Ignore the virtual environment directory
+client/api/venv/
+dist/
