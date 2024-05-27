@@ -4,7 +4,7 @@ import VideoChatInitiation from "@/components/layout/video-chat";
 const Video = () => {
   return (
     <div>
-      <VideoChatInitiation />
+      <VideoChatInitiation role={"patient"} />
     </div>
   );
 };

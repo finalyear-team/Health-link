@@ -20,7 +20,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { SymptomCheckerModule } from './symptom-checker/symptom-checker.module';
+import { SocketModule } from './socket/socket.module';
 import * as nestSchedule from '@nestjs/schedule';
+import { SocketService } from './socket/socket.service';
+import { ForumModule } from './forum/forum.module';
 
 
 @Module({
@@ -33,8 +36,8 @@ import * as nestSchedule from '@nestjs/schedule';
   nestSchedule.ScheduleModule.forRoot(),
   EventEmitterModule.forRoot()
   ,
-   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule],
-  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService],
+   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule],
+  providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService,SocketService],
   controllers: [PaymentController],
 })
 export class AppModule implements NestModule {

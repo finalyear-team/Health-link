@@ -1,0 +1,24 @@
+type Forum {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input CreateForumInput {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input UpdateForumInput {
+  id: Int!
+}
+
+type Query {
+  forum: [Forum]!
+  forum(id: Int!): Forum
+}
+
+type Mutation {
+  createForum(createForumInput: CreateForumInput!): Forum!
+  updateForum(updateForumInput: UpdateForumInput!): Forum!
+  removeForum(id: Int!): Forum
+}

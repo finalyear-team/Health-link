@@ -17,7 +17,7 @@ const fetchWithRetry = async (url: string, options: any) => {
     throw error;
 };
 
- export const tokenProvider=async(UserID:string,UserName:string)=>{
+ export const payPayment=async(UserID:string,AppointmentID:string)=>{
     try {
     const token=await fetchWithRetry("http://localhost:4000/stream-chat/token",{
         method: "POST",
@@ -26,7 +26,7 @@ const fetchWithRetry = async (url: string, options: any) => {
             },
             body: JSON.stringify({
                UserID,
-               UserName
+               AppointmentID
             }),
             credentials: "include"
     })       

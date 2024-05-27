@@ -99,9 +99,13 @@ enum Role {
   banned
 }
 
-enum LikeType {
+enum LikeItemType {
   forumAnswer
   post
+}
+enum LikeType {
+  like
+  dislike
 }
 
 enum CommentableType {
@@ -448,7 +452,8 @@ model Likes {
   LikeID      String       @id @default(uuid())
   UserID      String
   ItemID      String
-  ItemType    LikeType
+  ItemType    LikeItemType
+  LikeType    LikeType     @default(like)
   CreatedAt   DateTime     @default(now())
   User        Users        @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
   Post        Post?        @relation(onDelete: Cascade, fields: [ItemID], references: [PostID])

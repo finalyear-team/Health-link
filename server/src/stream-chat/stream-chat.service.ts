@@ -99,7 +99,7 @@ export class StreamChatService {
                     create:{
                         UserID,
                         Role:"admin",
-
+                        AuthToken
                     }
                 }
              }

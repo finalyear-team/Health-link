@@ -108,6 +108,7 @@ input updateUserInput{
   FirstName: String
   LastName: String
   Username: String
+  Email:String
   Gender: Gender
   DateOfBirth:Date,
   Bio: String

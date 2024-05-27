@@ -59,14 +59,14 @@ export class AppointmentService {
   }
 
   // checks slot availablity and update availablity of the slot
-  async findAndUpdateSchedule(appointment:Appointments){
+  async findAndUpdateSchedule(appointment: Appointments) {
     const WeekDay = format(appointment.AppointmentDate.toISOString(), "EEEE").toLowerCase() as Weekday
 
-      const EndTime = new Date(this.notValidBeforTime(appointment.AppointmentDate, appointment.AppointmentTime))
+    const EndTime = new Date(this.notValidBeforTime(appointment.AppointmentDate, appointment.AppointmentTime))
     try {
-      let schedule=await this.isSelectedDateAvailable(appointment.ScheduleID,appointment.DoctorID,appointment.AppointmentDate,appointment.AppointmentTime)
+      let schedule = await this.isSelectedDateAvailable(appointment.ScheduleID, appointment.DoctorID, appointment.AppointmentDate, appointment.AppointmentTime)
 
-      if (schedule.WeekDay===WeekDay) {
+      if (schedule.WeekDay === WeekDay) {
         schedule = await this.scheduleService.createSchedule({ Date: appointment.AppointmentDate, StartTime: appointment.AppointmentTime, EndTime, DoctorID: appointment.DoctorID, Status: ScheduleStatus.UNAVAILABLE })
       }
       else {
@@ -75,11 +75,12 @@ export class AppointmentService {
       }
       return schedule
 
-     } catch (error) {
+    } catch (error) {
       throw error
-      
-     }
+
+    }
   }
+  
 
   //
   async updateVideoCallRoomMembersToken(appointment: Appointments) {
@@ -150,9 +151,9 @@ export class AppointmentService {
           Status: "booked",
           Duration,
         }
-      }) 
+      })
 
-    const schedule=await this.findAndUpdateSchedule(appointment)          
+      const schedule = await this.findAndUpdateSchedule(appointment)
 
       appointment = await this.prisma.appointments.update({
         where: {
@@ -161,9 +162,9 @@ export class AppointmentService {
         data: {
           ScheduleID: schedule.ScheduleID
         }
-      })        
-     const Room= await this.updateVideoCallRoomMembersToken(appointment)
-     console.log(Room)
+      })
+      const Room = await this.updateVideoCallRoomMembersToken(appointment)
+      console.log(Room)
       return appointment
     } catch (error) {
       throw error
@@ -182,13 +183,13 @@ export class AppointmentService {
           AppointmentID
         }
       });
-  
+
       if (!existingAppointment) {
         throw new Error("Appointment not found");
       }
-    
-      const schedule=await this.findAndUpdateSchedule(existingAppointment)
-      
+
+      const schedule = await this.findAndUpdateSchedule(existingAppointment)
+
       const appointment = await this.prisma.appointments.update({
         where: {
           AppointmentID
@@ -201,17 +202,17 @@ export class AppointmentService {
           ScheduleID: schedule.ScheduleID
         }
       });
-  
+
       // Update the video call room
-   const Room= await this.updateVideoCallRoomMembersToken(appointment);
-   console.log(Room)
-  
+      const Room = await this.updateVideoCallRoomMembersToken(appointment);
+      console.log(Room)
+
       return appointment;
     } catch (error) {
       throw error;
     }
   }
-  
+
 
 
 
@@ -242,7 +243,7 @@ export class AppointmentService {
           AppointmentID
         }
       })
-    return appointment
+      return appointment
     } catch (error) {
       throw error
     }

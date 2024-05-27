@@ -1,16 +1,34 @@
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import { SocketService } from './socket.service';
+import { CreateSocketDto } from './dto/create-socket.dto';
+import { UpdateSocketDto } from './dto/update-socket.dto';
 
-@WebSocketGateway({
-  cors: {
-    origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Authorization', 'X-Custom-Header'],
-    credentials: true,
-  },
-})
+@WebSocketGateway()
 export class SocketGateway {
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
+  constructor(private readonly socketService: SocketService) {}
+
+  @SubscribeMessage('createSocket')
+  create(@MessageBody() createSocketDto: CreateSocketDto) {
+    return this.socketService.create(createSocketDto);
+  }
+
+  @SubscribeMessage('findAllSocket')
+  findAll() {
+    return this.socketService.findAll();
+  }
+
+  @SubscribeMessage('findOneSocket')
+  findOne(@MessageBody() id: number) {
+    return this.socketService.findOne(id);
+  }
+
+  @SubscribeMessage('updateSocket')
+  update(@MessageBody() updateSocketDto: UpdateSocketDto) {
+    return this.socketService.update(updateSocketDto.id, updateSocketDto);
+  }
+
+  @SubscribeMessage('removeSocket')
+  remove(@MessageBody() id: number) {
+    return this.socketService.remove(id);
   }
 }

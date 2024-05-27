@@ -19,11 +19,11 @@
                 "enableSsl": "Disabled"
             },
             "previewLimit": 50,
-            "server": "172.20.0.3",
+            "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
             "name": "Health_link",
-            "database": "Health_link_db",
+            "database": "Health_link",
             "username": "root"
         }
     ]

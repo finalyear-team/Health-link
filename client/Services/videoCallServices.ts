@@ -12,19 +12,17 @@ const fetchWithRetry = async (url: string, options: any) => {
     throw error;
 };
 
-const fetchRoom = async (id: string, token: string) => {
+const checkRoom = async (id: string, token: string) => {
     try {
         const response = await fetch(`https://api.100ms.live/v2/rooms/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
         });
-        console.log(response)
         if (!response.ok)
             throw new Error("request failed")
         return response.json()
     } catch (error) {
-        console.log(error)
         throw new Error("something")
 
     }
@@ -86,7 +84,7 @@ const addNewRoom = async (room: any, doctor: string, patient: string, Appointmen
 }
 
 
-export const createCall = async ({ doctor, patient, appointmentDate, appointmentTime }: any) => {
+export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTime }: any) => {
     try {
         let room: any
         const response = await fetchWithRetry(`http://localhost:4000/video-call/get-room?Doctor=${doctor}&Patient=${patient}`, {
@@ -101,16 +99,17 @@ export const createCall = async ({ doctor, patient, appointmentDate, appointment
             throw new Error("Request failed!")
 
         const { createdRoom, authToken } = await response.json()
+    
+
+
 
         if (createdRoom) {
-            room = await fetchRoom(createdRoom.id, authToken.token)
-            return room
+            room = await checkRoom(createdRoom.RoomID, authToken.token)
+            return {room,hostToken:createdRoom.HostAuthToken,memberToken:createdRoom.Members[0].MemberAuthToken}
         }
         else {
             room = await newRoom(authToken.token)
-            console.log(room)
             const createdRoom = await addNewRoom(room, doctor, patient, appointmentDate, appointmentTime)
-            console.log(createdRoom)
             return room
         }
 

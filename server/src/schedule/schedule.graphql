@@ -66,7 +66,7 @@ input SearchScheduleInput{
 type Query {  
   Schedules(DoctorID:String!): [Schedule]
   EmergencySchedules:[Schedule]
-  GetScheduleByDate(Date:String!,DoctorID:String!):[Schedule]
+  GetScheduleByDate(DoctorID:String!,Date:String!):[Schedule]
 }
 
 

@@ -110,6 +110,8 @@ export class UserService {
     }
   }
 
+  
+
   async searchDoctors(searchQuery: string): Promise<Users[]> {
     try {
       const Users = await this.prisma.users.findMany({

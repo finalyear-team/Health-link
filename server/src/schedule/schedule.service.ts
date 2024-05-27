@@ -264,15 +264,14 @@ export class ScheduleService {
 
         }
       })
-
       return schedules
-
     } catch (error) {
       throw error
-
     }
   }
 
+  //
+  
 
 
 }

@@ -23,17 +23,17 @@ export class VideoCallService {
                 roomId,
                 role: "host",
                 userId: host,
-                issuedAt: Date.now() / 1000,
-                notValidBefore,
-                validForSeconds: Duration && Duration
+                // issuedAt: Date.now() / 1000,
+                // notValidBefore,
+                // validForSeconds: Duration && Duration
             }
             const memberTokenConfig: HMS.AuthTokenConfig = {
                 roomId,
                 role: "guest",
                 userId: member,
-                issuedAt: Date.now() / 1000,
-                notValidBefore,
-                validForSeconds: Duration && Duration
+                // issuedAt: Date.now() / 1000,
+                // notValidBefore,
+                // validForSeconds: Duration && Duration
             }
             const HostAuthToken: any = await this.hms.auth.getAuthToken(hostTokenConfig)
             const MemberAuthToken: any = await this.hms.auth.getAuthToken(memberTokenConfig)
@@ -88,7 +88,8 @@ export class VideoCallService {
 
     //
     async getRoom(HostID: string, MemberID: string) {
-        
+        console.log(HostID)
+        console.log(MemberID)        
         try {
             const createdRoom = await this.prisma.videoChatRoom.findFirst({
                 where: {

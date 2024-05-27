@@ -175,7 +175,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
 import AudioSettings from "./AudioSettings ";
@@ -190,6 +190,7 @@ import {
   MdFullscreenExit,
   MdOutlineSettings,
   MdLogout,
+  MdScreenShare,
 } from "react-icons/md";
 import {
   Tooltip,
@@ -205,36 +206,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DeviceType, selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare } from "@100mslive/react-sdk";
 
 const Controls = () => {
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo} = useAVToggle();
+  const {screenShareAudioTrackId,screenShareVideoTrackId,toggleScreenShare}=useScreenShare()
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const hmsActions=useHMSActions()
   const { toast } = useToast();
   const { user } = useUser();
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+  const { videoInput, audioInput, audioOutput } = allDevices;
+  const videoTrackId = useHMSStore(selectLocalVideoTrackID);
+
   const role = user?.unsafeMetadata.role;
 
-  const [isMicOn, setIsMicOn] = useState(true);
-  const [isVideoOn, setIsVideoOn] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const toggleAudio = () => {
-    setIsMicOn(!isMicOn);
-    toast({
-      title: "This is a test Toast",
-      description: isMicOn ? "Microphone is OFF." : "Microphone is ON.",
-    });
-  };
+  useEffect(() => {
+    window.addEventListener("unload",()=>{
+      if(isConnected)
+       hmsActions.leave()
+    })
+    return  window.removeEventListener("unload",()=>{
+         console.log("component unmounted")
+    })
+  }, [hmsActions]);
 
-  const toggleVideo = () => {
-    setIsVideoOn(!isVideoOn);
-    toast({
-      title: "This is a test Toast",
-      description: isVideoOn ? "Video is OFF." : "Video is ON",
-    });
-  };
-
+  const handleDeviceChange = (deviceId: string, deviceType: DeviceType) => {
+        updateDevice({ deviceId, deviceType });
+      };
   const endCall = () => {
+     hmsActions.leave()
     toast({
-      title: "This is a test Toast",
-      description: "Video Ended.",
+      title: "Call ended",
+      description: "Thank u .",
     });
   };
 
@@ -257,7 +263,7 @@ const Controls = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button onClick={toggleAudio} variant={"video"}>
-              {isMicOn ? (
+              {isLocalAudioEnabled ? (
                 <MdMicNone size={20} />
               ) : (
                 <MdOutlineMicOff size={20} />
@@ -265,7 +271,7 @@ const Controls = () => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isMicOn ? "Turn Mic off" : "Turn Mic on"}</p>
+            <p>{isLocalAudioEnabled ? "Turn Mic off" : "Turn Mic on"}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -273,7 +279,7 @@ const Controls = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button onClick={toggleVideo} variant={"video"}>
-              {isVideoOn ? (
+              {isLocalVideoEnabled ? (
                 <MdOutlineVideocam size={20} />
               ) : (
                 <MdOutlineVideocamOff size={20} />
@@ -281,7 +287,7 @@ const Controls = () => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isMicOn ? "Turn Camera off" : "Turn Camera on"}</p>
+            <p>{isLocalVideoEnabled ? "Turn Camera off" : "Turn Camera on"}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -322,7 +328,11 @@ const Controls = () => {
                   <MdOutlineSettings size={20} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent >
+                <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
+                <DropdownMenuSeparator />                
+                <DropdownMenuItem>Default</DropdownMenuItem>
+                <DropdownMenuItem>Microphone</DropdownMenuItem>
                 <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Default</DropdownMenuItem>
@@ -340,14 +350,14 @@ const Controls = () => {
           <TooltipTrigger asChild>
             <Button onClick={toggleFullScreen} variant={"video"}>
               {isFullScreen ? (
-                <MdFullscreenExit size={20} />
+                <MdScreenShare size={20} />
               ) : (
-                <MdFullscreen size={20} />
+                <MdScreenShare size={20} />
               )}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isFullScreen ? "Exit Full Screen" : "Full Screen"}</p>
+            <p>screen share</p>
           </TooltipContent>
         </Tooltip>
       </div>
