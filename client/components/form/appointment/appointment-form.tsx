@@ -1,13 +1,15 @@
+"use client";
+
 import React, { useState } from "react";
 import * as Yup from "yup";
 import PaymentForm from "../payment/payment-form";
 import Container from "@/components/container/container";
-
-import { addDays, format } from "date-fns";
+import { addDays, format, setHours, setMinutes, setSeconds } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Formik, Form, Field } from "formik";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -21,12 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-type AppointmentFormInputs = {
-  date: Date;
-  time: string;
-  reason: string;
-};
+import useAppointmentStore from "@/store/appointmentStore";
 
 const doctorAvailability = {
   Monday: { start: "03:00 AM", end: "08:00 AM" },
@@ -44,17 +41,23 @@ const getTimeRangeForDay = (day: string) => {
 
 const AppointmentForm = () => {
   const [submitted, setSubmitted] = useState(false);
-  const [date, setDate] = React.useState<Date>();
+  const [date, setDate] = useState<Date>();
+  const [appointmentTime, setAppointmentTime] = useState("");
+  const clearSelection = useAppointmentStore((state) => state.clearSelection);
 
-  const handleSubmit = () => {
-    setSubmitted(true);
+  const handleSubmit = (values: any) => {
+    if (date && appointmentTime && values.reason) {
+      console.log("Date: ", date);
+      console.log("Reason: ", values.reason);
+      console.log("AppointmentTime: ", appointmentTime);
+      console.log("Combined time: ", formatDateAndTime());
+      setSubmitted(true);
+    }
   };
 
-  //   const initialValues: {
-  //           appointmentDate: new Date(),
-  //           time: "",
-  //           reason: "",
-  //         },
+  const initialValues = {
+    reason: "",
+  };
 
   const getAvailableTimes = () => {
     if (!date) return [];
@@ -87,12 +90,33 @@ const AppointmentForm = () => {
         current.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
+          hour12: true,
         })
       );
-      current.setMinutes(current.getMinutes() + 30);
+      current.setMinutes(current.getMinutes() + 60);
     }
 
     return times;
+  };
+
+  const formatDateAndTime = () => {
+    if (date && appointmentTime) {
+      const [time, period] = appointmentTime.split(" ");
+      let [hours, minutes] = time.split(":").map(Number);
+
+      if (period === "PM" && hours !== 12) {
+        hours += 12;
+      } else if (period === "AM" && hours === 12) {
+        hours = 0;
+      }
+
+      const combinedDateTime = setSeconds(
+        setMinutes(setHours(new Date(date), hours), minutes),
+        0
+      );
+      return format(combinedDateTime, "MM-dd-yyyy HH:mm:ss");
+    }
+    return "";
   };
 
   return (
@@ -103,81 +127,98 @@ const AppointmentForm = () => {
             <h2 className="text-2xl font-bold mb-5 text-gray-900 dark:text-gray-100">
               Book an Appointment
             </h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[280px] justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+
+            <Formik
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+              // validationSchema={validatePaymentInformation}
+              enableReinitialize
+            >
+              {({ isValid, isSubmitting }) => (
+                <Form>
+                  <div className="mb-4">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[280px] justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? (
+                            format(date, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                        <Select
+                          onValueChange={(value) =>
+                            setDate(addDays(new Date(), parseInt(value)))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            <SelectItem value="0">Today</SelectItem>
+                            <SelectItem value="1">Tomorrow</SelectItem>
+                            <SelectItem value="3">In 3 days</SelectItem>
+                            <SelectItem value="7">In a week</SelectItem>
+                            <SelectItem value="30">In a month</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="rounded-md border">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="mb-4">
                     <Select
-                      onValueChange={(value) =>
-                        setDate(addDays(new Date(), parseInt(value)))
-                      }
+                      onValueChange={(value) => setAppointmentTime(value)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
+                      <SelectTrigger className="w-[280px]">
+                        <SelectValue placeholder="Select Time" />
                       </SelectTrigger>
                       <SelectContent position="popper">
-                        <SelectItem value="0">Today</SelectItem>
-                        <SelectItem value="1">Tomorrow</SelectItem>
-                        <SelectItem value="3">In 3 days</SelectItem>
-                        <SelectItem value="7">In a week</SelectItem>
+                        {getAvailableTimes().map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    <div className="rounded-md border">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="time"
-                  className="block text-gray-700 dark:text-gray-300"
-                >
-                  Select Time
-                </label>
-                <select
-                  id="time"
-                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="" label="Select time" />
-                  {getAvailableTimes().map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="reason"
-                  className="block text-gray-700 dark:text-gray-300"
-                >
-                  Reason for Appointment
-                </label>
-                <textarea
-                  id="reason"
-                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  rows={4}
-                />
-              </div>
-              <Button type="submit">Book Appointment</Button>
-            </form>
+                  </div>
+                  <div className="mb-4">
+                    <Field
+                      as={Input}
+                      type="textarea"
+                      name="reason"
+                      label="Enter the Appointment Reason"
+                      placeholder="Appointment Reason"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-4 flex-wrap">
+                    <Button type="submit">Book Appointment</Button>
+                    <Button
+                      type="button"
+                      onClick={() => clearSelection()}
+                      variant={"destructive"}
+                    >
+                      Cancel Appointment
+                    </Button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         ) : (
           <PaymentForm />

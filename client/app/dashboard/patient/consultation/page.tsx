@@ -97,7 +97,7 @@ const Consultation = () => {
           {/* header */}
           <div className="flex justify-center items-center flex-col">
             <div className="flex text-6xl font-bold text-center space-x-3">
-              Meet Our <h1 className="text-primary-600"> Doctors </h1>{" "}
+              Meet Our <h1 className="text-primary-600 pl-2"> Doctors </h1>{" "}
             </div>
             <p className="font-medium text-lg my-3">
               Explore our dedicated team of doctors ready to provide
@@ -107,8 +107,9 @@ const Consultation = () => {
               <MdOutlineSavedSearch size={20} /> Advanced Search by Symptoms
             </Button>
           </div>
+          {/* search and filter */}
 
-          <div className="flex justify-between items-center space-x-5 mt-4">
+          <div className="flex justify-center items-center space-x-5 mt-4">
             <div>
               <SpecializationPopover
                 specializationValue={specializationValue}

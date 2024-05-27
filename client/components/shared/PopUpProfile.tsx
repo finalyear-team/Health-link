@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-// import Button from "./Button";
 import { Button } from "@/components/ui/button";
 import {
   MdVerified,
@@ -9,22 +8,6 @@ import {
 } from "react-icons/md";
 import Rating from "./Rating";
 import { DoctorProfile } from "@/types";
-
-// interface UserProfile {
-//   profilePicture: string;
-//   name: string;
-//   username: string;
-//   type: string;
-//   followers: number;
-//   following: number;
-//   rating: number;
-//   speciality: string;
-//   experience: number;
-//   hourlyRate: number;
-//   onFollow: () => void;
-//   onMakeAppointment: () => void;
-//   profile: DoctorProfile;
-// }
 
 const DoctorProfileCard: React.FC<DoctorProfile> = ({
   profilePicture,
@@ -38,7 +21,7 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
   experience,
   hourlyRate,
   onFollow,
-  onMakeAppointment,
+  onMakeAppointment = (profile: DoctorProfile) => {},
   profile,
 }) => {
   return (
@@ -116,7 +99,11 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
           variant={"outline"}
           className="w-full"
           type="submit"
-          onClick={() => onMakeAppointment(profile)}
+          onClick={() => {
+            if (profile) {
+              onMakeAppointment(profile);
+            }
+          }}
         >
           Make an Appointment
         </Button>

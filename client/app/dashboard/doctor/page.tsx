@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Container from "@/components/container/container";
-import { Clock, Settings, X } from "lucide-react";
+import { Clock, CalendarClock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { MdWavingHand } from "react-icons/md";
@@ -77,10 +77,10 @@ const PatientDahboard = () => {
               </div>
               <Button variant={"secondary"}>
                 <Link
-                  href="/dashboard/patient/setting"
+                  href="/dashboard/doctor/appointment"
                   className="flex space-x-3"
                 >
-                  <Settings className="w-4 h-4 mr-2" />
+                  <CalendarClock className="w-4 h-4 mr-2" />
                   Manage Calendar
                 </Link>
               </Button>
@@ -93,7 +93,7 @@ const PatientDahboard = () => {
                 Generate a Summary
               </Button>
             ) : null}
-            {!isLoaded ? <Loader /> : null }
+            {!isLoaded ? <Loader /> : null}
 
             <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
               <QuickSettings />
@@ -102,9 +102,9 @@ const PatientDahboard = () => {
           {/* the illustration part */}
           <div>
             <Image
-              src={"/image/product/patient-1-card.svg"}
-              width={400}
-              height={200}
+              src={"/image/product/doctor(357x253).svg"}
+              width={357}
+              height={253}
               alt="user"
             />
           </div>
