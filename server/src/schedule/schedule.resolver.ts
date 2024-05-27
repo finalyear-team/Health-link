@@ -58,6 +58,7 @@ export class ScheduleResolver {
 
   @Query('EmergencySchedules')
   async findEmergencySchedules() {
+    console.log("emergency schedules")
     const emergencySchedules=await this.scheduleService.emergencySchedules()
     return emergencySchedules
   }

@@ -12,7 +12,7 @@ export class ForumResolver {
     return this.forumService.create(createForumInput);
   }
 
-  @Query('forum')
+  @Query('forums')
   findAll() {
     return this.forumService.findAll();
   }

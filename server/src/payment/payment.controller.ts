@@ -19,7 +19,6 @@ export class PaymentController {
 
     @Post("/pay")
     async acceptPayment(@Req() req:Request,@Res() res:Response){
-
         const data = JSON.stringify({
             "amount": "100",
             "currency": "ETB",
@@ -27,12 +26,13 @@ export class PaymentController {
             "first_name": "dawit",
             "last_name": "wondwosen",
             "phone_number": "0913176534",
-            "tx_ref": "dawitsdlfkjalskdjf-hf669",
+            "tx_ref": "alskjdflkajsldfkjalskdjf-hf669",
             "callback_url": "http://localhost:4000/payment/webhook",
-            "return_url": "http://localhost:3000/new",
             "customization[title]": "Payment for my favourite merchant",
-            "customization[description]": "I love online payments"
+            "customization[description]": "I love online payments",
+            "subaccounts[id]": "ac2e6b5b-0e76-464a-8c20-2d441fbaca6c"
           });
+          console.log(data)
        try {
         const response=await fetch('https://api.chapa.co/v1/transaction/initialize',{
             method:"POST",
@@ -44,13 +44,14 @@ export class PaymentController {
 
 
         })
+        console.log(response.status)
         const {data:response_data}=await response.json()
         console.log(response_data)
         if(response_data)
         res.send(response_data.checkout_url)
         
        } catch (error) {
-        console.log(error)
+        console.log(error.errors)
         
        }
     }

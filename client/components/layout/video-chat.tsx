@@ -65,7 +65,7 @@ const ConsultationPage = ({role}:any) => {
 
   },[AuthToken,Room])
 
-  
+   
   
   return (
     <div className="flex flex-wrap">

@@ -30,14 +30,15 @@ export class UserResolver {
 
  @Mutation('DoctorRegister')
  async doctorRegister(@Args('DoctorDetailInput') DoctorDetailInput:DoctorDetailInput){
-  const {UserDetails,Speciality:DoctorSpeciality,...others}=DoctorDetailInput
-  const FirstName=UserDetails.FirstName.toLowerCase()
-  const LastName=UserDetails.LastName.toLowerCase()
-  const Speciality=DoctorSpeciality.toLowerCase()
-  const userDetails={...UserDetails,FirstName,LastName}
-  const doctor=await this.userService.DoctorRegister({ UserDetails,Speciality,...others })
-  console.log(doctor)
-  return doctor
+  console.log(DoctorDetailInput)
+  // const {UserDetails,Speciality:DoctorSpeciality,...others}=DoctorDetailInput
+  // const FirstName=UserDetails.FirstName.toLowerCase()
+  // const LastName=UserDetails.LastName.toLowerCase()
+  // const Speciality=DoctorSpeciality.toLowerCase()
+  // const userDetails={...UserDetails,FirstName,LastName}
+  // const doctor=await this.userService.DoctorRegister({ UserDetails,Speciality,...others })
+  // console.log(doctor)
+  // return doctor
  }
 
   

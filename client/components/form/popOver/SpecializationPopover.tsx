@@ -21,6 +21,7 @@ const SpecializationPopover = ({
   specializationValue,
   setSpecializationValue,
 }: any) => {
+  console.log(specializationValue)
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,6 +51,9 @@ const SpecializationPopover = ({
                 <CommandItem
                   value={speciality.value}
                   onSelect={(currentValue) => {
+                    console.log(currentValue)
+                    console.log(specializationValue)
+                    console.log(currentValue===specializationValue)
                     setSpecializationValue(
                       currentValue === specializationValue ? "" : currentValue
                     );

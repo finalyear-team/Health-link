@@ -100,9 +100,6 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
 
         const { createdRoom, authToken } = await response.json()
     
-
-
-
         if (createdRoom) {
             room = await checkRoom(createdRoom.RoomID, authToken.token)
             return {room,hostToken:createdRoom.HostAuthToken,memberToken:createdRoom.Members[0].MemberAuthToken}

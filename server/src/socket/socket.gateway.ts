@@ -7,17 +7,17 @@ import { UpdateSocketDto } from './dto/update-socket.dto';
 export class SocketGateway {
   constructor(private readonly socketService: SocketService) {}
 
-  @SubscribeMessage('createSocket')
+  @SubscribeMessage('new-appiontment')
   create(@MessageBody() createSocketDto: CreateSocketDto) {
     return this.socketService.create(createSocketDto);
   }
 
-  @SubscribeMessage('findAllSocket')
+  @SubscribeMessage('')
   findAll() {
     return this.socketService.findAll();
   }
 
-  @SubscribeMessage('findOneSocket')
+  @SubscribeMessage('upcoming-appointments')
   findOne(@MessageBody() id: number) {
     return this.socketService.findOne(id);
   }

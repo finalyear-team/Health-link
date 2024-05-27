@@ -20,7 +20,7 @@ export const REGISTER_USER = gql`
 `
 
 export const REGISTER_DOCTOR = gql`
-  mutation DoctorRegister(DoctorDetailInput:DoctorDetailInput!) {
+  mutation DoctorRegister($DoctorDetailInput:DoctorRegisterInput!) {
     DoctorRegister(DoctorDetailInput:$DoctorDetailInput) {
         UserID
         Username
@@ -36,13 +36,13 @@ export const REGISTER_DOCTOR = gql`
         Speciality
         ExperienceYears
         ConsultationFee
-        EducationalBackground
+      
     }     
     }
 `;
 
 export const UPDATE_USER = gql`
-mutation UpdateUser(updateUserInput:updateUserInput) {
+mutation UpdateUser($updateUserInput:updateUserInput) {
   UpdateUser(updateUserInput:$updateUserInput) {
           UserID
           Username
@@ -63,7 +63,8 @@ mutation UpdateUser(updateUserInput:updateUserInput) {
 }
 `
 export const SUSPEND_USER=gql`
-  mutation SuspendUser(id:String!,suspendType:SuspendType!) {
+  mutation SuspendUser($id:String!,
+  $suspendType:SuspendType!) {
       SuspendUser(id:$id,suspendType:$suspendType) {
           UserID
           Username

@@ -19,7 +19,7 @@ const fetchWithRetry = async (url: string, options: any) => {
 
  export const payPayment=async(UserID:string,AppointmentID:string)=>{
     try {
-    const token=await fetchWithRetry("http://localhost:4000/stream-chat/token",{
+    const token=await fetchWithRetry("http://localhost:4000/payment/pay",{
         method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -32,6 +32,8 @@ const fetchWithRetry = async (url: string, options: any) => {
     })       
 
     } catch (error) {
+        throw error
+
         
     }
 }

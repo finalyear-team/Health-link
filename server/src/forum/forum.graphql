@@ -13,7 +13,7 @@ input UpdateForumInput {
 }
 
 type Query {
-  forum: [Forum]!
+  forums: [Forum]!
   forum(id: Int!): Forum
 }
 

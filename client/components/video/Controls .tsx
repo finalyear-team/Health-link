@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare } from "@100mslive/react-sdk";
 
 const Controls = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo} = useAVToggle();
@@ -57,21 +58,6 @@ const Controls = () => {
   const [inputVideoSetting, setInputVideoSetting] = useState("");
   const [speakerSetting, setspeakerSetting] = useState("");
 
-  const toggleAudio = () => {
-    setIsMicOn(!isMicOn);
-    toast({
-      title: "This is a test Toast",
-      description: isMicOn ? "Microphone is OFF." : "Microphone is ON.",
-    });
-  };
-
-  const toggleVideo = () => {
-    setIsVideoOn(!isVideoOn);
-    toast({
-      title: "This is a test Toast",
-      description: isVideoOn ? "Video is OFF." : "Video is ON",
-    });
-  };
 
   const endCall = () => {
      hmsActions.leave()
