@@ -11,25 +11,27 @@ import Link from "next/link";
 import QuickSettings from "@/components/settings/quick-settings/quick-settings";
 import DashboardCard from "@/components/dashboard/card";
 import image from "@/public/data/image";
+import Loader from "@/common/Loader/Loading";
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [timeString, setTimeString] = useState("");
-  const [showQuickSettings, setShowQuickSettings] = useState(true);
 
   useEffect(() => {
     const updateGreetingAndTime = () => {
       const now = new Date();
       let hours = now.getHours();
       const minutes = now.getMinutes();
-      const amOrPm = hours >= 12 ? 'PM' : 'AM';
-  
+      const amOrPm = hours >= 12 ? "PM" : "AM";
+
       // Convert hours to 12-hour format
       hours = hours % 12 || 12;
-  
-      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${amOrPm}`;
+
+      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")} ${amOrPm}`;
       setTimeString(formattedTime);
-  
+
       if (hours >= 5 && hours < 12) {
         setCurrentTime("Good morning");
       } else if (hours >= 12 && hours < 17) {
@@ -38,23 +40,18 @@ const PatientDahboard = () => {
         setCurrentTime("Good evening");
       }
     };
-  
+
     // Initial call to set the state
     updateGreetingAndTime();
-  
+
     // Set up an interval to update the time every minute
     const intervalId = setInterval(updateGreetingAndTime, 60000);
-  
+
     // Clean up the interval on unmount
     return () => clearInterval(intervalId);
   }, []);
-  
 
-  const handleX = () => {
-    setShowQuickSettings(false);
-  };
-
-  const { user, isSignedIn } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
   const Role = user?.unsafeMetadata.role;
 
   return (
@@ -69,8 +66,8 @@ const PatientDahboard = () => {
                 <MdWavingHand size={30} color="#ffd700" className="mr-2" />{" "}
                 {currentTime}{" "}
               </div>
-              <span className="text-primary-600 dark:text-primary-700">
-                Mr. {user?.firstName} {user?.lastName}
+              <span className="text-primary-600 dark:text-primary-700 flex items-center space-x-2">
+                Mr. {user?.firstName} {user?.lastName} {!isLoaded && <Loader />}
               </span>{" "}
             </div>
             {/* the time show */}
@@ -97,15 +94,9 @@ const PatientDahboard = () => {
               </Button>
             ) : null}
 
-            {showQuickSettings ? (
-              <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
-                <X
-                  className="absolute w-4 h-4 top-0 right-0 m-2 cursor-pointer"
-                  onClick={handleX}
-                />
-                <QuickSettings />
-              </div>
-            ) : null}
+            <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
+              <QuickSettings />
+            </div>
           </div>
           {/* the illustration part */}
           <div>

@@ -78,7 +78,7 @@ body{
 }
 
 .input__error {
-  @apply text-red-500 font-main text-xs mt-1;
+  @apply text-red-500 font-main text-xs mt-1 flex flex-wrap;
 }
 
 .main_container {

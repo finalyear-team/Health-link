@@ -1,21 +1,8 @@
 import React from "react";
-import {TailSpin} from "react-loader-spinner";
+import { Loader2 } from "lucide-react";
 
 const Loading = () => {
-  return (
-    <div className="w-full">
-      <TailSpin
-        visible={true}
-        height="15"
-        width="15"
-        color="#ffffff"
-        ariaLabel="tail-spin-loading"
-        radius="1"
-        wrapperStyle={{}}
-        wrapperClass=""
-      />
-    </div>
-  );
-}
+  return <Loader2 className="mr-2 h-4 w-4 animate-spin" />;
+};
 
-export default Loading
+export default Loading;
