@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { specialties } from "@/public/data/specialities";
 import { cn } from "@/lib/utils";
+import useUserStore from "@/store/userStore";
 import {
   Command,
   CommandInput,
@@ -22,6 +23,8 @@ const SpecializationPopover = ({
   setSpecializationValue,
 }: any) => {
   const [open, setOpen] = useState(false);
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const userInformation = useUserStore((state) => state.user);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,6 +56,10 @@ const SpecializationPopover = ({
                     setSpecializationValue(
                       currentValue === specializationValue ? "" : currentValue
                     );
+                    setUserInformation({
+                      ...userInformation,
+                      specialization: currentValue,
+                    });
                     setOpen(false);
                   }}
                 >

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { validationSchemaContInfo } from "@/utils/validationSchema";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Loader2 } from "lucide-react";
+import useUserStore from "@/store/userStore";
 
 const ContactInfo = ({
   onNext,
@@ -15,17 +16,26 @@ const ContactInfo = ({
   onNext: () => void;
   onBack: () => void;
 }) => {
-
-  const [storedValues, setStoredValues] = useLocalStorage("patient_contactInfo", {
-    email: "",
-    password: "",
-    phone: "",
-    address: "",
-  });
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const [storedValues, setStoredValues] = useLocalStorage(
+    "patient_contactInfo",
+    {
+      email: "",
+      password: "",
+      phone: "",
+      address: "",
+    }
+  );
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    // Removing the password from local storage
+    const { password, ...valuesWithoutPassword } = values;
+
+    // setting the values into the store
+    setUserInformation(values);
+
     setTimeout(() => {
-      setStoredValues(values);
+      setStoredValues(valuesWithoutPassword);
       setSubmitting(false);
       onNext();
     }, 1000);
@@ -97,8 +107,13 @@ const ContactInfo = ({
                     <Button disabled={!isValid} type="submit">
                       {isSubmitting ? (
                         <div>
-                          <Button disabled={!isValid} type="submit" >
-                            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : ""} Next
+                          <Button disabled={!isValid} type="submit">
+                            {isSubmitting ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              ""
+                            )}{" "}
+                            Next
                           </Button>
                         </div>
                       ) : (

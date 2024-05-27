@@ -2,28 +2,35 @@
 
 import { useSignUp } from "@clerk/nextjs";
 import { useState } from "react";
+import useUserStore from "@/store/userStore";
 
 export const useSubmit = (setStoredValues: any, role: string) => {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [completed, setCompleted] = useState(false);
   const { isLoaded, signUp } = useSignUp();
   const [error, setError] = useState("");
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const user = useUserStore((state) => state.user);
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    // storing values in the zustands store
+    setUserInformation(values);
+
     setStoredValues(values);
 
     let item1, item2, item3;
 
-    if (role === 'provider') {
+    if (role === "provider") {
       item1 = localStorage.getItem("personalInfo");
       item2 = localStorage.getItem("contactInfo");
       item3 = localStorage.getItem("professionalInfo");
-    } else if (role === 'patient') {
+    } else if (role === "patient") {
       item1 = localStorage.getItem("patient_personalInfo");
       item2 = localStorage.getItem("patient_contactInfo");
       item3 = localStorage.getItem("patient_additionalInfo");
     }
 
+    console.log("The values are as follows: ", user);
 
     if (item1 && item2 && item3) {
       const parsedPersonal = JSON.parse(item1);
@@ -72,7 +79,6 @@ export const useSubmit = (setStoredValues: any, role: string) => {
       // }
 
       setSubmitting(false);
-      
     }
   };
 

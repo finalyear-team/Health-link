@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validationSchemaPersInfo } from "@/utils/validationSchema";
 import { Loader2 } from "lucide-react";
+import useUserStore from "@/store/userStore";
 
 const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
   const [storedValues, setStoredValues] = useLocalStorage("personalInfo", {
     firstName: "",
     lastName: "",
@@ -20,6 +22,9 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
   });
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    // setting the values in the store
+    setUserInformation(values);
+    // Simulate delay for demonstration purposes
     setTimeout(() => {
       setStoredValues(values);
       setSubmitting(false);

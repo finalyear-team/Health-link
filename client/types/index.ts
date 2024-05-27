@@ -23,3 +23,26 @@ export interface AppointmentType {
   purpose: string;
   status: string;
 }
+
+
+export interface UserRegister {
+  id: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  DOB: Date;
+  gender: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  specialization: string;
+  education: string;
+  consultationFee: number;
+  license: number;
+  experiance: number;
+  agreedToTerms: true;
+  institution: string;
+  additionalInfo?: File | undefined;
+  graduationYear: number;
+}
