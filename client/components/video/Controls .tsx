@@ -1,184 +1,8 @@
-// "use client";
-
-// import React, { useState } from "react";
-// import { Button } from "../ui/button";
-// import { useUser } from "@clerk/nextjs";
-// import AudioSettings from "./AudioSettings ";
-// import { useToast } from "@/components/ui/use-toast";
-// import {
-//   MdOutlineKeyboardVoice,
-//   MdOutlineVideocam,
-//   MdOutlineVideocamOff,
-//   MdOutlineCallEnd,
-//   MdFullscreen,
-//   MdFullscreenExit,
-//   MdOutlineSettings,
-//   MdLogout,
-// } from "react-icons/md";
-// import {
-//   Tooltip,
-//   TooltipContent,
-//   TooltipProvider,
-//   TooltipTrigger,
-// } from "@/components/ui/tooltip";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuGroup,
-//   DropdownMenuItem,
-//   DropdownMenuLabel,
-//   DropdownMenuPortal,
-//   DropdownMenuSeparator,
-//   DropdownMenuShortcut,
-//   DropdownMenuSub,
-//   DropdownMenuSubContent,
-//   DropdownMenuSubTrigger,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-
-// const Controls = () => {
-//   const { toast } = useToast();
-//   const { user } = useUser();
-//   const role = user?.unsafeMetadata.role;
-
-//   const toggleAudio = () => {
-//     toast({
-//       title: "This is a test Toast",
-//       description: "Audio button is toggled.",
-//     });
-//   };
-
-//   const toggleVideo = () => {
-//     toast({
-//       title: "This is a test Toast",
-//       description: "Video button is toggled.",
-//     });
-//   };
-
-//   const endCall = () => {
-//     toast({
-//       title: "This is a test Toast",
-//       description: "Video Ended.",
-//     });
-//   };
-
-//   const fullScreen = () => {
-//     toast({
-//       title: "This is a test Toast",
-//       description: "Full Screened.",
-//     });
-//   };
-
-//   return (
-//     <TooltipProvider>
-//       <div className="flex justify-center items-end mt-4 space-x-2">
-//         {/* audio control */}
-//         <AudioSettings />
-//         {/* microphone control */}
-//         <Tooltip>
-//           <TooltipTrigger>
-//             {" "}
-//             <Button onClick={toggleAudio} variant={"video"}>
-//               <MdOutlineKeyboardVoice size={20} />
-//             </Button>
-//           </TooltipTrigger>
-//           <TooltipContent>
-//             <p>Microphone</p>
-//           </TooltipContent>
-//         </Tooltip>
-
-//         {/* camera control */}
-//         <Tooltip>
-//           <TooltipTrigger>
-//             {" "}
-//             <Button onClick={toggleVideo} variant={"video"}>
-//               <MdOutlineVideocam size={20} />
-//             </Button>
-//           </TooltipTrigger>
-//           <TooltipContent>
-//             <p>Camera</p>
-//           </TooltipContent>
-//         </Tooltip>
-
-//         {role === "provider" ? (
-//           // end call control
-//           <Tooltip>
-//             <TooltipTrigger>
-//               {" "}
-//               <Button onClick={endCall} variant={"destructive"}>
-//                 <MdOutlineCallEnd size={20} />
-//               </Button>
-//             </TooltipTrigger>
-//             <TooltipContent>
-//               <p>End Call</p>
-//             </TooltipContent>
-//           </Tooltip>
-//         ) : role === "patient" ? (
-//           // Leave call control
-//           <Tooltip>
-//             <TooltipTrigger>
-//               {" "}
-//               <Button onClick={endCall} variant={"destructive"}>
-//                 <MdLogout size={20} />
-//               </Button>
-//             </TooltipTrigger>
-//             <TooltipContent>
-//               <p>Leave Call</p>
-//             </TooltipContent>
-//           </Tooltip>
-//         ) : (
-//           ""
-//         )}
-
-//         {/* Settings control */}
-//         <Tooltip>
-//           <TooltipTrigger>
-//             {" "}
-//             <DropdownMenu>
-//               <DropdownMenuTrigger>
-//                 {" "}
-//                 <Button onClick={endCall} variant={"video"}>
-//                   <MdOutlineSettings size={20} />
-//                 </Button>
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent>
-//                 <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
-//                 <DropdownMenuSeparator />
-//                 <DropdownMenuItem>Default</DropdownMenuItem>
-//                 <DropdownMenuItem>Microphone</DropdownMenuItem>
-//               </DropdownMenuContent>
-//             </DropdownMenu>
-//           </TooltipTrigger>
-//           <TooltipContent>
-//             <p>Setting</p>
-//           </TooltipContent>
-//         </Tooltip>
-
-//         {/* Full screen control */}
-//         <Tooltip>
-//           <TooltipTrigger>
-//             {" "}
-//             <Button onClick={fullScreen} variant={"video"}>
-//               <MdFullscreen size={20} />
-//             </Button>
-//           </TooltipTrigger>
-//           <TooltipContent>
-//             <p>Full Screen</p>
-//           </TooltipContent>
-//         </Tooltip>
-//       </div>
-//     </TooltipProvider>
-//   );
-// };
-
-// export default Controls;
-
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
-import AudioSettings from "./AudioSettings ";
 import { useToast } from "@/components/ui/use-toast";
 import {
   MdMicNone,
@@ -192,6 +16,7 @@ import {
   MdLogout,
   MdScreenShare,
 } from "react-icons/md";
+import { Volume2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -206,7 +31,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DeviceType, selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare } from "@100mslive/react-sdk";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Controls = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo} = useAVToggle();
@@ -222,20 +53,26 @@ const Controls = () => {
   const role = user?.unsafeMetadata.role;
 
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [inputAudioSetting, setInputAudioSetting] = useState("");
+  const [inputVideoSetting, setInputVideoSetting] = useState("");
+  const [speakerSetting, setspeakerSetting] = useState("");
 
-  useEffect(() => {
-    window.addEventListener("unload",()=>{
-      if(isConnected)
-       hmsActions.leave()
-    })
-    return  window.removeEventListener("unload",()=>{
-         console.log("component unmounted")
-    })
-  }, [hmsActions]);
+  const toggleAudio = () => {
+    setIsMicOn(!isMicOn);
+    toast({
+      title: "This is a test Toast",
+      description: isMicOn ? "Microphone is OFF." : "Microphone is ON.",
+    });
+  };
 
-  const handleDeviceChange = (deviceId: string, deviceType: DeviceType) => {
-        updateDevice({ deviceId, deviceType });
-      };
+  const toggleVideo = () => {
+    setIsVideoOn(!isVideoOn);
+    toast({
+      title: "This is a test Toast",
+      description: isVideoOn ? "Video is OFF." : "Video is ON",
+    });
+  };
+
   const endCall = () => {
      hmsActions.leave()
     toast({
@@ -257,8 +94,6 @@ const Controls = () => {
   return (
     <TooltipProvider>
       <div className="flex justify-center items-end mt-4 space-x-2">
-        {/* audio control */}
-        <AudioSettings />
         {/* microphone control */}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -328,15 +163,68 @@ const Controls = () => {
                   <MdOutlineSettings size={20} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent >
-                <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
-                <DropdownMenuSeparator />                
+              <DropdownMenuContent className="w-[250px]">
+                <h2 className="text-lg font-semibold mb-1 p-2">
+                  Device Setting
+                </h2>
+                {/* Audio */}
+                <DropdownMenuLabel className="flex items-center">
+                  <MdOutlineVideocam className="h-5 w-5 mr-2" />
+                  Video
+                </DropdownMenuLabel>
+                <Select onValueChange={(value) => setInputVideoSetting(value)}>
+                  <SelectTrigger className="bg-slate-100">
+                    <SelectValue placeholder="Select device from the list" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="microphone">Microphone</SelectItem>
+                  </SelectContent>
+                </Select>
+                {/* Microphone */}
+                <DropdownMenuSeparator className="my-1" />
+                <DropdownMenuLabel className="flex items-center">
+                  <MdMicNone size={20} className="mr-2" />
+                  Microphone
+                </DropdownMenuLabel>
+                <Select
+                  onValueChange={(value) => setInputAudioSetting(value)}
+                  defaultValue="default"
+                >
+                  <SelectTrigger className="bg-slate-100">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="default">
+                      Default - External Microphone (Conexant ISST Audio)
+                    </SelectItem>
+                    <SelectItem value="microphone">Microphone</SelectItem>
+                  </SelectContent>
+                </Select>
+                {/* speaker */}
+                <DropdownMenuSeparator className="my-1" />
+                <DropdownMenuLabel className="flex items-center">
+                  <Volume2 className="h-5 w-5 mr-2" /> Speaker
+                </DropdownMenuLabel>
+                <Select
+                  onValueChange={(value) => setspeakerSetting(value)}
+                  defaultValue="default"
+                >
+                  <SelectTrigger className="bg-slate-100">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="default">
+                      Default - Headphones (Conexant ISST Audio)
+                    </SelectItem>
+                    <SelectItem value="microphone">Microphone</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
+                
                 <DropdownMenuItem>Default</DropdownMenuItem>
-                <DropdownMenuItem>Microphone</DropdownMenuItem>
-                <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Default</DropdownMenuItem>
-                <DropdownMenuItem>Microphone</DropdownMenuItem>
+                <DropdownMenuItem>Microphone</DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
           </TooltipTrigger>

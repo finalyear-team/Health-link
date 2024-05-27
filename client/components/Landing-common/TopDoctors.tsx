@@ -6,6 +6,7 @@ import { DoctorProfile } from "@/types";
 import useAppointmentStore from "@/store/appointmentStore";
 import { useEffect } from "react";
 
+
 interface TopDoctorsProps {
   items: DoctorProfile[];
 }
@@ -22,12 +23,14 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
   };
 
   useEffect(() => {
-      console.log("The selected Doctor is : ", selectedDoctor);
+    console.log("The selected Doctor is : ", selectedDoctor);
   }, [selectedDoctor]);
 
   const handleMakeAppointment = (profile: DoctorProfile) => {
     selectDoctor(profile);
-    showAppointmentForm();
+    setTimeout(() => {
+      showAppointmentForm();
+    }, 1000);
     console.log("The updated Doctor is : ", profile);
   };
 
