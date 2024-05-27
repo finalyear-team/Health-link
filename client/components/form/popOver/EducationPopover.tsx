@@ -41,7 +41,7 @@ const EducationPopover = ({ educationValue, setEducationValue }: any) => {
         <Command>
           <CommandInput placeholder="Search Degrees..." />
           <CommandEmpty>No Degree found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className="overflow-y-scroll h-[300px]">
             {medicalQualifications.map((qualified) => (
               <CommandList key={qualified.value}>
                 <CommandItem

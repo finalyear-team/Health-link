@@ -61,15 +61,15 @@ export const useSubmit = (setStoredValues: any, role: string) => {
         setError(error.errors[0].longMessage);
       }
 
-      if (role === 'provider') {
-        localStorage.removeItem("personalInfo");
-        localStorage.removeItem("contactInfo");
-        localStorage.removeItem("professionalInfo");
-      } else if (role === 'patient') {
-        localStorage.removeItem("patient_personalInfo");
-        localStorage.removeItem("patient_contactInfo");
-        localStorage.removeItem("patient_additionalInfo");
-      }
+      // if (role === 'provider') {
+      //   localStorage.removeItem("personalInfo");
+      //   localStorage.removeItem("contactInfo");
+      //   localStorage.removeItem("professionalInfo");
+      // } else if (role === 'patient') {
+      //   localStorage.removeItem("patient_personalInfo");
+      //   localStorage.removeItem("patient_contactInfo");
+      //   localStorage.removeItem("patient_additionalInfo");
+      // }
 
       setSubmitting(false);
       

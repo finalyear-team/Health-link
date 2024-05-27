@@ -4,7 +4,15 @@ import React, { useState } from "react";
 import * as Yup from "yup";
 import PaymentForm from "../payment/payment-form";
 import Container from "@/components/container/container";
-import { addDays, format, setHours, setMinutes, setSeconds } from "date-fns";
+import {
+  addDays,
+  format,
+  setHours,
+  setMinutes,
+  setSeconds,
+  isBefore,
+  startOfDay,
+} from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -47,16 +55,20 @@ const AppointmentForm = () => {
 
   const handleSubmit = (values: any) => {
     if (date && appointmentTime && values.reason) {
-      console.log("Date: ", date);
-      console.log("Reason: ", values.reason);
-      console.log("AppointmentTime: ", appointmentTime);
-      console.log("Combined time: ", formatDateAndTime());
       setSubmitted(true);
     }
   };
 
   const initialValues = {
     reason: "",
+  };
+
+  const [todayDay, setTodayDat] = useState(null);
+  const today = startOfDay(new Date());
+
+  // Function to determine if a date is disabled
+  const isDateDisabled = (todayDay: any) => {
+    return isBefore(todayDay, today);
   };
 
   const getAvailableTimes = () => {
@@ -176,6 +188,7 @@ const AppointmentForm = () => {
                             mode="single"
                             selected={date}
                             onSelect={setDate}
+                            disabled={isDateDisabled}
                           />
                         </div>
                       </PopoverContent>

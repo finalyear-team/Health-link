@@ -44,7 +44,7 @@ const SpecializationPopover = ({
         <Command>
           <CommandInput placeholder="Search Specialization..." />
           <CommandEmpty>No specialization found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className="overflow-y-scroll h-[300px]">
             {specialties.map((speciality) => (
               <CommandList key={speciality.value}>
                 <CommandItem

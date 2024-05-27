@@ -213,10 +213,6 @@ const Controls = () => {
                   </SelectContent>
                 </Select>
 
-                {/* <DropdownMenuLabel>Audio Input Device</DropdownMenuLabel>
-                
-                <DropdownMenuItem>Default</DropdownMenuItem>
-                <DropdownMenuItem>Microphone</DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
           </TooltipTrigger>

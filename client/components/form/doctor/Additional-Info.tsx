@@ -17,7 +17,6 @@ import { Loader2 } from "lucide-react";
 
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const [specializationValue, setSpecializationValue] = useState("");
-
   const [educationValue, setEducationValue] = useState("");
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
