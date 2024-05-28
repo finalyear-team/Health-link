@@ -49,38 +49,33 @@ Welcome to the HealthLink Telemedicine Web Application, a platform designed to c
 
 health-link/
 ├── admin/
-├── client/                 # Frontend Nextjs v.14 application
+├── client/                 # Frontend Next.js v.14 application
 │   ├── Services
-    ├── actions
-    ├── app
-    ├── common/Loader
-    ├── components
-    ├── firebase
-    ├── graphql
-    ├── hooks
-    ├── lib
-    ├── public
-    ├── store
-    ├── types
-    ├── utils
-    ├── .env.example
-    ├── .eslintrc.json
-    ├── Dockerfile.dev
-    ├── Dockerfile.prod
-    ├── README.md
-    ├── components.json
-    ├── middleware.ts
-    ├── next.config.mjs
-    ├── package-lock.json
-    ├── package.json
-    ├── postcss.config.js
-    ├── tailwind.config.ts
-    ├── tsconfig.json
-│
-│
-│
-│
-│
+│   ├── actions
+│   ├── app
+│   ├── common/Loader
+│   ├── components
+│   ├── firebase
+│   ├── graphql
+│   ├── hooks
+│   ├── lib
+│   ├── public
+│   ├── store
+│   ├── types
+│   ├── utils
+│   ├── .env.example
+│   ├── .eslintrc.json
+│   ├── Dockerfile.dev
+│   ├── Dockerfile.prod
+│   ├── README.md
+│   ├── components.json
+│   ├── middleware.ts
+│   ├── next.config.mjs
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
 ├── server/                 # Backend Nest.js application
 │   ├── controllers/
 │   ├── models/
@@ -93,3 +88,4 @@ health-link/
 ├── docker-compose.dev.yml
 ├── docker-compose.yml
 └── package-lock.json
+
