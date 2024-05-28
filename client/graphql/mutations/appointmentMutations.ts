@@ -1,10 +1,10 @@
-import { UserStatus, UserType } from '@/utils/types';
+import { UserStatus, UserType } from '@/types/types';
 import { gql } from '@apollo/client';
 
 export const CREATE_APPOINTMENT = gql`
-mutation CreateAppointment($input: CreateAppointmentInput!) {
-  CreateAppointment(createAppointmentInput: $input) {
-    AppointmentID
+mutation CreateAppointment($createAppointmentInput: CreateAppointmentInput!) {
+  CreateAppointment(createAppointmentInput: $createAppointmentInput) {
+  AppointmentID
   DoctorID
   PatientID
   ScheduleID
@@ -14,13 +14,14 @@ mutation CreateAppointment($input: CreateAppointmentInput!) {
   Duration
   Status
   AppointmentType
-    Note  
+  Note  
+}
 }
 `;
 export const UPDATE_APPOINTMENT = gql`
 mutation UpdateAppointment($input: UpdateAppointmentInput!) {
   UpdateSchedule(updateAppointmentInput: $input) {
-    AppointmentID
+  AppointmentID
   DoctorID
   PatientID
   ScheduleID
@@ -30,7 +31,7 @@ mutation UpdateAppointment($input: UpdateAppointmentInput!) {
   Duration
   Status
   AppointmentType
-    Note  
+  Note  
   
   }
 }
@@ -57,16 +58,16 @@ mutation CreateEmergencyAppointment($input: EmergencyAppointmentInput!) {
 export const ACCEPT_APPOINTMENT = gql`
 mutation AcceptAppointment($DoctorID: String!) {
     AcceptAppointment(DoctorID: $DoctorID) {
-        AppointmentID
-  DoctorID
-  PatientID
-  ScheduleID
-  AppointmentDate
-  AppointmentTime
-  VideoChatRoomID
-  Duration
-  Status
-  AppointmentType
+    AppointmentID
+    DoctorID
+    PatientID
+    ScheduleID
+    AppointmentDate
+    AppointmentTime
+    VideoChatRoomID
+    Duration
+    Status
+    AppointmentType
     Note  
 
    

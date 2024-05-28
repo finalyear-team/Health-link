@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { medicalQualifications } from "@/public/data/specialities";
+import useUserStore from "@/store/userStore";
 import {
   Command,
   CommandInput,
@@ -19,6 +20,8 @@ import { cn } from "@/lib/utils";
 
 const EducationPopover = ({ educationValue, setEducationValue }: any) => {
   const [open, setOpen] = useState(false);
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const userInformation = useUserStore((state) => state.user);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -41,7 +44,7 @@ const EducationPopover = ({ educationValue, setEducationValue }: any) => {
         <Command>
           <CommandInput placeholder="Search Degrees..." />
           <CommandEmpty>No Degree found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className="overflow-y-scroll h-[300px]">
             {medicalQualifications.map((qualified) => (
               <CommandList key={qualified.value}>
                 <CommandItem
@@ -50,6 +53,10 @@ const EducationPopover = ({ educationValue, setEducationValue }: any) => {
                     setEducationValue(
                       currentValue === educationValue ? "" : currentValue
                     );
+                    setUserInformation({
+                      ...userInformation,
+                      education: currentValue,
+                    });
                     setOpen(false);
                   }}
                 >

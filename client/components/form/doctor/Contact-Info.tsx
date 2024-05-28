@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Container from "@/components/container/container";
 import { Formik, Form } from "formik";
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validationSchemaContInfo } from "@/utils/validationSchema";
 import { Loader2 } from "lucide-react";
+import useUserStore from "@/store/userStore";
+
 
 const ContactInfoForm = ({
   onNext,
@@ -17,6 +19,7 @@ const ContactInfoForm = ({
   onNext: () => void;
   onBack: () => void;
 }) => {
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
   const [storedValues, setStoredValues] = useLocalStorage("contactInfo", {
     email: "",
     password: "",
@@ -25,8 +28,14 @@ const ContactInfoForm = ({
   });
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    // Removing the password from local storage
+    const { password, ...valuesWithoutPassword } = values;
+
+    // setting the values into the store
+    setUserInformation(values);
+
     setTimeout(() => {
-      setStoredValues(values);
+      setStoredValues(valuesWithoutPassword);
       setSubmitting(false);
       onNext();
     }, 1000);
@@ -101,7 +110,7 @@ const ContactInfoForm = ({
                       {isSubmitting ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        ''
+                        ""
                       )}{" "}
                       Next
                     </Button>

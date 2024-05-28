@@ -1,3 +1,5 @@
+import { Gender, UserType } from "./types";
+
 export interface DoctorProfile {
   id: number;
   profilePicture: string;
@@ -22,4 +24,29 @@ export interface AppointmentType {
   doctorName: string;
   purpose: string;
   status: string;
+}
+
+
+// updated user interface to be consistent with the backend user Data
+export interface UserRegister {
+  id: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  DOB: Date;
+  gender: Gender;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  role:UserType
+  specialization: string;
+  education: string;
+  consultationFee: number;
+  license: number;
+  experiance: number;
+  agreedToTerms: true;
+  institution: string;
+  additionalInfo?: File | undefined;
+  graduationYear: number;
 }

@@ -9,6 +9,7 @@ const RoleValues=Object.values(UserType) as [string,...string[]]
 const GenderValues=Object.values(Gender) as [string,...string[]]
 
 export const RegisterSchema=z.object({
+    UserID:z.string(),
     FirstName:z.string(),
     LastName:z.string(),
     Username:z.string(),
@@ -16,10 +17,7 @@ export const RegisterSchema=z.object({
     Role:z.enum(RoleValues),
     Gender:z.enum(GenderValues),
     DateOfBirth:z.string(),
-    PhoneNumber:z.string().optional().refine((PhoneNumber)=>{
-     if( /^\+251[79]\d{8}$|^(07|09)\d{8}$/.test(PhoneNumber))
-        return true     
-    },"Invalid Ethiopian Number")
+    PhoneNumber:z.string().optional()
 }).refine(({DateOfBirth})=>{
     const today = new Date();
   const birthDate = new Date(DateOfBirth);
@@ -70,10 +68,11 @@ export class UserDetailsInput {
     @Field()
     Role:UserType
 
-    constructor(input:UserDetailsInput){
-        const validatedData=RegisterSchema.parse(input)
-         Object.assign(this,validatedData)
-         this.DateOfBirth=new Date(format(parseDate(validatedData.DateOfBirth),"yyyy-MM-dd"))
+    constructor(input:any){
+         Object.assign(this,input)
+         this.FirstName=input.FirstName.toLowerCase()
+         this.LastName=input.LastName.toLowerCase()
+         this.DateOfBirth=new Date(format(parseDate(input.DateOfBirth),"yyyy-MM-dd"))
     }
 }
 
@@ -95,7 +94,13 @@ export class DoctorDetailInput {
     ExperienceYears : number;    
 
     constructor(input:DoctorDetailInput){
-        console.log(input)
+        const validatedData=RegisterSchema.parse(input.UserDetails)
+        Object.assign(this,validatedData)
+        this.UserDetails.FirstName=validatedData.FirstName.toLowerCase()
+        this.UserDetails.LastName=validatedData.FirstName.toLowerCase()
+        this.LicenseNumber=input.LicenseNumber.toString()
+        this.Speciality=input.Speciality.toLowerCase()
+        this.UserDetails.DateOfBirth=new Date(format(parseDate(validatedData.DateOfBirth),"yyyy-MM-dd"))
     }
 }
 

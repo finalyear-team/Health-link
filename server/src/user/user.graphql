@@ -21,8 +21,8 @@ enum SuspendType{
 }
 
 enum Gender {
-  Male
-  Female
+  male
+  female
 }
 
 scalar Date
@@ -52,6 +52,8 @@ type User{
    ExperienceYears:Int
    ConsultationFee:Float
    EducationalBackground:EducationalBackground
+   Followers:Int
+   Following:Int
 }
 
 
@@ -81,7 +83,7 @@ input EducationalBackgroundInput {
 
 input DoctorDetails{
   Speciality: String
-  LicenseNumber: String
+  LicenseNumber: Int
   ExperienceYears:Int
   EducationalBackground:String
   }
@@ -91,7 +93,7 @@ input DoctorDetails{
 input DoctorRegisterInput {
   UserDetails: UserDetailsInput
   Speciality: String
-  LicenseNumber: String
+  LicenseNumber: Int
   ExperienceYears:Int
   EducationalBackground:EducationalBackgroundInput
 }
@@ -125,6 +127,7 @@ input updateUserInput{
 type Query {
   GetUsers: [User!]
   GetUser(id: String!): User
+  GetDoctors:[User!]
   SearchUsers(searchQuery:String):[User]
   SearchDoctors(searchQuery:String):[User]
 }

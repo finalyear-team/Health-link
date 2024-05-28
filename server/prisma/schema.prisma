@@ -58,8 +58,8 @@ enum MessageType {
 }
 
 enum Gender {
-  Male
-  Female
+  male
+  female
 }
 
 enum AppointmentType {

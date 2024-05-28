@@ -20,28 +20,29 @@ export class UserResolver {
   
 @Mutation('RegisterUser')
   async register(@Args('RegisterInput') RegisterInput:UserDetailsInput,@Context("res") res:Response ) {
-     const FirstName=RegisterInput.FirstName.toLowerCase() 
-     const LastName= RegisterInput.LastName.toLowerCase()
-     const user=await this.userService.RegisterUser({FirstName,LastName,...RegisterInput});
+    console.log(RegisterInput)
+     const input=new UserDetailsInput(RegisterInput)
+     const user=await this.userService.RegisterUser(input);
      return user
   }  
   
 
 
  @Mutation('DoctorRegister')
- async doctorRegister(@Args('DoctorDetailInput') DoctorDetailInput:DoctorDetailInput){
+ async doctorRegister(@Args('DoctorDetailInput') doctorDetailInput:DoctorDetailInput){
   console.log(DoctorDetailInput)
-  // const {UserDetails,Speciality:DoctorSpeciality,...others}=DoctorDetailInput
-  // const FirstName=UserDetails.FirstName.toLowerCase()
-  // const LastName=UserDetails.LastName.toLowerCase()
-  // const Speciality=DoctorSpeciality.toLowerCase()
-  // const userDetails={...UserDetails,FirstName,LastName}
-  // const doctor=await this.userService.DoctorRegister({ UserDetails,Speciality,...others })
-  // console.log(doctor)
-  // return doctor
+  const input=new DoctorDetailInput(doctorDetailInput)  
+  const doctor=await this.userService.DoctorRegister(input)
+  console.log(doctor)
+  return doctor
  }
 
-  
+  @Query("GetDoctors")
+  async findDoctors(){
+    const doctors=await this.userService.getDoctors()
+    console.log(doctors)
+    return doctors
+  }
   @Query('GetUsers')
   // @UseGuards(RoleGuard)
   // @UserRoles(UserType.ADMIN)

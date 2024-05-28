@@ -1,38 +1,43 @@
 "use client";
 
-import PersonalInfo from "@/components/form/patient/Personal-Info";
-import { REGISTER_DOCTOR } from "@/graphql/mutations/userMutations";
-import { GET_EMERGENCY_SCHEDULES } from "@/graphql/queries/scheduleQueries";
-import { GET_USER } from "@/graphql/queries/userQueries";
-import { useMutation, useQuery } from "@apollo/client";
 import { useSignUp } from "@clerk/nextjs";
 import { useState } from "react";
+import useUserStore from "@/store/userStore";
 
 export const useSubmit = (setStoredValues: any, role: string) => {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [completed, setCompleted] = useState(false);
   const { isLoaded, signUp } = useSignUp();
   const [error, setError] = useState("");
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const user = useUserStore((state) => state.user);
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    // storing values in the zustands store
     console.log(values)
+    setUserInformation(values);
+
     setStoredValues(values);
+
     let item1, item2, item3;
-    if (role === 'provider') {
+
+    if (role === "provider") {
       item1 = localStorage.getItem("personalInfo");
       item2 = localStorage.getItem("contactInfo");
       item3 = localStorage.getItem("professionalInfo");
-    } else if (role === 'patient') {
+    } else if (role === "patient") {
       item1 = localStorage.getItem("patient_personalInfo");
       item2 = localStorage.getItem("patient_contactInfo");
       item3 = localStorage.getItem("patient_additionalInfo");
     }
 
+    console.log("The values are as follows: ", user);
+
     if (item1 && item2 && item3) {
       const parsedPersonal = JSON.parse(item1);
       const parsedContact = JSON.parse(item2);
       const parsedProfessional = JSON.parse(item3);
-       
+
       const firstName = parsedPersonal.firstName;
       const lastName = parsedPersonal.lastName;
       const email = parsedContact.email;
@@ -43,12 +48,11 @@ export const useSubmit = (setStoredValues: any, role: string) => {
       }
 
       try {
-               
         await signUp.create({
           firstName: firstName,
           lastName: lastName,
           emailAddress: email,
-          password: password,
+          password: user?.password,
           unsafeMetadata: {
             role: role,
           },
@@ -58,10 +62,8 @@ export const useSubmit = (setStoredValues: any, role: string) => {
           strategy: "email_code",
         });
 
-     
-
-        // setCompleted(true);
-        // setPendingVerification(true);
+        setCompleted(true);
+        setPendingVerification(true);
       } catch (error: any) {
         console.log("The Error is as follows: ", error);
         setError(error.errors[0].longMessage);
@@ -77,8 +79,7 @@ export const useSubmit = (setStoredValues: any, role: string) => {
       //   localStorage.removeItem("patient_additionalInfo");
       // }
 
-      // setSubmitting(false);
-      
+      setSubmitting(false);
     }
   };
 

@@ -18,7 +18,6 @@ const PatientSignUp = () => {
     setStep(step - 1);
   };
 
-  console.log(step)
   return (
     <div className="bg-container">
       <Header />

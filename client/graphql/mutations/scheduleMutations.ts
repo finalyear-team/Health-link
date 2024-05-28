@@ -1,4 +1,4 @@
-import { UserStatus, UserType } from '@/utils/types';
+import { UserStatus, UserType } from '@/types/types';
 import { gql } from '@apollo/client';
 
 export  const CREATE_SCHEDULE = gql`

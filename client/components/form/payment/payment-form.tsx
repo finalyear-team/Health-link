@@ -34,7 +34,7 @@ const PaymentForm = () => {
     }, 2000);
   };
   return (
-    <div className="min-h-screen flex">
+    <div className="flex">
       <div className="p-6 rounded-lg w-full max-w-md">
         <h2 className="flex space-x-3 text-2xl font-bold mb-5 text-gray-900 dark:text-gray-100">
           <CreditCard className="w-6 h-6 mr-2" /> Payment Form

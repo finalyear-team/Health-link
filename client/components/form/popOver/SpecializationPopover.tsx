@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { specialties } from "@/public/data/specialities";
 import { cn } from "@/lib/utils";
+import useUserStore from "@/store/userStore";
 import {
   Command,
   CommandInput,
@@ -23,6 +24,8 @@ const SpecializationPopover = ({
 }: any) => {
   console.log(specializationValue)
   const [open, setOpen] = useState(false);
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const userInformation = useUserStore((state) => state.user);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -45,7 +48,7 @@ const SpecializationPopover = ({
         <Command>
           <CommandInput placeholder="Search Specialization..." />
           <CommandEmpty>No specialization found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className="overflow-y-scroll h-[300px]">
             {specialties.map((speciality) => (
               <CommandList key={speciality.value}>
                 <CommandItem
@@ -57,6 +60,10 @@ const SpecializationPopover = ({
                     setSpecializationValue(
                       currentValue === specializationValue ? "" : currentValue
                     );
+                    setUserInformation({
+                      ...userInformation,
+                      specialization: currentValue,
+                    });
                     setOpen(false);
                   }}
                 >

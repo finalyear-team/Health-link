@@ -29,7 +29,6 @@ export default function RootLayout({
           >
             {children}
             <Toaster />
-
           </ThemeProvider>
             </ApolloWrappper>
         </body>

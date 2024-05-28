@@ -17,7 +17,6 @@ import { Loader2 } from "lucide-react";
 
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const [specializationValue, setSpecializationValue] = useState("");
-
   const [educationValue, setEducationValue] = useState("");
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -27,14 +26,16 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   };
 
   const [storedValues, setStoredValues] = useLocalStorage("professionalInfo", {
-    specialization: specializationValue,
-    consultationFee:"",
-    education: educationValue,
+    consultationFee: "",
     license: "",
     experiance: "",
     agreedToTerms: true,
     institution: "",
-    additionalInfo: null,
+
+    // additionalInfo causes a warning message in the console if no value is assigned to it
+    // Warning: `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
+    additionalInfo: "",
+    
     graduationYear: "",
   });
 

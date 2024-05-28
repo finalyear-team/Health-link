@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { validationSchemaPersInfo } from "@/utils/validationSchema";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Loader2 } from "lucide-react";
+import useUserStore from "@/store/userStore";
+import { UserType } from "@/types/types";
 
 const PersonalInfo = ({
   onNext,
@@ -17,6 +19,7 @@ const PersonalInfo = ({
   onNext: () => void;
   onBack: () => void;
 }) => {
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
   const [storedValues, setStoredValues] = useLocalStorage(
     "patient_personalInfo",
     {
@@ -25,10 +28,14 @@ const PersonalInfo = ({
       userName: "",
       DOB: "",
       gender: "",
+      role:UserType.PATIENT
     }
   );
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {
+    // setting the values into the store
+    setUserInformation(values);
+
     setTimeout(() => {
       setStoredValues(values);
       setSubmitting(false);
