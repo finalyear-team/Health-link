@@ -47,6 +47,8 @@ Welcome to the HealthLink Telemedicine Web Application, a platform designed to c
 
 ## Project Structure
 
+## Project Structure
+
 health-link/
 ├── admin/
 ├── client/                 # Frontend Next.js v.14 application
