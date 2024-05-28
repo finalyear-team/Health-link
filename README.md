@@ -8,7 +8,6 @@ Welcome to the HealthLink Telemedicine Web Application, a platform designed to c
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Project Structure](#project-structure)
 
 ## Features
 
@@ -44,50 +43,4 @@ Welcome to the HealthLink Telemedicine Web Application, a platform designed to c
 - **Text and Video Chat**: Doctors and patients can initiate text and video chats.
 - **Forum Interaction**: Users can ask questions, and others can provide answers.
 - **Blog Interaction**: Users can post, read, like, share, and comment on blogs.
-
-## Project Structure
-
-## Project Structure
-
-health-link/
-├── admin/
-├── client/                 # Frontend Next.js v.14 application
-│   ├── Services
-│   ├── actions
-│   ├── app
-│   ├── common/Loader
-│   ├── components
-│   ├── firebase
-│   ├── graphql
-│   ├── hooks
-│   ├── lib
-│   ├── public
-│   ├── store
-│   ├── types
-│   ├── utils
-│   ├── .env.example
-│   ├── .eslintrc.json
-│   ├── Dockerfile.dev
-│   ├── Dockerfile.prod
-│   ├── README.md
-│   ├── components.json
-│   ├── middleware.ts
-│   ├── next.config.mjs
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.ts
-│   ├── tsconfig.json
-├── server/                 # Backend Nest.js application
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   └── server.js            
-├── .gitignore
-├── Health_link.session.sql
-├── README.md
-├── docker-compose.dev.yml
-├── docker-compose.yml
-└── package-lock.json
 
