@@ -59,7 +59,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
               Professional Information (3/3)
             </h2>
             <Formik
-              initialValues={storedValues}
+              initialValues={{...storedValues,specialization:specializationValue,education:educationValue}}
               onSubmit={handleSubmit}
               validationSchema={validationSchemaAddInfo}
               enableReinitialize
@@ -174,7 +174,6 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                     <div>
                       <Button
                         disabled={
-                          !isValid ||
                           isSubmitting ||
                           !specializationValue ||
                           !educationValue ||

@@ -1,3 +1,4 @@
+"use client"
 import Head from "next/head";
 import VideoChatInitiation from "@/components/layout/video-chat";
 
@@ -14,7 +15,7 @@ const Home = () => {
       </Head>
 
       <div>
-        <VideoChatInitiation />
+        <VideoChatInitiation role={"doctor"}/>
       </div>
     </div>
   );

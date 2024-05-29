@@ -11,6 +11,7 @@ export const PastAppointment = ({
   purpose,
   status,
 }: AppointmentType) => {
+  
   const [year, month, day] = appointmentDate.split("-");
   const monthNames = [
     "Jan",

@@ -14,6 +14,7 @@ export const useSubmit = (setStoredValues: any, role: string) => {
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     // storing values in the zustands store
+    console.log(values)
     setUserInformation(values);
 
     setStoredValues(values);
@@ -51,7 +52,7 @@ export const useSubmit = (setStoredValues: any, role: string) => {
           firstName: firstName,
           lastName: lastName,
           emailAddress: email,
-          password: password,
+          password: user?.password,
           unsafeMetadata: {
             role: role,
           },

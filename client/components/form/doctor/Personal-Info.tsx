@@ -10,6 +10,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { validationSchemaPersInfo } from "@/utils/validationSchema";
 import { Loader2 } from "lucide-react";
 import useUserStore from "@/store/userStore";
+import { UserType } from "@/types/types";
 
 const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
   const setUserInformation = useUserStore((state) => state.setUserInformation);
@@ -19,6 +20,7 @@ const BasicInfoForm = ({ onNext }: { onNext: () => void }) => {
     userName: "",
     DOB: "",
     gender: "",
+    role:UserType.DOCTOR
   });
 
   const handleSubmit = (values: any, { setSubmitting }: any) => {

@@ -1,5 +1,4 @@
 "use client";
-
 import Container from "@/components/container/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +14,13 @@ import { Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
+
 const LoginPage = () => {
   const [error, setError] = useState(null);
   const { isLoaded, signIn, setActive } = useSignIn();
   const router = useRouter();
 
-  //validation for the input fields
+  // validation for the input fields
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("*Email is required!"),
@@ -57,6 +57,7 @@ const LoginPage = () => {
         identifier: values.email,
         password: values.password,
       });
+      console.log(result)
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         router.push("/dashboard");
@@ -144,7 +145,6 @@ const LoginPage = () => {
 
                 <div>
                   <Button
-                    disabled={!isValid || isSubmitting}
                     className="w-full"
                     type="submit"
                   >

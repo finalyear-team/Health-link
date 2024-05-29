@@ -25,6 +25,8 @@ import users from "@/public/data/users";
 import useAppointmentStore from "@/store/appointmentStore";
 import { Loader2 } from "lucide-react";
 import AppointmentForm from "@/components/form/appointment/appointment-form";
+import { useQuery } from "@apollo/client";
+import { GET_DOCTORS } from "@/graphql/queries/userQueries";
 
 type SortOrder = "ascending" | "descending";
 
@@ -34,13 +36,18 @@ const Consultation = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("ascending");
   const [noValue, setNoValue] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState(users);
-
   // cancel the appointment form
   const cancelAppointmentForm = useAppointmentStore(
     (state) => state.cancelAppointmentForm
   );
   // to check whether the doctor is selected or not
+  
   const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
+
+
+ 
+
+
 
   const handleCriteriaChange = (value: any) => {
     setCriteria(value);

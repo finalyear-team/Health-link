@@ -10,6 +10,7 @@ import { validationSchemaPersInfo } from "@/utils/validationSchema";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Loader2 } from "lucide-react";
 import useUserStore from "@/store/userStore";
+import { UserType } from "@/types/types";
 
 const PersonalInfo = ({
   onNext,
@@ -27,6 +28,7 @@ const PersonalInfo = ({
       userName: "",
       DOB: "",
       gender: "",
+      role:UserType.PATIENT
     }
   );
 

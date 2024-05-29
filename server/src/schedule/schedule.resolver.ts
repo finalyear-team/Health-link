@@ -58,6 +58,7 @@ export class ScheduleResolver {
 
   @Query('EmergencySchedules')
   async findEmergencySchedules() {
+    console.log("emergency schedules")
     const emergencySchedules=await this.scheduleService.emergencySchedules()
     return emergencySchedules
   }
@@ -66,8 +67,8 @@ export class ScheduleResolver {
   async GetScheduleByDate(@Args("DoctorID") DoctorID:string,@Args("Date") Date:string) {
     console.log(DoctorID)
     console.log(Date)
-    const emergencySchedules=await this.scheduleService.getScheduleByDate(DoctorID,Date)
-    return emergencySchedules
+    // const emergencySchedules=await this.scheduleService.getScheduleByDate(DoctorID,Date)
+    // return emergencySchedules
   }
 
  

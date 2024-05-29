@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
+import ApolloWrappper from "./providers/ApolloWrappper";
 
 export const metadata: Metadata = {
   title: "HealthLink",
@@ -16,8 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
+
       <html lang="en" suppressHydrationWarning>
         <body>
+          <ApolloWrappper>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -27,6 +30,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+            </ApolloWrappper>
         </body>
       </html>
     </ClerkProvider>

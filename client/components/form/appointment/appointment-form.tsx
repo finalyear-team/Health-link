@@ -32,6 +32,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useAppointmentStore from "@/store/appointmentStore";
+import { useQuery } from "@apollo/client";
+import { GET_SCHEDULES, GET_SCHEDULE_BY_DATE } from "@/graphql/queries/scheduleQueries";
 
 const doctorAvailability = {
   Monday: { start: "03:00 AM", end: "08:00 AM" },
@@ -51,9 +53,16 @@ const AppointmentForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [date, setDate] = useState<Date>();
   const [appointmentTime, setAppointmentTime] = useState("");
-  const clearSelection = useAppointmentStore((state) => state.clearSelection);
+  const selectedDoctor=useAppointmentStore((state)=>state.selectedDoctor)
+  const clearSelection = useAppointmentStore((state) => state.clearSelection);  
+  const { data, loading, error } = useQuery(GET_SCHEDULE_BY_DATE, {
+    variables: { doctorID:selectedDoctor?.id, date: date ? format(date, 'yyyy-MM-dd') : '' },
+    skip: !selectedDoctor?.id || !date, // Skip the query if doctorID or date is not set
+  });
+
 
   const handleSubmit = (values: any) => {
+    console.log(values)
     if (date && appointmentTime && values.reason) {
       setSubmitted(true);
     }
@@ -61,6 +70,7 @@ const AppointmentForm = () => {
 
   const initialValues = {
     reason: "",
+
   };
 
   const [todayDay, setTodayDat] = useState(null);
@@ -72,6 +82,7 @@ const AppointmentForm = () => {
   };
 
   const getAvailableTimes = () => {
+
     if (!date) return [];
     const dayOfWeek = date.toLocaleDateString("en-US", {
       weekday: "long",
@@ -202,7 +213,7 @@ const AppointmentForm = () => {
                         <SelectValue placeholder="Select Time" />
                       </SelectTrigger>
                       <SelectContent position="popper">
-                        {getAvailableTimes().map((time) => (
+                        {getAvailableTimes().map((time:any) => (
                           <SelectItem key={time} value={time}>
                             {time}
                           </SelectItem>

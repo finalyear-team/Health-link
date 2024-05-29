@@ -10,6 +10,7 @@ export class JwtTokenValidator{
  isTokenExpired(exp:number){
     return (Date.now()/1000)>exp
     }
+    
   validateToken(token:string){
     const decode  = this.jwt.decode(token) 
     if(!decode||this.isTokenExpired(decode.exp))

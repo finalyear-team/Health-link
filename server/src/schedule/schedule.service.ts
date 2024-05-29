@@ -4,10 +4,8 @@ import { UpdateScheduleInput } from './dto/update-schedule.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { convertToIso } from 'src/utils/converToIso';
 import { validateEndTime } from 'src/utils/validateTime';
-import { startWith } from 'rxjs';
 import { ScheduleType, Weekday } from '@prisma/client';
-import { error } from 'console';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { parseDate } from 'src/utils/parseDate';
 
 @Injectable()
@@ -264,15 +262,14 @@ export class ScheduleService {
 
         }
       })
-
       return schedules
-
     } catch (error) {
       throw error
-
     }
   }
 
+  //
+  
 
 
 }

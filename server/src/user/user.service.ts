@@ -109,6 +109,46 @@ export class UserService {
       throw error
     }
   }
+async countFollowersAndFollowing(UserID:string){
+  try {
+   const followers=await this.prisma.followers.count({
+      where:{
+        FollowerID:UserID
+      }
+    })
+    const following=await this.prisma.followers.count({
+      where:{
+        FollowingID:UserID
+      }
+    })
+    return {Followers:followers,Following:following}
+  } catch (error) {
+    
+  }
+
+}
+ async getDoctors(){
+     try {
+        const doctors=await this.prisma.users.findMany({
+          where:{
+            Role:"doctor"
+          },
+          include:{
+           DoctorDetails:true,
+        },
+        
+      })
+
+      const Followers=await Promise.all(doctors.map(async(doctor)=>this.countFollowersAndFollowing(doctor.UserID)))
+      console.log(Followers)
+      console.log(doctors.map((doctor,i)=>({...doctor.DoctorDetails,...doctor,...Followers[i]})))
+      return Promise.all(doctors.map((doctor,i)=>({...doctor.DoctorDetails,...doctor,...Followers[i]})))
+
+     } catch (error) {
+      console.log(error)
+      
+     }
+ }
 
   async searchDoctors(searchQuery: string): Promise<Users[]> {
     try {
