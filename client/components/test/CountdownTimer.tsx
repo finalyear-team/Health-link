@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
+import { Info, Timer } from "lucide-react";
 
 interface CountdownTimerProps {
   targetTime: string;
@@ -37,12 +37,20 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
 
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setTimeLeft(calculateTimeLeft());
+  //   }, 1000);
+
+  //   return () => clearTimeout(timer);
+  // }, [targetTime]);
+
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const interval = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(interval);
   }, [targetTime]);
 
   const timerComponents: JSX.Element[] = [];
@@ -63,10 +71,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
   return (
     <div className="text-center text-lg font-semibold text-slate-600 dark:text-slate-300">
       {timerComponents.length ? (
-        timerComponents
+        <div className="flex items-center space-x-3">
+          <Timer className="h-5 w-5" /> {timerComponents} <span> Left</span>{" "}
+        </div>
       ) : (
         <div className="w-[250px] flex items-center justify-center space-x-2 flex-wrap text-sm text-slate-600 dark:text-slate-300">
-          You can Join the Consultation Now.{" "}
+          You can Now Join the Video Consultation.{" "}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>

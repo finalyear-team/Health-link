@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 import { Button } from "@/components/ui/button";
-
+import { Video } from "lucide-react";
 
 interface JoinButtonProps {
   isActive: boolean;
@@ -9,14 +9,14 @@ interface JoinButtonProps {
 
 const JoinButton: React.FC<JoinButtonProps> = ({ isActive, onClick }) => {
   return (
-    <Button 
-      onClick={onClick} 
-      className={`${isActive ? '' : 'bg-slate-300 cursor-not-allowed'}`} 
+    <Button
+      onClick={onClick}
+      className={`${isActive ? "" : "bg-slate-300 cursor-not-allowed"}`}
       disabled={!isActive}
     >
-    Join Chat
+      <Video className="w-4 h-4 mr-2" /> Join Live Consultation
     </Button>
   );
-}
+};
 
 export default JoinButton;
