@@ -22,6 +22,7 @@ export interface AppointmentType {
   appointmentDate: string;
   appointmentTime: string;
   doctorName: string;
+  doctorPhoto: string;
   purpose: string;
   status: string;
 }

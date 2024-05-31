@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import Image from "next/image";
 import users from "@/public/data/users";
@@ -8,7 +8,7 @@ import useAppointmentStore from "@/store/appointmentStore";
 import { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_DOCTORS } from "@/graphql/queries/userQueries";
-
+import Loading from "@/common/Loader/Loading";
 
 interface TopDoctorsProps {
   items: DoctorProfile[];
@@ -20,7 +20,7 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
   const showAppointmentForm = useAppointmentStore(
     (state) => state.showAppointmentForm
   );
-  const {data,error,loading}=useQuery(GET_DOCTORS)
+  const { data, error, loading } = useQuery(GET_DOCTORS);
 
   const handleFollow = () => {
     // handle follow logic
@@ -38,14 +38,12 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
     console.log("The updated Doctor is : ", profile);
   };
 
-  if(loading)
-    return <div>loading.....</div>
+  if (loading) return <Loading />;
 
-
-console.log(data)
+  console.log(data);
   return (
     <div className="flex flex-wrap justify-center mt-3">
-      {data.GetDoctors.map((profile:any) => (
+      {data.GetDoctors.map((profile: any) => (
         <DoctorProfileCard
           key={profile.id}
           id={profile.UserID}
