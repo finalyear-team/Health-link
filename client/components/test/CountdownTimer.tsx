@@ -20,6 +20,8 @@ interface TimeLeft {
 }
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
+
+  // calculate the remaing time
   const calculateTimeLeft = (): TimeLeft => {
     const difference = +new Date(targetTime) - +new Date();
     let timeLeft: TimeLeft = {};
@@ -37,14 +39,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setTimeLeft(calculateTimeLeft());
-  //   }, 1000);
-
-  //   return () => clearTimeout(timer);
-  // }, [targetTime]);
-
+  // change the timeleft whenver the targettime is changes
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
@@ -55,6 +50,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
 
   const timerComponents: JSX.Element[] = [];
 
+  // add a span that containes the remaining time
   Object.keys(timeLeft).forEach((interval) => {
     const value = timeLeft[interval as keyof TimeLeft];
     if (!value) {

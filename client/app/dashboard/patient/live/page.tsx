@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import VideoChatInitiation from "@/components/layout/video-chat";
 import { Button } from "@/components/ui/button";
 import AppointmentDetails from "@/components/test/AppointmentDetails";
@@ -32,14 +32,20 @@ import {
 } from "@/components/ui/dialog";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 const Video = () => {
   const [showVideoChat, setShowVideoChat] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
-  const appointmentTime = "2024-06-01T00:50:00";
-  const currentTime = new Date().toISOString();
-  const isActive = new Date(currentTime) >= new Date(appointmentTime);
+  const appointmentTime = "2024-06-01T14:50:00";
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentTime = new Date().toISOString();
+      setIsActive(new Date(currentTime) >= new Date(appointmentTime));
+    }, 1000);
+
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, [appointmentTime]);
 
   const initialValues = {
     name: "",

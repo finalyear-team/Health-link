@@ -70,12 +70,12 @@ const ConsultationPage = ({ role }: any) => {
   return (
     <div className="flex flex-wrap">
       {/* Video Call Area */}
-      <div className="flex-grow w-full md:w-3/4">
+      <div className="flex-grow w-full md:w-3/4 mb-2">
         <VideoCall />
       </div>
 
       {/* Participant List */}
-      <div className="w-full md:w-1/4 px-4">
+      <div className="w-full md:w-1/4">
         {/* <ParticipantList participants={participants} /> */}
         <ChatBox />
       </div>
