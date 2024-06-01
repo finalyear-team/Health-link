@@ -7,6 +7,7 @@ import AppointmentDetails from "@/components/test/AppointmentDetails";
 import CountdownTimer from "@/components/test/CountdownTimer";
 import JoinButton from "@/components/test/JoinButton";
 import ChatBox from "@/components/test/ChatBox";
+import AppointmentForm from "@/components/form/appointment/appointment-form";
 import { Formik, Form } from "formik";
 import { CircleArrowOutUpRight, Settings2, Trash2 } from "lucide-react";
 import {
@@ -60,6 +61,14 @@ const Video = () => {
     // some Logic
   };
 
+  const dummyData = {
+    doctorId: "1",
+    doctorName: "Dr. John Doe",
+    doctorPhoto: "/image/profile-picture.jpg",
+    appointmentTime: "June 1, 2024, 10:00 AM",
+    purpose: "General consultation",
+  };
+
   return (
     <div>
       {!showVideoChat && (
@@ -72,10 +81,10 @@ const Video = () => {
           <hr className="mt-2" />
           <div className="flex items-center justify-between flex-wrap mt-2">
             <AppointmentDetails
-              doctorName="Dr. John Doe"
-              doctorPhoto="/image/profile-picture.jpg"
-              appointmentTime="June 1, 2024, 10:00 AM"
-              purpose="General consultation"
+              doctorName={dummyData.doctorName}
+              doctorPhoto={dummyData.doctorPhoto}
+              appointmentTime={dummyData.appointmentTime}
+              purpose={dummyData.purpose}
             />
             <div className="mt-4">
               <CountdownTimer targetTime={appointmentTime} />
@@ -91,9 +100,9 @@ const Video = () => {
                   <Settings2 className="w-4 h-4 mr-2" /> Reschedule
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="">
                 <DialogHeader>
-                  <DialogTitle className="flex">
+                  <DialogTitle className="flex items-center mb-2">
                     {" "}
                     <Settings2 className="w-4 h-4 mr-2" /> Reschedule
                     Appointment
@@ -103,28 +112,7 @@ const Video = () => {
                     you&apos;re done.
                   </DialogDescription>
                 </DialogHeader>
-                <Formik
-                  initialValues={initialValues}
-                  onSubmit={handleSchedule}
-                  // validationSchema={validationSchema}
-                >
-                  {({ isValid, isSubmitting }) => (
-                    <Form className="mt-8 space-y-4" action="#" method="POST">
-                      <div className="py-4">
-                        <div className="">
-                          <Input type="text" name="name" label="Name" />
-                        </div>
-                        <div className="mt-2">
-                          <Input type="text" name="username" label="Username" />
-                        </div>
-                      </div>
-
-                      <DialogFooter>
-                        <Button type="submit">Save changes</Button>
-                      </DialogFooter>
-                    </Form>
-                  )}
-                </Formik>
+                <AppointmentForm doctorId={dummyData.doctorId} />
               </DialogContent>
             </Dialog>
 
