@@ -43,7 +43,8 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
   console.log(data);
   return (
     <div className="flex flex-wrap justify-center mt-3">
-      {data.GetDoctors.map((profile: any) => (
+      {/* {data.GetDoctors.map((profile: any) => ( */}
+      {items.map((profile: any) => (
         <DoctorProfileCard
           key={profile.id}
           id={profile.UserID}

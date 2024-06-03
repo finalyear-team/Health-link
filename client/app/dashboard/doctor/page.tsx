@@ -21,7 +21,7 @@ const PatientDahboard = () => {
   useEffect(() => {
     const updateGreetingAndTime = () => {
       const now = new Date();
-      const formattedTime = format(now, 'ይይ hh:mm aa');
+      const formattedTime = format(now, 'hh:mm aa');
 
       setTimeString(formattedTime);
 

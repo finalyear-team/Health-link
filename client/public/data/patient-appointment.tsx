@@ -4,8 +4,8 @@ export const patientAppointments = {
   upcomingAppointments: [
     {
       id: 1,
-      appointmentDate: "2024-05-25",
-      appointmentTime: "09:30",
+      appointmentDate: "2024-08-25",
+      appointmentTime: "09:30:00",
       doctorName: "Dr. Smith",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Regular Check-up",
@@ -13,8 +13,8 @@ export const patientAppointments = {
     },
     {
       id: 2,
-      appointmentDate: "2024-06-01",
-      appointmentTime: "13:00",
+      appointmentDate: "2024-06-03",
+      appointmentTime: "23:35:00",
       doctorName: "Dr. Taylor",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Vaccination",
@@ -22,8 +22,8 @@ export const patientAppointments = {
     },
     {
       id: 3,
-      appointmentDate: "2024-06-10",
-      appointmentTime: "11:00",
+      appointmentDate: "2024-06-03",
+      appointmentTime: "22:00:00",
       doctorName: "Dr. Johnson",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Consultation",
@@ -34,7 +34,7 @@ export const patientAppointments = {
     {
       id: 4,
       appointmentDate: "2024-05-10",
-      appointmentTime: "10:00",
+      appointmentTime: "10:00:00",
       doctorName: "Dr. Williams",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Follow-up",
@@ -43,7 +43,7 @@ export const patientAppointments = {
     {
       id: 5,
       appointmentDate: "2024-04-20",
-      appointmentTime: "15:00",
+      appointmentTime: "15:00:00",
       doctorName: "Dr. Miller",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Dental Check-up",
@@ -52,7 +52,7 @@ export const patientAppointments = {
     {
       id: 6,
       appointmentDate: "2024-03-30",
-      appointmentTime: "09:30",
+      appointmentTime: "09:30:00",
       doctorName: "Dr. Anderson",
       doctorPhoto: "/image/profile-picture.jpg",
       purpose: "Physical Therapy",
