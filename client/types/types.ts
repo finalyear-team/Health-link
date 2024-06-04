@@ -18,10 +18,7 @@ export enum SuspendType {
   UNSUSPEND = 'unsuspend',
 }
 
-export enum ItemType {
-  POST = 'post',
-  FORUM = 'forum',
-}
+
 
 export enum AttachmentType {
   IMAGE = 'image',
@@ -71,14 +68,12 @@ export enum Role {
   GUEST = 'guest',
 }
 
-export enum LikeType {
-  FORUM_ANSWER = 'forumAnswer',
-  POST = 'post',
-}
 
-export enum CommentableType {
+
+export enum ContentType {
   FORUM_ANSWER = 'forumAnswer',
   POST = 'post',
+  COMMENT="comment"
 }
 
 export enum FeedbackType {
@@ -100,4 +95,13 @@ export enum PaymentStatus {
   PENDING = 'pending',
   COMPLETED = 'completed',
 
+}
+export enum MediaType{
+  VIDEO="video",
+ IMAGE= "image"
+}
+
+export enum LikeType{
+  LIKE="like",
+ DISLIKE= "dislike"
 }

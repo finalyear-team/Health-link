@@ -1,0 +1,52 @@
+scalar Date
+
+
+
+type Blog {
+  BlogID:String
+  Title:String
+  Content:String
+  DoctorID:String
+  CommentsCount:Int
+  Views:Int
+  Comments:[Comment]
+  PublishedAt:Date
+  CreatedAt:Date
+}
+
+
+input CreateBlogInput {
+  Title:String!
+  Content:String!
+  DoctorID:String!
+  Publish:Boolean
+}
+
+input CreateBlogCommentInput{
+  BlogID:String!
+  Content:String!
+  UserID:String!   
+  Medias:[MediaInput]
+}
+
+input UpdateBlogInput {
+  BlogID: String!
+  DoctorID:String
+  Title:String
+  Content:String
+  Publish:Boolean
+}
+
+type Query {
+  GetBlogs: [Blog]!
+  GetBlog(BlogID: String!): Blog
+  GetDoctorBlog(DoctorID:String!):[Blog]
+  SearchBlog(Query:String!):[Blog]  
+}
+
+type Mutation {
+  CreateBlog(createBlogInput: CreateBlogInput!): Blog!
+  CreateBlogComment(createBlogCommentInput:CreateBlogCommentInput):Comment!
+  UpdateBlog(updateBlogInput: UpdateBlogInput!): Blog!  
+  RemoveBlog(BlogID: String!): Blog
+}

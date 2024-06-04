@@ -1,24 +1,86 @@
-type Post {
-  # Example field (placeholder)
-  exampleField: Int
+
+enum MediaType{
+   video
+   Image
 }
+enum ItemType{
+   comment
+   post
+   blog
+}
+enum LikeType{
+  like
+  dislike
+}
+
+type PostMedia{
+   MediaType:MediaType
+   URL:String
+  }  
+
+        
+
+type views{
+   ViewID:String
+}
+
+type Likes{
+   LikeID:String
+   ItemType:ItemType
+   ItemID:String
+   UserID:String
+}
+
+type Post {
+   PostID:String!
+   Content:String
+   Media:[PostMedia]
+   DoctorID:String
+   Comments: [Comment]
+   Views: Int
+   Likes: Int
+   CommentsCount: Int
+   CreatedAt: String
+   UpdatedAt: String
+}
+
+input MediaInput {
+  MediaType: MediaType
+  ContentType:ItemType
+  URL: String
+} 
 
 input CreatePostInput {
-  # Example field (placeholder)
-  exampleField: Int
+  Content:String!
+  DoctorID:String!
+  Medias:[MediaInput]  
 }
+
+
 
 input UpdatePostInput {
-  id: Int!
+  PostID: String!
+  Content:String!
+  DoctorID:String!
+  Medias:[MediaInput]
 }
+
+
 
 type Query {
-  posts: [Post]!
-  post(id: Int!): Post
-}
+  GetPosts: [Post]
+  GetPost(PostID: String!): Post
+  GetPostByDoctorID(DoctorID:String!):[Post]
+  GetMedias(DoctorID:String!):[PostMedia]
+  GetLikes(UserID:String!):[Post]
+  SearchPost(Query:String!):[Post]
+  }
+
 
 type Mutation {
-  createPost(createPostInput: CreatePostInput!): Post!
-  updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: Int!): Post
+  CreatePost(createPostInput: CreatePostInput!): Post!
+  UpdatePost(updatePostInput: UpdatePostInput!): Post!
+  LikeContent(ItemID:String!,UserID:String!,LikeType:LikeType):Likes
+  RemovePost(PostID: String!): Post
+
 }

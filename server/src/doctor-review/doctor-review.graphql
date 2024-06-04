@@ -1,0 +1,35 @@
+scalar Date
+type DoctorReview {
+   ReviewID:String!
+   ReviewerID:String!
+   DoctorID:String!
+   Rating:Int
+   ReviewText:String
+   CreatedAt:Date
+}
+
+input CreateDoctorReviewInput {
+   DoctorID:String!
+   ReviewerID:String!
+   Rating:Int
+   ReviewText:String
+}
+
+input UpdateDoctorReviewInput {
+   ReviewID: String!
+   ReviewerID:String!
+   Rating:Int
+   ReviewText:String
+
+}
+
+type Query {
+  GetReviews(DoctorID:String!): [DoctorReview]!
+  GetReview(Doctor: String!): DoctorReview
+}
+
+type Mutation {
+  CreateDoctorReview(createDoctorReviewInput: CreateDoctorReviewInput!): DoctorReview!
+  UpdateDoctorReview(updateDoctorReviewInput: UpdateDoctorReviewInput!): DoctorReview!
+  RemoveDoctorReview(id: Int!): DoctorReview
+}

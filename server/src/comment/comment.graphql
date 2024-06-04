@@ -1,0 +1,57 @@
+        
+
+type Comment{
+   CommentID:String        
+   Content:String
+   UserID:String
+   PostID:String
+   Medias:[PostMedia]
+   ItemType:ItemType
+   Likes:Int
+   views:Int
+   CommentsCount: Int
+   Replies: [Comment]
+   createdAt: String
+   updatedAt: String
+   
+}
+
+
+input CreateCommentInput{
+   ItemID:String!
+   Content:String!
+   UserID:String! 
+   ItemType:ItemType  
+   Medias:[MediaInput]
+}
+
+input CreateCommentReply{
+   CommentID:String!
+   Content:String!
+   UserID:String
+   Medias:[MediaInput]
+}
+
+
+
+input UpdatePostInput {
+  PostID: String!
+  Content:String!
+  DoctorID:String!
+  Medias:[MediaInput]
+}
+
+
+
+type Query {
+  GetComments(ItemID: String!): [Comment]
+  GetCommentReplies(CommentID:String!):[Comment]
+  }
+
+
+type Mutation {
+  CreateComment(createPostInput: CreatePostInput!): Comment!
+  LikeContent(ItemID:String!,UserID:String!):Likes
+  CreateCommentReply(createCommentReply:CreateCommentReply!):Comment!
+  RemoveComment(CommentID: String!): Comment
+}

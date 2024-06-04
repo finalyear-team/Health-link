@@ -1,0 +1,24 @@
+type Stream {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input CreateStreamInput {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input UpdateStreamInput {
+  id: Int!
+}
+
+type Query {
+  streams: [Stream]!
+  stream(id: Int!): Stream
+}
+
+type Mutation {
+  createStream(createStreamInput: CreateStreamInput!): Stream!
+  updateStream(updateStreamInput: UpdateStreamInput!): Stream!
+  removeStream(id: Int!): Stream
+}

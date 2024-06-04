@@ -1,7 +1,6 @@
 "use server"
+import { auth } from "@clerk/nextjs/server";
 
-import { useAuth } from "@clerk/nextjs";
-import { UserRoundIcon } from "lucide-react";
 
 const fetchWithRetry = async (url: string, options: any) => {
     const MAX_RETRIES = 4;
@@ -17,19 +16,24 @@ const fetchWithRetry = async (url: string, options: any) => {
     throw error;
 };
 
- export const tokenProvider=async(UserID:string,UserName:string)=>{
+ export const tokenProvider=async()=>{
     try {
-    const token=await fetchWithRetry("http://localhost:4000/stream-chat/token",{
+    const UserID=auth().userId
+    console.log(UserID)
+    const response=await fetchWithRetry("http://localhost:4000/stream-chat/token",{
         method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                UserID,
-               UserName
             }),
             credentials: "include"
-    })       
+    })   
+    const token=await response.json() 
+    console.log(token)  
+
+    return token
 
     } catch (error) {
         

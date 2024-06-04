@@ -24,7 +24,7 @@ const ConsultationPage = ({role}:any) => {
     const fetchRoom=async()=>{
       try {           
         const response=await getRoom({doctor:"user_2h0T5Y17niLD8kejPXXEPx4j1ME",
-      patient:"user_2gjqwG6Txeg2XAHHZ56zy5kvITA",appointmentDate:"29/05/2024",
+      patient:"user_2h4A4uEjz6GSvje547xNK7I276j",appointmentDate:"29/05/2024",
       appointmentTime:"06:40 pm"})
       setRoom(response.room)
       if(  role.includes("doctor") )

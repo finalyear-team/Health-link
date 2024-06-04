@@ -7,11 +7,24 @@ export class StreamChatController {
   constructor(private readonly streamChatService: StreamChatService) {
   }
 
-  @Post("create-dm")
-  async streamDmChannel(@Body() {UserID,memberID}:{UserID:string,memberID:string},@Res() res:Response){
-    const token=this.streamChatService.createDmChannel(UserID,memberID)
+
+  @Post("/token")
+  async createStreamToken(@Body() body:any,@Res() res:Response){
+    const {UserID}=body
+    const token=await this.streamChatService.createStreamUser(UserID)
     console.log(token)
     res.json(token)
+    
+  }
+  
+  @Post("create-dm")
+  async streamDmChannel(@Body() {UserID,memberID}:{UserID:string,memberID:string},@Res() res:Response){
+    console.log(UserID)
+    console.log(memberID)
+    console.log("come on man")
+    const channel=await this.streamChatService.createDmChannel(UserID,memberID)
+    console.log(channel)
+    res.json(channel)
   }
 
 

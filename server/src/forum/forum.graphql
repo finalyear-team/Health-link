@@ -1,24 +1,69 @@
+scalar Date
+
+type PostMedia{
+   MediaType:MediaType
+   URL:String
+  }  
+
+type ForumAnswer{
+  ForumPostID:String
+  Answer:String
+  UserID:String
+  Medias:[PostMedia]
+  Comments:[Comment]
+  CommentsCount:Int
+  Likes:Int
+}
 type Forum {
-  # Example field (placeholder)
-  exampleField: Int
+  ForumPostID:String
+  UserID:String
+  Question:String!
+  CreatedAt:Date
+  UpdatedAt:Date
+  ForumAnswer:[ForumAnswer]
 }
 
 input CreateForumInput {
-  # Example field (placeholder)
-  exampleField: Int
+   Question:String!
+   UserID:String!   
+}
+
+input CreateForumAnswerInput {
+  Answer:String!
+  ForumPostID:String!
+  UserID:String!
+  Medias:[MediaInput]
 }
 
 input UpdateForumInput {
-  id: Int!
+  ForumPostID:String!
+  Question:String
+  UserID:String!
+}
+
+input UpdateForumAnswerInput {
+  ForumPostID:String!
+  ForumAnswerID:String!
+  Answer:String
+  UserID:String!
 }
 
 type Query {
-  forums: [Forum]!
-  forum(id: Int!): Forum
+  getForumPosts: [Forum]
+  getForumPost(ForumPostID: String!): Forum
+  getForumAnswers(ForumPostID:String!):[ForumAnswer]
+  getForumAnswer(ForumAnswerID:String!):[ForumAnswer]
 }
 
 type Mutation {
-  createForum(createForumInput: CreateForumInput!): Forum!
+  createForumPost(createForumInput: CreateForumInput!): Forum!
   updateForum(updateForumInput: UpdateForumInput!): Forum!
-  removeForum(id: Int!): Forum
+  removeForumPost(ForumPostID:String!):Forum!
+  
+  createForumAnswer(createForumAnswerInput: CreateForumAnswerInput!): Forum!
+  updateForumAnswer(updateForumAnswerInput:UpdateForumAnswerInput):Forum!
+
+  removeForumAnswer(ForumAnswerID:String!):Forum!
+
+
 }

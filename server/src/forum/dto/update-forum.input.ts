@@ -1,6 +1,10 @@
-import { CreateForumInput } from './create-forum.input';
+import { CreateForumAnswerInput, CreateForumInput } from './create-forum.input';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class UpdateForumInput extends PartialType(CreateForumInput) {
-  id: number;
+  ForumID: string;
+}
+
+export class UpdateForumAnswerInput extends PartialType(CreateForumAnswerInput) {
+  ForumAnswerID: string;
 }

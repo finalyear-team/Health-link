@@ -116,6 +116,7 @@ export class VideoCallService {
                 return { createdRoom, authToken }
             }
         } catch (error) {
+            console.log(error)
             throw error
 
         }

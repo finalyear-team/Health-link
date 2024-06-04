@@ -24,6 +24,11 @@ import { SocketModule } from './socket/socket.module';
 import * as nestSchedule from '@nestjs/schedule';
 import { SocketService } from './socket/socket.service';
 import { ForumModule } from './forum/forum.module';
+import { RedisModule } from './redis/redis.module';
+import { BlogModule } from './blog/blog.module';
+import { CommentModule } from './comment/comment.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { DoctorReviewModule } from './doctor-review/doctor-review.module';
 
 
 @Module({
@@ -36,14 +41,14 @@ import { ForumModule } from './forum/forum.module';
   nestSchedule.ScheduleModule.forRoot(),
   EventEmitterModule.forRoot()
   ,
-   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule],
+   UserModule, AuthModule, VideoCallModule, StreamChatModule,JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule],
   providers: [AppService, SocketGateway,AuthService, UserService,UserResolver, PrismaService, AccessControlService,SocketService],
   controllers: [PaymentController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // consumer.apply(ClerkMiddleware).forRoutes('/video-call/*');
-    consumer.apply(ClerkMiddleware).forRoutes('/stream-chat/*');
+    // consumer.apply(ClerkMiddleware).forRoutes('/stream-chat/*');
   }
  
 }

@@ -4,7 +4,6 @@ import { ApolloProvider } from '@apollo/client'
 import React from 'react'
 
 const ApolloWrappper = ({children}:any) => {
-  console.log(client)
   return (
     <ApolloProvider client={client}>
         {children}
