@@ -104,6 +104,7 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             description: `Your appointment has been updated successfully, please wait for response from ${selectedDoctor?.name} to confirm`,
             variant: "success",
           });
+          clearSelection();
         } else {
           await CreateAppointment({
             variables: {
@@ -120,6 +121,7 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             description: `Your appointment has been sent successfully, please wait for response from ${selectedDoctor?.name} to confirm.`,
             variant: "success",
           });
+          clearSelection();
         }
       } catch (error) {
         console.error(
@@ -284,13 +286,6 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             <div className="flex items-center space-x-4 flex-wrap">
               <Button type="submit" disabled={!isValid || isSubmitting}>
                 {existingAppointment ? "Reschedule" : "Book"}
-              </Button>
-              <Button
-                type="button"
-                onClick={clearSelection}
-                variant={"outline"}
-              >
-                Cancel
               </Button>
             </div>
           </Form>

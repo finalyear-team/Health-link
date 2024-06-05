@@ -1,8 +1,11 @@
 import React from "react";
 import { FC, useState } from "react";
 import { Button } from "../ui/button";
-import { BadgeCheck } from "lucide-react";
+import {
+  MdVerified,
+} from "react-icons/md";
 import { Badge } from "../ui/badge";
+import Image from "next/image";
 
 interface SocialMediaHeaderCardProps {
   profilePicture: string;
@@ -21,7 +24,7 @@ const ProfileHeader: FC<SocialMediaHeaderCardProps> = ({
 }) => {
   return (
     <div>
-      <div className="flex items-center border border-slate-200 shadow-sm dark:border-slate-500  p-2 rounded">
+      <div className="flex items-center m-2">
         <img
           src={profilePicture}
           alt={name}
@@ -31,7 +34,7 @@ const ProfileHeader: FC<SocialMediaHeaderCardProps> = ({
           <div className="flex items-center">
             <h2 className="font-semibold">{name}</h2>
 
-            <BadgeCheck className="w-4 h-4 text-secondary-600 ml-2" />
+            <MdVerified size={16} className="text-secondary-600 ml-2" />
           </div>
           <div className="text-sm text-gray-500">
             @{username} - <Badge>{userType}</Badge>

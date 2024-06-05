@@ -35,6 +35,7 @@ import { useMutation } from "@apollo/client";
 import { REMOVE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
 import { useToast } from "../ui/use-toast";
 import Loading from "@/common/Loader/Loading";
+import { format, parse } from 'date-fns';
 
 const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
   const [ISOFormattedtime, setISOFormattedTime] = useState("");
@@ -50,6 +51,12 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     const dateTime = new Date(`${date}T${time}`);
     return dateTime.toISOString();
   };
+
+  // change the format of the appointment time from HH:mm:ss to hh:mm a to display
+  const parsedTime = parse(dummyData.appointmentTime, 'HH:mm:ss', new Date());
+  
+  // Format the parsed time to 'hh:mm a'
+  const formattedTime = format(parsedTime, 'hh:mm a');
 
   // assign combined ISO format date and time to state
   useEffect(() => {
@@ -118,7 +125,7 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
           doctorName={dummyData.doctorName}
           doctorPhoto={dummyData.doctorPhoto}
           appointmentId={dummyData.appointmentId}
-          appointmentTime={`${dummyData.appointmentDate} | ${dummyData.appointmentTime}`}
+          appointmentTime={`${dummyData.appointmentDate} | ${formattedTime}`}
           purpose={dummyData.purpose}
         />
         <CountdownTimer targetTime={ISOFormattedtime} expire={expire} />
