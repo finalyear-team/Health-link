@@ -9,6 +9,8 @@ import {
   setSeconds,
   isBefore,
   startOfDay,
+  parse,
+  addMinutes,
 } from "date-fns";
 import { useUser } from "@clerk/nextjs";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -39,6 +41,7 @@ import {
   UPDATE_APPOINTMENT,
   CREATE_APPOINTMENT,
 } from "@/graphql/mutations/appointmentMutations";
+import { useToast } from "@/components/ui/use-toast";
 
 type DayOfWeek = keyof typeof doctorAvailability;
 
@@ -69,6 +72,8 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
   const [CreateAppointment] = useMutation(CREATE_APPOINTMENT);
   const [UpdateAppointment] = useMutation(UPDATE_APPOINTMENT);
 
+  const { toast } = useToast();
+
   const { data } = useQuery(GET_SCHEDULE_BY_DATE, {
     variables: {
       doctorID: selectedDoctor?.id,
@@ -94,6 +99,11 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             },
           });
           console.log("appointment updated");
+          toast({
+            title: "Appointment Updated",
+            description: `Your appointment has been updated successfully, please wait for response from ${selectedDoctor?.name} to confirm`,
+            variant: "success",
+          });
         } else {
           await CreateAppointment({
             variables: {
@@ -105,12 +115,24 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             },
           });
           console.log("appointment created");
+          toast({
+            title: "Appointment Created",
+            description: `Your appointment has been sent successfully, please wait for response from ${selectedDoctor?.name} to confirm.`,
+            variant: "success",
+          });
         }
       } catch (error) {
         console.error(
           `Error ${existingAppointment ? "updating" : "creating"} appointment:`,
           error
         );
+        toast({
+          title: `Error ${
+            existingAppointment ? "updating" : "creating"
+          } appointment`,
+          description: "Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -123,61 +145,52 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
 
   const getAvailableTimes = () => {
     if (!date) return [];
-    const dayOfWeek = date.toLocaleDateString("en-US", {
-      weekday: "long",
-    }) as DayOfWeek;
+
+    // Get the day of the week
+    const dayOfWeek = format(date, "EEEE") as DayOfWeek;
     const range = getTimeRangeForDay(dayOfWeek);
 
     if (!range) return [];
 
-    const [startHour, startMinutes] = range.start.split(/[: ]/).map(Number);
-    const [endHour, endMinutes] = range.end.split(/[: ]/).map(Number);
-    const startPeriod = range.start.split(" ")[1];
-    const endPeriod = range.end.split(" ")[1];
-
-    const start = new Date(date);
-    start.setHours(
-      startPeriod === "AM" ? startHour : startHour + 12,
-      startMinutes
-    );
-
-    const end = new Date(date);
-    end.setHours(endPeriod === "AM" ? endHour : endHour + 12, endMinutes);
+    // Parse the start and end times
+    const start = parse(range.start, "hh:mm a", date);
+    const end = parse(range.end, "hh:mm a", date);
 
     const times = [];
-    const current = new Date(start);
+    let current = start;
 
-    while (current <= end) {
-      times.push(
-        current.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-      );
-      current.setMinutes(current.getMinutes() + 60);
+    // Generate times in 1-hour increments
+    while (isBefore(current, end) || current.getTime() === end.getTime()) {
+      times.push(format(current, "hh:mm a"));
+      current = addMinutes(current, 60);
     }
 
     return times;
   };
 
+  // Function to format date and time into a specific combined string format
   const formatDateAndTime = () => {
     if (date && appointmentTime) {
       const [time, period] = appointmentTime.split(" ");
+
       let [hours, minutes] = time.split(":").map(Number);
 
+      // Convert hours to 24-hour format based on the period
       if (period === "PM" && hours !== 12) {
         hours += 12;
       } else if (period === "AM" && hours === 12) {
         hours = 0;
       }
 
+      // Create a new date object
       const combinedDateTime = setSeconds(
         setMinutes(setHours(new Date(date), hours), minutes),
         0
       );
+
       return format(combinedDateTime, "yyyy-MM-dd HH:mm:ss");
     }
+
     return "";
   };
 

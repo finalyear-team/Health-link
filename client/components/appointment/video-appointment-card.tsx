@@ -31,11 +31,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMutation } from "@apollo/client";
+import { REMOVE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
+import { useToast } from "../ui/use-toast";
+import Loading from "@/common/Loader/Loading";
 
 const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
   const [ISOFormattedtime, setISOFormattedTime] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [expire, setExpire] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [RemoveAppointment, { data, loading, error }] =
+    useMutation(REMOVE_APPOINTMENT);
+  const { toast } = useToast();
 
   // convert string format date and time into combined ISO format
   const convertToISO = (date: string, time: string): string => {
@@ -71,8 +79,40 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     return () => clearInterval(intervalId); // Clean up on unmount
   }, [dummyData.appointmentDate, dummyData.appointmentTime]);
 
+  const RemoveAppointmentHandler = async () => {
+    try {
+      await RemoveAppointment({
+        variables: { Id: dummyData.appointmentId },
+      });
+      console.log("appointment Removed");
+      toast({
+        title: "Appointment Removed",
+        description: "Your appointment has been removed successfully.",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error removing appointment: ", error);
+      toast({
+        title: "Error removing appointment",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="w-full flex justify-center my-2">
+        <Loading />
+      </div>
+    );
+
   return (
-    <div className="relative rounded border border-slate-200 dark:border-slate-600 p-3 mb-2">
+    <div
+      className="relative rounded border border-slate-200 dark:border-slate-600 p-3 mb-2"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="flex items-center justify-between flex-wrap">
         <AppointmentDetails
           doctorName={dummyData.doctorName}
@@ -91,7 +131,10 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
               <Tooltip>
                 <TooltipTrigger>
                   <DialogTrigger asChild>
-                    <div className="hover:bg-slate-100 p-2 rounded-full dark:hover:bg-slate-600">
+                    <div
+                      className="hover:bg-slate-100 p-2 rounded-full dark:hover:bg-slate-600 transition-opacity duration-300"
+                      style={{ opacity: isHovered ? 1 : 0 }}
+                    >
                       <Settings2 className="w-4 h-4 cursor-pointer" />
                     </div>
                   </DialogTrigger>
@@ -126,7 +169,10 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
             <Tooltip>
               <TooltipTrigger>
                 <AlertDialogTrigger asChild>
-                  <div className="hover:bg-slate-100 p-2 rounded-full dark:hover:bg-slate-600">
+                  <div
+                    className="hover:bg-slate-100 p-2 rounded-full dark:hover:bg-slate-600 transition-opacity duration-300"
+                    style={{ opacity: isHovered ? 1 : 0 }}
+                  >
                     <Trash2 className="w-4 h-4 cursor-pointer" />{" "}
                   </div>
                 </AlertDialogTrigger>
@@ -146,7 +192,9 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction>Continue</AlertDialogAction>
+                <AlertDialogAction onClick={RemoveAppointmentHandler}>
+                  Continue
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

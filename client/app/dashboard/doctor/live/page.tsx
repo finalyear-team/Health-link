@@ -27,6 +27,7 @@ const Video = () => {
             <VideoAppointmentCard
               key={value.id}
               dummyData={{
+                appointmentId: value.id,
                 doctorId: value.id,
                 appointmentTime: value.appointmentTime,
                 appointmentDate: value.appointmentDate,
