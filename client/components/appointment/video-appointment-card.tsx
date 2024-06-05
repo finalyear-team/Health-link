@@ -117,6 +117,7 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
         <AppointmentDetails
           doctorName={dummyData.doctorName}
           doctorPhoto={dummyData.doctorPhoto}
+          appointmentId={dummyData.appointmentId}
           appointmentTime={`${dummyData.appointmentDate} | ${dummyData.appointmentTime}`}
           purpose={dummyData.purpose}
         />

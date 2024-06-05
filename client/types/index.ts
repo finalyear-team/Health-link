@@ -18,9 +18,10 @@ export interface DoctorProfile {
 }
 
 export interface AppointmentType {
-  id: number;
+  id: string;
   appointmentDate: string;
   appointmentTime: string;
+  doctorId: string;
   doctorName: string;
   doctorPhoto: string;
   purpose: string;

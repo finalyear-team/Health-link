@@ -1,9 +1,10 @@
-import React from 'react'
+import React from "react";
+import ChatBox from "@/components/test/ChatBox";
+import Image from "next/image";
+import users from "@/public/data/users";
 
 const Chat = () => {
-  return (
-    <div className='text-3xl font-bold'>Your chat page</div>
-  )
-}
+  return <ChatBox />;
+};
 
-export default Chat
+export default Chat;

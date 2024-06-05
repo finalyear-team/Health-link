@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import ChatBox from "@/components/test/ChatBox";
 
 const Chat = () => {
-  return (
-    <div className='text-3xl font-bold'>Your Chat page</div>
-  )
-}
+  return <ChatBox />;
+};
 
-export default Chat
+export default Chat;
