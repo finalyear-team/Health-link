@@ -59,53 +59,52 @@ export class StreamChatService {
 
     async createDmChannel(UserID: string, memberID: string) {
         try {
-            this.getClient()
-            // const user=await this.userService.getUserDetails(UserID)
-            // const member=await this.userService.getUserDetails(memberID)
-            // if(!user)
-            //      throw new HttpException(`${user.Username} not found`,HttpStatus.NOT_FOUND)
-            // if(!member)
-            //     throw new HttpException(`${member.Username} not found`,HttpStatus.NOT_FOUND)
+            const user=await this.userService.getUserDetails(UserID)
+            const member=await this.userService.getUserDetails(memberID)
+            if(!user)
+                 throw new HttpException(`${user.Username} not found`,HttpStatus.NOT_FOUND)
+            if(!member)
+                throw new HttpException(`${member.Username} not found`,HttpStatus.NOT_FOUND)
             
-            // const userToken = await this.createStreamUser(UserID, "user")
-            // const memeberToken = await this.createStreamUser(memberID, "user")
+            const userToken = await this.createStreamUser(UserID, "user")
+            const memeberToken = await this.createStreamUser(memberID, "user")
 
-            // const channelID = `dm-${randomBytes(3).toString("hex")}`
+            const channelID = `dm-${randomBytes(3).toString("hex")}`
             
-            // const channel = this.stream.channel("messaging", channelID, {
-            //     created_by_id:UserID,
-            //     name: "DM",
-            //     members: [UserID, memberID]
-            // })
-            // console.log(channelID)
-            // const response = await channel.create()
-            // console.log(response)
-            // const Channel = await this.prisma.chatChannel.create({
-            //     data: {
-            //         ChannelID: channelID,
-            //         ChannelName: "DM",
-            //         ChannelType: "dm",
-            //         Members: {
-            //             createMany: {
-            //                 data: [{
-            //                     UserID,
-            //                     AuthToken: userToken
-            //                 },
-            //                 {
-            //                     UserID:memberID,
-            //                     AuthToken: memeberToken
-            //                 },
-            //                 ]
-            //             }
-            //         }
+            const channel = this.stream.channel("messaging", channelID, {
+                created_by_id:UserID,
+                name: "DM",
+                members: [UserID, memberID]
+            })
+            console.log(channelID)
+            const response = await channel.create()
+            console.log(response)
+            const Channel = await this.prisma.chatChannel.create({
+                data: {
+                    ChannelID: channelID,
+                    ChannelName: "DM",
+                    ChannelType: "dm",
+                    Members: {
+                        createMany: {
+                            data: [{
+                                UserID,
+                                AuthToken: userToken
+                            },
+                            {
+                                UserID:memberID,
+                                AuthToken: memeberToken
+                            },
+                            ]
+                        }
+                    }
 
 
-            //     }
+                }
 
-            // })
-            // console.log(channel)
-            // console.log(response.channel)
-            // return response
+            })
+            console.log(channel)
+            console.log(response.channel)
+            return response
 
         } catch (error) {
             console.log("error from CreateDmChannel")

@@ -1,7 +1,5 @@
-"use server"
 
-import { useAuth } from "@clerk/nextjs";
-import { UserRoundIcon } from "lucide-react";
+
 
 const fetchWithRetry = async (url: string, options: any) => {
     const MAX_RETRIES = 4;
@@ -17,23 +15,24 @@ const fetchWithRetry = async (url: string, options: any) => {
     throw error;
 };
 
- export const payPayment=async(UserID:string,AppointmentID:string)=>{
+export const payPayment = async () => {
     try {
-    const token=await fetchWithRetry("http://localhost:4000/payment/pay",{
-        method: "POST",
+        const response = await fetchWithRetry("http://localhost:4000/payment/pay", {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-               UserID,
-               AppointmentID
-            }),
+            // body: JSON.stringify({
+            //     UserID,
+            //     AppointmentID
+            // }),
             credentials: "include"
-    })       
+        })
+
 
     } catch (error) {
         throw error
 
-        
+
     }
 }

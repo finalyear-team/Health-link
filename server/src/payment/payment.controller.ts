@@ -1,59 +1,38 @@
-import { Controller, Post, Redirect, Req, Res } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Post, Redirect, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 import axios from 'axios';
-import { Cipher } from 'crypto';
+import * as crypto from 'crypto'
+import { PaymentService } from './payment.service';
 
 @Controller('payment')
 export class PaymentController {
+  private chapaWeebHookSecret = process.env.CHAPA_WEBHOOK_SECRET
 
-    @Post("/webhook")
-    async Webhook(@Req() req:Request,@Res() res:Response){
-        console.log("payment success")
-        console.log(req.body)         
+  constructor(private readonly paymentService: PaymentService) {
 
+  }
+
+  @Post("/webhook")
+  async Webhook(@Req() req: Request, @Res() res: Response) {
+    try {
+      const hash = crypto.createHmac('sha256', this.chapaWeebHookSecret).update(JSON.stringify(req.body)).digest('hex');
+      if (hash == req.headers['x-chapa-signature']) {
+        const event = req.body as any;
+        console.log(event.status === "success")
+        return
+      }
+    } catch (error) {
+      throw new HttpException("unexpected error", HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @Post("/callback")
-    async callback(@Req() req:Request,@Res() res:Response){       
-    }
-
-    @Post("/pay")
-    async acceptPayment(@Req() req:Request,@Res() res:Response){
-        const data = JSON.stringify({
-            "amount": "100",
-            "currency": "ETB",
-            "email": "dawitgem@gmail.com",
-            "first_name": "dawit",
-            "last_name": "wondwosen",
-            "phone_number": "0913176534",
-            "tx_ref": "alskjdflkajsldfkjalskdjf-hf669",
-            "callback_url": "http://localhost:4000/payment/webhook",
-            "customization[title]": "Payment for my favourite merchant",
-            "customization[description]": "I love online payments",
-            "subaccounts[id]": "ac2e6b5b-0e76-464a-8c20-2d441fbaca6c"
-          });
-          console.log(data)
-       try {
-        const response=await fetch('https://api.chapa.co/v1/transaction/initialize',{
-            method:"POST",
-            headers:{
-                'Authorization': 'Bearer CHASECK_TEST-lRFRXTl0wl4tJPelQGAA0Cq4rjSxviYA',
-                'Content-Type': 'application/json'
-            },
-            body:data
+  }
 
 
-        })
-        console.log(response.status)
-        const {data:response_data}=await response.json()
-        console.log(response_data)
-        if(response_data)
-        res.send(response_data.checkout_url)
-        
-       } catch (error) {
-        console.log(error.errors)
-        
-       }
-    }
-    
+  @Post("/pay")
+  async acceptPayment(@Req() req: Request, @Res() res: Response) {
+    const payment = await this.paymentService.confirmPayment()
+
+
+  }
+
 }

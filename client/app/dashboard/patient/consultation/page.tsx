@@ -36,18 +36,15 @@ const Consultation = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("ascending");
   const [noValue, setNoValue] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState(users);
+
   // cancel the appointment form
   const cancelAppointmentForm = useAppointmentStore(
     (state) => state.cancelAppointmentForm
   );
-  // to check whether the doctor is selected or not
   
+  // to check whether the doctor is selected or not
+
   const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
-
-
- 
-
-
 
   const handleCriteriaChange = (value: any) => {
     setCriteria(value);
@@ -192,7 +189,12 @@ const Consultation = () => {
           )}
         </div>
       ) : (
-        <AppointmentForm />
+        <Container>
+          <h2 className="text-2xl font-bold mb-5 text-gray-900 dark:text-gray-100">
+            Book an Appointment
+          </h2>
+          <AppointmentForm />
+        </Container>
       )}
     </Container>
   );

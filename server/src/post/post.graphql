@@ -80,7 +80,7 @@ type Query {
 type Mutation {
   CreatePost(createPostInput: CreatePostInput!): Post!
   UpdatePost(updatePostInput: UpdatePostInput!): Post!
-  LikeContent(ItemID:String!,UserID:String!,LikeType:LikeType):Likes
+  IncrementPostView(PostID:String):Post!  
   RemovePost(PostID: String!): Post
 
 }

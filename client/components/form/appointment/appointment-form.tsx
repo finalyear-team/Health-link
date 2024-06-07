@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import * as Yup from "yup";
-import PaymentForm from "../payment/payment-form";
-import Container from "@/components/container/container";
+import React, { useState, useEffect } from "react";
 import {
   addDays,
   format,
@@ -13,6 +10,7 @@ import {
   isBefore,
   startOfDay,
 } from "date-fns";
+import { useUser } from "@clerk/nextjs";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,8 +30,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useAppointmentStore from "@/store/appointmentStore";
-import { useQuery } from "@apollo/client";
-import { GET_SCHEDULES, GET_SCHEDULE_BY_DATE } from "@/graphql/queries/scheduleQueries";
+import { useQuery, useMutation } from "@apollo/client";
+import {
+  GET_SCHEDULES,
+  GET_SCHEDULE_BY_DATE,
+} from "@/graphql/queries/scheduleQueries";
+import {
+  UPDATE_APPOINTMENT,
+  CREATE_APPOINTMENT,
+} from "@/graphql/mutations/appointmentMutations";
+
+type DayOfWeek = keyof typeof doctorAvailability;
 
 const doctorAvailability = {
   Monday: { start: "03:00 AM", end: "08:00 AM" },
@@ -45,48 +52,80 @@ const doctorAvailability = {
   Sunday: { start: "12:00 PM", end: "04:00 PM" },
 };
 
-const getTimeRangeForDay = (day: string) => {
-  return doctorAvailability[day as keyof typeof doctorAvailability];
-};
+const getTimeRangeForDay = (day: DayOfWeek) => doctorAvailability[day];
 
-const AppointmentForm = () => {
-  const [submitted, setSubmitted] = useState(false);
-  const [date, setDate] = useState<Date>();
-  const [appointmentTime, setAppointmentTime] = useState("");
-  const selectedDoctor=useAppointmentStore((state)=>state.selectedDoctor)
-  const clearSelection = useAppointmentStore((state) => state.clearSelection);  
-  const { data, loading, error } = useQuery(GET_SCHEDULE_BY_DATE, {
-    variables: { doctorID:selectedDoctor?.id, date: date ? format(date, 'yyyy-MM-dd') : '' },
-    skip: !selectedDoctor?.id || !date, // Skip the query if doctorID or date is not set
+const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
+  const [date, setDate] = useState<Date | null>(
+    existingAppointment?.date ? new Date(existingAppointment.date) : null
+  );
+  const [appointmentTime, setAppointmentTime] = useState<string>(
+    existingAppointment?.time || ""
+  );
+  const { user } = useUser();
+  const patientID = user?.id;
+  const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
+  const clearSelection = useAppointmentStore((state) => state.clearSelection);
+
+  const [CreateAppointment] = useMutation(CREATE_APPOINTMENT);
+  const [UpdateAppointment] = useMutation(UPDATE_APPOINTMENT);
+
+  const { data } = useQuery(GET_SCHEDULE_BY_DATE, {
+    variables: {
+      doctorID: selectedDoctor?.id,
+      date: date ? format(date, "yyyy-MM-dd") : "",
+    },
+    skip: !selectedDoctor?.id || !date,
   });
 
-
-  const handleSubmit = (values: any) => {
-    console.log(values)
+  const handleSubmit = async (values: any) => {
     if (date && appointmentTime && values.reason) {
-      setSubmitted(true);
+      const formattedDateTime = formatDateAndTime();
+      // submission logic
+      try {
+        if (existingAppointment) {
+          await UpdateAppointment({
+            variables: {
+              AppointmentID: existingAppointment.id,
+              DoctorID: selectedDoctor?.id,
+              PatientID: patientID,
+              AppointmentDate: format(date, "yyyy-MM-dd"),
+              AppointmentTime: appointmentTime,
+              Note: values.reason,
+            },
+          });
+          console.log("appointment updated");
+        } else {
+          await CreateAppointment({
+            variables: {
+              DoctorID: selectedDoctor?.id,
+              PatientID: patientID,
+              AppointmentDate: format(date, "yyyy-MM-dd"),
+              AppointmentTime: appointmentTime,
+              Note: values.reason,
+            },
+          });
+          console.log("appointment created");
+        }
+      } catch (error) {
+        console.error(
+          `Error ${existingAppointment ? "updating" : "creating"} appointment:`,
+          error
+        );
+      }
     }
   };
 
-  const initialValues = {
-    reason: "",
+  const initialValues = { reason: existingAppointment?.reason || "" };
 
-  };
-
-  const [todayDay, setTodayDat] = useState(null);
   const today = startOfDay(new Date());
 
-  // Function to determine if a date is disabled
-  const isDateDisabled = (todayDay: any) => {
-    return isBefore(todayDay, today);
-  };
+  const isDateDisabled = (day: Date) => isBefore(day, today);
 
   const getAvailableTimes = () => {
-
     if (!date) return [];
     const dayOfWeek = date.toLocaleDateString("en-US", {
       weekday: "long",
-    });
+    }) as DayOfWeek;
     const range = getTimeRangeForDay(dayOfWeek);
 
     if (!range) return [];
@@ -96,13 +135,13 @@ const AppointmentForm = () => {
     const startPeriod = range.start.split(" ")[1];
     const endPeriod = range.end.split(" ")[1];
 
-    const start = new Date();
+    const start = new Date(date);
     start.setHours(
       startPeriod === "AM" ? startHour : startHour + 12,
       startMinutes
     );
 
-    const end = new Date();
+    const end = new Date(date);
     end.setHours(endPeriod === "AM" ? endHour : endHour + 12, endMinutes);
 
     const times = [];
@@ -137,118 +176,114 @@ const AppointmentForm = () => {
         setMinutes(setHours(new Date(date), hours), minutes),
         0
       );
-      return format(combinedDateTime, "MM-dd-yyyy HH:mm:ss");
+      return format(combinedDateTime, "yyyy-MM-dd HH:mm:ss");
     }
     return "";
   };
 
-  return (
-    <Container>
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-[800px]">
-        {!submitted ? (
-          <div>
-            <h2 className="text-2xl font-bold mb-5 text-gray-900 dark:text-gray-100">
-              Book an Appointment
-            </h2>
+  useEffect(() => {
+    setDate(
+      existingAppointment?.date ? new Date(existingAppointment.date) : null
+    );
+    setAppointmentTime(existingAppointment?.time || "");
+  }, [doctorId, existingAppointment]);
 
-            <Formik
-              initialValues={initialValues}
-              onSubmit={handleSubmit}
-              // validationSchema={validatePaymentInformation}
-              enableReinitialize
-            >
-              {({ isValid, isSubmitting }) => (
-                <Form>
-                  <div className="mb-4">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[280px] justify-start text-left font-normal",
-                            !date && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {date ? (
-                            format(date, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-                        <Select
-                          onValueChange={(value) =>
-                            setDate(addDays(new Date(), parseInt(value)))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent position="popper">
-                            <SelectItem value="0">Today</SelectItem>
-                            <SelectItem value="1">Tomorrow</SelectItem>
-                            <SelectItem value="3">In 3 days</SelectItem>
-                            <SelectItem value="7">In a week</SelectItem>
-                            <SelectItem value="30">In a month</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="rounded-md border">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            disabled={isDateDisabled}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div className="mb-4">
-                    <Select
-                      onValueChange={(value) => setAppointmentTime(value)}
-                    >
-                      <SelectTrigger className="w-[280px]">
-                        <SelectValue placeholder="Select Time" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        {getAvailableTimes().map((time:any) => (
-                          <SelectItem key={time} value={time}>
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="mb-4">
-                    <Field
-                      as={Input}
-                      type="textarea"
-                      name="reason"
-                      label="Enter the Appointment Reason"
-                      placeholder="Appointment Reason"
+  return (
+    <div className="p-6">
+      <Formik
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({ isValid, isSubmitting }) => (
+          <Form>
+            <div className="mb-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                  <Select
+                    onValueChange={(value) =>
+                      setDate(addDays(new Date(), parseInt(value)))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="0">Today</SelectItem>
+                      <SelectItem value="1">Tomorrow</SelectItem>
+                      <SelectItem value="3">In 3 days</SelectItem>
+                      <SelectItem value="7">In a week</SelectItem>
+                      <SelectItem value="30">In a month</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="rounded-md border">
+                    <Calendar
+                      mode="single"
+                      selected={date ?? undefined}
+                      onSelect={(selectedDate) => {
+                        if (selectedDate !== undefined) {
+                          setDate(selectedDate);
+                        } else {
+                          setDate(null); // Explicitly setting to null if selectedDate is undefined
+                        }
+                      }}
+                      disabled={isDateDisabled}
                     />
                   </div>
-                  <div className="flex items-center space-x-4 flex-wrap">
-                    <Button type="submit">Book Appointment</Button>
-                    <Button
-                      type="button"
-                      onClick={() => clearSelection()}
-                      variant={"destructive"}
-                    >
-                      Cancel Appointment
-                    </Button>
-                  </div>
-                </Form>
-              )}
-            </Formik>
-          </div>
-        ) : (
-          <PaymentForm />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="mb-4">
+              <Select onValueChange={(value) => setAppointmentTime(value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select Time" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {getAvailableTimes().map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mb-4">
+              <Field
+                as={Input}
+                type="textarea"
+                name="reason"
+                label="Enter the Appointment Reason"
+                placeholder="Appointment Reason"
+              />
+            </div>
+            <div className="flex items-center space-x-4 flex-wrap">
+              <Button type="submit" disabled={!isValid || isSubmitting}>
+                {existingAppointment ? "Reschedule" : "Book"}
+              </Button>
+              <Button
+                type="button"
+                onClick={clearSelection}
+                variant={"outline"}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Form>
         )}
-      </div>
-    </Container>
+      </Formik>
+    </div>
   );
 };
 

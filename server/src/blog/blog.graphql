@@ -1,13 +1,12 @@
 scalar Date
-
-
-
 type Blog {
   BlogID:String
   Title:String
   Content:String
   DoctorID:String
+  Thumbnail:String
   CommentsCount:Int
+  Category:String
   Views:Int
   Comments:[Comment]
   PublishedAt:Date
@@ -15,9 +14,12 @@ type Blog {
 }
 
 
+
 input CreateBlogInput {
+  Category:String!
   Title:String!
   Content:String!
+  Thumbnail:String
   DoctorID:String!
   Publish:Boolean
 }
@@ -33,6 +35,7 @@ input UpdateBlogInput {
   BlogID: String!
   DoctorID:String
   Title:String
+  Thumbnail:String
   Content:String
   Publish:Boolean
 }
@@ -41,12 +44,14 @@ type Query {
   GetBlogs: [Blog]!
   GetBlog(BlogID: String!): Blog
   GetDoctorBlog(DoctorID:String!):[Blog]
+  GetMyBlogs(DoctorID:String!):[Blog]
   SearchBlog(Query:String!):[Blog]  
 }
 
 type Mutation {
   CreateBlog(createBlogInput: CreateBlogInput!): Blog!
   CreateBlogComment(createBlogCommentInput:CreateBlogCommentInput):Comment!
+  IncrementView(BlogID: String!): Blog!  
   UpdateBlog(updateBlogInput: UpdateBlogInput!): Blog!  
   RemoveBlog(BlogID: String!): Blog
 }

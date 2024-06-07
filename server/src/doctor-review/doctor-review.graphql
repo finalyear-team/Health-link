@@ -25,7 +25,7 @@ input UpdateDoctorReviewInput {
 
 type Query {
   GetReviews(DoctorID:String!): [DoctorReview]!
-  GetReview(Doctor: String!): DoctorReview
+  GetReview(ReviewID: String!): DoctorReview
 }
 
 type Mutation {

@@ -49,21 +49,23 @@ input UpdateForumAnswerInput {
 }
 
 type Query {
-  getForumPosts: [Forum]
-  getForumPost(ForumPostID: String!): Forum
-  getForumAnswers(ForumPostID:String!):[ForumAnswer]
-  getForumAnswer(ForumAnswerID:String!):[ForumAnswer]
+  GetForumPosts: [Forum]
+  GetForumPost(ForumPostID: String!): Forum
+  GetForumAnswers(ForumPostID:String!):[ForumAnswer]
+  GetForumAnswer(ForumAnswerID:String!):[ForumAnswer]
 }
 
 type Mutation {
-  createForumPost(createForumInput: CreateForumInput!): Forum!
-  updateForum(updateForumInput: UpdateForumInput!): Forum!
-  removeForumPost(ForumPostID:String!):Forum!
+  CreateForumPost(createForumInput: CreateForumInput!): Forum!
+  UpdateForum(updateForumInput: UpdateForumInput!): Forum!
+  RemoveForumPost(ForumPostID:String!):Forum!
   
-  createForumAnswer(createForumAnswerInput: CreateForumAnswerInput!): Forum!
-  updateForumAnswer(updateForumAnswerInput:UpdateForumAnswerInput):Forum!
+  CreateForumAnswer(createForumAnswerInput: CreateForumAnswerInput!): Forum!
+  UpdateForumAnswer(updateForumAnswerInput:UpdateForumAnswerInput):Forum!
 
-  removeForumAnswer(ForumAnswerID:String!):Forum!
+  IncreaseForumAnswerView(ForumAnswerID:String):ForumAnswer!  
+
+  RemoveForumAnswer(ForumAnswerID:String!):Forum!
 
 
 }

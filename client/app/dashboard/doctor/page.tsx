@@ -12,6 +12,7 @@ import QuickSettings from "@/components/settings/quick-settings/quick-settings";
 import DashboardCard from "@/components/dashboard/card";
 import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
+import { format } from 'date-fns';
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
@@ -20,24 +21,17 @@ const PatientDahboard = () => {
   useEffect(() => {
     const updateGreetingAndTime = () => {
       const now = new Date();
-      let hours = now.getHours();
-      const minutes = now.getMinutes();
-      const amOrPm = hours >= 12 ? "PM" : "AM";
+      const formattedTime = format(now, 'hh:mm aa');
 
-      // Convert hours to 12-hour format
-      hours = hours % 12 || 12;
-
-      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-        .toString()
-        .padStart(2, "0")} ${amOrPm}`;
       setTimeString(formattedTime);
 
+      const hours = now.getHours();
       if (hours >= 5 && hours < 12) {
-        setCurrentTime("Good morning");
+        setCurrentTime('Good morning');
       } else if (hours >= 12 && hours < 17) {
-        setCurrentTime("Good afternoon");
+        setCurrentTime('Good afternoon');
       } else {
-        setCurrentTime("Good evening");
+        setCurrentTime('Good evening');
       }
     };
 
@@ -50,7 +44,6 @@ const PatientDahboard = () => {
     // Clean up the interval on unmount
     return () => clearInterval(intervalId);
   }, []);
-
   const { user, isSignedIn, isLoaded } = useUser();
   const Role = user?.unsafeMetadata.role;
 
@@ -87,7 +80,7 @@ const PatientDahboard = () => {
             </div>
           </div>
           {/* radio button settings */}
-          <div>
+          {/* <div>
             {Role === "provider" ? (
               <Button size={"lg"} className="mb-2">
                 Generate a Summary
@@ -98,7 +91,7 @@ const PatientDahboard = () => {
             <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
               <QuickSettings />
             </div>
-          </div>
+          </div> */}
           {/* the illustration part */}
           <div>
             <Image

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBlogInput } from './dto/create-blog.input';
 import { UpdateBlogInput } from './dto/update-blog.input';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Blog } from './entities/blog.entity';
 
 @Injectable()
 export class BlogService {
@@ -11,12 +12,12 @@ export class BlogService {
     try {
       const blog=await this.prisma.blogPost.create({
         data:{
-          ...createBlogInput
+          ...createBlogInput,
         }
       })
     } catch (error) {
       console.log(error)
-      throw error
+      throw new HttpException("faild to create blog",HttpStatus.INTERNAL_SERVER_ERROR)
       
     }
   }
@@ -24,21 +25,36 @@ export class BlogService {
   async getBlogs() {
     try {
       const blogs=await this.prisma.blogPost.findMany({
-        orderBy:{
-          CreatedAt:"desc"
-        }
+        where:{IsPublished:true},
+        orderBy:{CreatedAt:"desc"}
       })
       console.log(blogs)
       return blogs
 
     } catch (error) {
       console.log(error)
-      throw error
-      
+      throw new HttpException("faild to fetch blogs",HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
+
   async getDoctorBlogs(DoctorID: string) {
+    try {
+      const blogs=await this.prisma.blogPost.findMany({
+        where:{
+          IsPublished:true,
+          DoctorID
+        }
+      })
+      console.log(blogs)
+      return blogs
+    } catch (error) {
+      console.log(error)
+      throw new HttpException("faild to fetch blogs",HttpStatus.INTERNAL_SERVER_ERROR)     
+    }
+  }
+
+  async getMyBlogs(DoctorID: string) {
     try {
       const blogs=await this.prisma.blogPost.findMany({
         where:{
@@ -49,9 +65,10 @@ export class BlogService {
       return blogs
     } catch (error) {
       console.log(error)
-      throw error      
+      throw new HttpException("faild to fetch blogs",HttpStatus.INTERNAL_SERVER_ERROR)     
     }
   }
+
 
 
   async searchBlogs(Query: string) {
@@ -66,13 +83,27 @@ export class BlogService {
       return blogs
       
     } catch (error) {
-      console.log("first")
-      console.log(error)
-      throw error
+      throw new HttpException("faild to fetch blogs",HttpStatus.INTERNAL_SERVER_ERROR)
       
     }
   }
 
+  async incrementView(BlogID:string){
+    try {      
+      const blog=await this.prisma.blogPost.update({
+        where:{BlogID},
+        data:{
+          View:{
+            increment:1
+          }
+        }
+      })
+      return blog
+    } catch (error) {
+      throw new HttpException("faild to increase view",HttpStatus.INTERNAL_SERVER_ERROR)     
+    }
+
+  }
   async updateBlog(BlogID: string, updateBlogInput: UpdateBlogInput) {
     try {
       const blogs=await this.prisma.blogPost.update({
@@ -87,12 +118,12 @@ export class BlogService {
       return blogs
     } catch (error) {
       console.log(error)
-      throw error
+      throw new HttpException("faild to update blog",HttpStatus.INTERNAL_SERVER_ERROR)
       
     }
   }
 
-  async remove(BlogID: string) {
+  async removeBlog(BlogID: string) {
     try {
       const blogs=await this.prisma.blogPost.delete({
         where:{BlogID}
@@ -101,7 +132,7 @@ export class BlogService {
       
     } catch (error) {
       console.log(error)
-      throw error
+      throw new HttpException("faild to delete blog",HttpStatus.INTERNAL_SERVER_ERROR)
       
     }
   }

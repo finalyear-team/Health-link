@@ -5,6 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   controllers: [SymptomCheckerController],
-  providers: [SymptomCheckerService,PrismaService],
+  providers: [SymptomCheckerService, PrismaService],
 })
-export class SymptomCheckerModule {}
+export class SymptomCheckerModule { }

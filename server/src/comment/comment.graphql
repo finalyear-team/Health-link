@@ -34,10 +34,9 @@ input CreateCommentReply{
 
 
 
-input UpdatePostInput {
-  PostID: String!
-  Content:String!
-  DoctorID:String!
+input UpdateCommentInput {
+  CommentID: String!
+  Content:String
   Medias:[MediaInput]
 }
 
@@ -51,7 +50,9 @@ type Query {
 
 type Mutation {
   CreateComment(createPostInput: CreatePostInput!): Comment!
-  LikeContent(ItemID:String!,UserID:String!):Likes
+  UpdateComment(updateCommnetInput:UpdateCommentInput):Comment!
+  LikeContent(ItemID:String!,UserID:String!,ItemType:ItemType!):Likes
+  DislikeContent(ItemID:String!,UserID:String!):Likes
   CreateCommentReply(createCommentReply:CreateCommentReply!):Comment!
   RemoveComment(CommentID: String!): Comment
 }

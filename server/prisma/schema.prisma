@@ -105,17 +105,16 @@ enum ContentType {
   comment
   blog
 }
+
 enum LikeType {
   like
   dislike
 }
 
-
-
 enum FeedbackType {
   generalFeedback
-  productReview
-  serviceReview
+  question
+  review
 }
 
 enum Weekday {
@@ -128,9 +127,32 @@ enum Weekday {
   sunday
 }
 
-enum MediaType{
-   video
-   image
+enum MediaType {
+  video
+  image
+}
+
+enum BlogCategory {
+  GeneralHealthAndWellness
+  MedicalConditions
+  DiseaseManagement
+  MentalHealth
+  NutritionAndDiet
+  FitnessAndExercise
+  MedicationAndTreatment
+  PatientStoriesAndTestimonials
+  MedicalResearchAndBreakthroughs
+  MedicalEducation
+  HealthTechnology
+  HealthcarePolicyAndAdvocacy
+  WomensHealth
+  MensHealth
+  PediatricsAndChildHealth
+  ElderlyCareAndAging
+  AlternativeMedicine
+  GlobalHealth
+  MedicalEthicsAndLegalIssues
+  CancerAwarenessAndSupport
 }
 
 model Users {
@@ -163,7 +185,6 @@ model Users {
   ForumAnswer           ForumAnswer[]
   Comment               Comments[]
   Like                  Likes[]
-  Views                 Views[]
   Prescription          Prescription[]      @relation("patient_prescription")
   Feedback              UserFeedback[]
   FeedbackReply         Reply[]
@@ -181,10 +202,11 @@ model Users {
   Payment               Payment[]           @relation("patient_payment")
   DoctorPayment         Payment[]           @relation("doctor_payment")
   VideoChatRoom         VideoChatRoom[]
-   FollowersFollowing    Followers[]         @relation("following")
+  FollowersFollowing    Followers[]         @relation("following")
   FollowersFollowers    Followers[]         @relation("followers")
-  Notification           Notification[]
-  Bookmarks              Bookmark[]
+  Notification          Notification[]
+  Bookmarks             Bookmark[]
+  Report                Report[]
 
   @@index([Email], name: "email_index")
 }
@@ -197,6 +219,8 @@ model MedicalRecord {
   Medications  Json?
   Allergies    Json?
   Patient      Users    @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+
+  @@index([UserID], name: "user_record_index")
 }
 
 model DoctorDetails {
@@ -215,7 +239,7 @@ model DoctorSchedule {
   ScheduleID   String         @id @default(uuid())
   DoctorID     String
   Date         DateTime?      @db.Date
-  WeekDay      Weekday?     
+  WeekDay      Weekday?
   StartTime    DateTime       @db.Time
   EndTime      DateTime       @db.Time
   ScheduleType ScheduleType   @default(normal)
@@ -225,15 +249,17 @@ model DoctorSchedule {
   UpdatedAt    DateTime       @updatedAt
   Appointments Appointments[]
   Doctor       Users          @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
+
+  @@index([DoctorID], name: "doctor_schedule_index")
 }
 
 model Appointments {
   AppointmentID   String            @id @default(uuid())
   DoctorID        String
   PatientID       String
-  ScheduleID      String 
-  AppointmentDate DateTime        @db.Date
-  AppointmentTime DateTime        @db.Time
+  ScheduleID      String
+  AppointmentDate DateTime          @db.Date
+  AppointmentTime DateTime          @db.Time
   Duration        Int?
   Status          AppointmentStatus @default(pending)
   AppointmentType AppointmentType   @default(initialConsultation)
@@ -308,10 +334,12 @@ model VideoChatRoom {
   Host          Users               @relation(onDelete: Cascade, fields: [HostID], references: [UserID])
   Appointment   Appointments[]
   Members       MemberInVideoChat[]
+
+  @@index([HostID], name: "host_index")
 }
 
 model MemberInVideoChat {
-  MemberID          String        @id @unique
+  MemberID        String        @id @unique
   VideoChatRoomID String
   MemberAuthToken String        @db.LongText
   User            Users         @relation(onDelete: Cascade, fields: [MemberID], references: [UserID])
@@ -348,7 +376,7 @@ model ChannelMember {
   UserID           String      @id
   ChannelID        String
   AuthToken        String      @db.LongText
-  Role             Role?        @default(member)
+  Role             Role?       @default(member)
   JoinedAt         DateTime?   @default(now())
   CreatedAt        DateTime?   @default(now())
   UpdatedAt        DateTime?   @updatedAt
@@ -363,10 +391,8 @@ model Payment {
   Amount        Float
   PaymentDate   DateTime      @default(now())
   PaymentMethod String?
-  Status        String
   AppointmentID String?       @unique
-  // ConsultancyID String?       @unique
-  PaymentStatus PaymentStatus
+  PaymentStatus PaymentStatus @default(pending)
   Patient       Users         @relation(onDelete: Cascade, "patient_payment", fields: [PatientID], references: [UserID])
   Doctor        Users         @relation(onDelete: Cascade, "doctor_payment", fields: [DoctorID], references: [UserID])
   Appointment   Appointments? @relation(onDelete: Cascade, fields: [AppointmentID], references: [AppointmentID])
@@ -379,10 +405,10 @@ model DoctorReviews {
   ReviewID   String   @id @default(uuid())
   DoctorID   String
   ReviewerID String
-  Rating     Int?     
+  Rating     Int?
   ReviewText String?  @db.LongText
-  CreatedAt DateTime @default(now())
-  UpdatedAt  DateTime  @updatedAt
+  CreatedAt  DateTime @default(now())
+  UpdatedAt  DateTime @updatedAt
   Doctor     Users    @relation(onDelete: Cascade, "doctor_review", fields: [DoctorID], references: [UserID])
   Reviewer   Users    @relation(onDelete: Cascade, "patient_review", fields: [ReviewerID], references: [UserID])
 
@@ -390,22 +416,25 @@ model DoctorReviews {
 }
 
 model BlogPost {
-  BlogID      String   @id @default(uuid())
+  BlogID      String       @id @default(uuid())
   Title       String
-  Content     String   @db.LongText
-  PublishedAt DateTime?   
-  CreatedAt   DateTime @default(now())
-  UpdatedAt   DateTime @updatedAt
-  IsPublished Boolean  @default(false)
+  Content     String       @db.LongText
+  Thumbnail   String?
+  PublishedAt DateTime?
+  CreatedAt   DateTime     @default(now())
+  UpdatedAt   DateTime     @updatedAt
+  IsPublished Boolean      @default(false)
+  View        Int          @default(0)
+  Category    BlogCategory
   DoctorID    String
-  Doctor      Users    @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
-  View        Views[]
-  Comment    Comments[]
+  Doctor      Users        @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
+  Comment     Comments[]
+  Report      Report[]
 }
 
 model ForumPost {
   ForumPostID String        @id @default(uuid())
-  Question     String        @db.LongText
+  Question    String        @db.LongText
   CreatedAt   DateTime      @default(now())
   UpdatedAt   DateTime      @updatedAt
   UserID      String
@@ -414,71 +443,70 @@ model ForumPost {
 }
 
 model ForumAnswer {
-  ForumAnswerID String     @id @default(uuid())
-  Answer       String
-  CreatedAt     DateTime   @default(now())
-  UpdatedAt     DateTime   @updatedAt
+  ForumAnswerID String      @id @default(uuid())
+  Answer        String
+  CreatedAt     DateTime    @default(now())
+  UpdatedAt     DateTime    @updatedAt
   ForumPostID   String
   UserID        String
-  ForumPost     ForumPost  @relation(onDelete: Cascade, fields: [ForumPostID], references: [ForumPostID])
-  User          Users      @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
-  View          Views[]
+  View          Int         @default(0)
+  ForumPost     ForumPost   @relation(onDelete: Cascade, fields: [ForumPostID], references: [ForumPostID])
+  User          Users       @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
   Comment       Comments[]
   Like          Likes[]
   Medias        PostMedia[]
 }
 
 model Post {
-  PostID    String     @id @default(uuid())
+  PostID    String      @id @default(uuid())
   Content   String
-  CreatedAt DateTime   @default(now())
-  UpdatedAt DateTime   @updatedAt
+  CreatedAt DateTime    @default(now())
+  UpdatedAt DateTime    @updatedAt
   DoctorID  String
-  Doctor    Users      @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
-  View      Views[]
+  View      Int         @default(0)
+  Doctor    Users       @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
   Comment   Comments[]
   Like      Likes[]
   Share     Share[]
-  Bookmarks  Bookmark[]
-  Medias     PostMedia[]
+  Bookmarks Bookmark[]
+  Medias    PostMedia[]
+  Report    Report[]
 }
 
-
-
-
 model Comments {
-  CommentID       String          @id @default(uuid())
+  CommentID       String       @id @default(uuid())
   Content         String
-  CreatedAt       DateTime        @default(now())
-  UpdatedAt       DateTime        @updatedAt
+  CreatedAt       DateTime     @default(now())
+  UpdatedAt       DateTime     @updatedAt
   UserID          String
   ItemID          String
   ParentCommentID String?
-  User            Users           @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
-  ParentComment   Comments?       @relation(onDelete: Cascade, "ParentComment", fields: [ParentCommentID], references: [CommentID])
-  Replies         Comments[]      @relation("ParentComment")
+  View            Int          @default(0)
+  Edited          Boolean      @default(false)
+  User            Users        @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  ParentComment   Comments?    @relation(onDelete: Cascade, "ParentComment", fields: [ParentCommentID], references: [CommentID])
+  Replies         Comments[]   @relation("ParentComment")
   Like            Likes[]
-  View            Views[]
   ItemType        ContentType
-  Post            Post?           @relation(onDelete: Cascade, fields: [ItemID], references: [PostID])
-  ForumAnswer     ForumAnswer?    @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forumanswer_fkey")
-  Blog           BlogPost? @relation(onDelete: Cascade,fields: [ItemID],references: [BlogID],map: "blogpost_fkey")
-  Medias           PostMedia[]
-  
+  Post            Post?        @relation(onDelete: Cascade, fields: [ItemID], references: [PostID])
+  ForumAnswer     ForumAnswer? @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forumanswer_fkey")
+  Blog            BlogPost?    @relation(onDelete: Cascade, fields: [ItemID], references: [BlogID], map: "blogpost_fkey")
+  Medias          PostMedia[]
+  Report          Report[]
 }
 
 model PostMedia {
-  MediaID   String   @id @default(uuid())
-  PostID    String?
-  CommentID String?  
+  MediaID       String       @id @default(uuid())
+  PostID        String?
+  CommentID     String?
   ForumAnswerID String?
-  ContentType  ContentType @default(post)
-  MediaType MediaType   
-  URL       String  
-  CreatedAt DateTime @default(now())
-  Post      Post?    @relation(onDelete: Cascade,fields: [PostID], references: [PostID])
-  Comment   Comments?  @relation(onDelete: Cascade,fields: [CommentID], references: [CommentID])
-  ForumAnswer   ForumAnswer?  @relation(onDelete: Cascade,fields: [ForumAnswerID], references: [ForumAnswerID])
+  ContentType   ContentType  @default(post)
+  MediaType     MediaType
+  URL           String
+  CreatedAt     DateTime     @default(now())
+  Post          Post?        @relation(onDelete: Cascade, fields: [PostID], references: [PostID])
+  Comment       Comments?    @relation(onDelete: Cascade, fields: [CommentID], references: [CommentID])
+  ForumAnswer   ForumAnswer? @relation(onDelete: Cascade, fields: [ForumAnswerID], references: [ForumAnswerID])
 }
 
 model Likes {
@@ -498,37 +526,36 @@ model Likes {
   @@index([CreatedAt])
 }
 
-model Views {
-  ViewID    String          @id @default(uuid())
-  UserID    String?
-  ItemID    String
-  ItemType  ContentType
-  CreatedAt DateTime        @default(now())
-  User      Users?          @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
-  Comment      Comments?          @relation(onDelete: Cascade, fields: [ItemID], references: [CommentID],map: "comment_view_fkey")
-  BlogPost  BlogPost?       @relation(onDelete: Cascade, fields: [ItemID], references: [BlogID])
-  ForumAnswer   ForumAnswer? @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID],map:"forum_answer_view_fkey")
-  Post      Post?           @relation(onDelete: Cascade, fields: [ItemID], references: [PostID], map: "post_view_fkey")
-}
+// model Views {
+//   ViewID      String       @id @default(uuid())
+//   UserID      String?
+//   ItemID      String
+//   ItemType    ContentType
+//   CreatedAt   DateTime     @default(now())
+//   User        Users?       @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+//   Comment     Comments?    @relation(onDelete: Cascade, fields: [ItemID], references: [CommentID], map: "comment_view_fkey")
+//   BlogPost    BlogPost?    @relation(onDelete: Cascade, fields: [ItemID], references: [BlogID])
+//   ForumAnswer ForumAnswer? @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forum_answer_view_fkey")
+//   Post        Post?        @relation(onDelete: Cascade, fields: [ItemID], references: [PostID], map: "post_view_fkey")
+// }
 
 model Share {
-  ShareID   String   @id @default(uuid())
-  PostID    String
-  Platform  String   // e.g., "facebook", "twitter", etc.
-  SharedAt  DateTime @default(now())
-  Post      Post      @relation(onDelete: Cascade,fields: [PostID], references: [PostID])
+  ShareID  String   @id @default(uuid())
+  PostID   String
+  Platform String // e.g., "facebook", "twitter", etc.
+  SharedAt DateTime @default(now())
+  Post     Post     @relation(onDelete: Cascade, fields: [PostID], references: [PostID])
 }
 
 model Bookmark {
-  BookmarkID String @id @default(uuid())
-  UserID    String
-  PostID    String
-  AddedAt   DateTime @default(now())
-  RemovedAt DateTime? // Nullable if the bookmark hasn't been removed
-  User      Users     @relation(onDelete: Cascade,fields: [UserID], references: [UserID])
-  Post      Post      @relation(onDelete: Cascade,fields: [PostID], references: [PostID])
+  BookmarkID String    @id @default(uuid())
+  UserID     String
+  PostID     String
+  AddedAt    DateTime  @default(now())
+  RemovedAt  DateTime? // Nullable if the bookmark hasn't been removed
+  User       Users     @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
+  Post       Post      @relation(onDelete: Cascade, fields: [PostID], references: [PostID])
 }
-
 
 model FAQ {
   FAQID     String   @id @default(uuid())
@@ -542,7 +569,7 @@ model FAQ {
 model UserFeedback {
   FeedbackID String       @id @default(uuid())
   UserID     String
-  Content    String
+  Content    String?
   CreatedAt  DateTime     @default(now())
   UpdatedAt  DateTime     @updatedAt
   Type       FeedbackType @default(generalFeedback)
@@ -601,22 +628,36 @@ model PrescriptionAttachment {
 }
 
 model Followers {
-  FollowerID   String   @id
-  Follower     Users    @relation("following", fields: [FollowerID], references: [UserID])
-  FollowingID  String
-  Following    Users    @relation("followers", fields: [FollowingID], references: [UserID])
-  CreatedAt    DateTime @default(now())
+  FollowersID String   @id @default(uuid())
+  FollowerID  String
+  FollowingID String
+  Follower    Users    @relation("followers", fields: [FollowerID], references: [UserID])
+  Following   Users    @relation("following", fields: [FollowingID], references: [UserID])
+  CreatedAt   DateTime @default(now())
 
   @@index([FollowerID, FollowingID], name: "follower_following_unique")
 }
 
-model Notification{
-  NotificationID String @id @default(uuid())
-  UserID     String
-  Message    String @db.Text()
-  CreatedAt  DateTime  @default(now())
-  UpdatedAt  DateTime  @updatedAt
-  User       Users    @relation(fields: [UserID] ,references: [UserID])
+model Notification {
+  NotificationID String   @id @default(uuid())
+  UserID         String
+  Message        String   @db.Text()
+  CreatedAt      DateTime @default(now())
+  UpdatedAt      DateTime @updatedAt
+  User           Users    @relation(fields: [UserID], references: [UserID])
 }
 
-
+model Report {
+  ReportID  String      @id @default(uuid())
+  UserID    String
+  ItemID    String
+  ItemType  ContentType
+  Reason    String      @db.Text
+  Status    String      @default("pending")
+  CreatedAt DateTime    @default(now())
+  UpdatedAt DateTime    @updatedAt
+  User      Users       @relation(fields: [UserID], references: [UserID])
+  PostID    Post?       @relation(fields: [ItemID], references: [PostID], map: "report_post_fkey")
+  BlogPost  BlogPost?   @relation(fields: [ItemID], references: [BlogID], map: "report_blog_fkey")
+  Comment   Comments?   @relation(fields: [ItemID], references: [CommentID], map: "report_comment_fkey")
+}

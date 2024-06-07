@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ForumService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
 
   private async addCounts(answer: any) {
@@ -75,7 +75,7 @@ export class ForumService {
         where: { ForumPostID },
         include: {
           Answers: true,
-          
+
         },
       });
       if (!forumPost) {
@@ -94,17 +94,16 @@ export class ForumService {
         where: {
           ForumPostID,
         },
-        include:{
-          Like:true,
-          View:true,
-          Comment:true
+        include: {
+          Like: true,
+          Comment: true
 
         },
         orderBy: {
           CreatedAt: 'desc',
         },
       });
-     return Promise.all(forums.map( async(post)=>await this.addCounts(post)));
+      return Promise.all(forums.map(async (post) => await this.addCounts(post)));
     } catch (error) {
       console.error(error);
       throw new HttpException('Failed to get forum post answers', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -117,9 +116,10 @@ export class ForumService {
         where: {
           ForumAnswerID,
         },
-        include:{
-          Like:true
-    }});
+        include: {
+          Like: true
+        }
+      });
       if (!forumAnswer) {
         throw new HttpException('Forum answer not found', HttpStatus.NOT_FOUND);
       }
@@ -165,13 +165,28 @@ export class ForumService {
         },
         include: {
           Like: true,
-          View: true,
         },
       });
       return forum;
     } catch (error) {
       console.error(error);
       throw new HttpException('Failed to update forum answer', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async increaseView(ForumAnswerID: string) {
+    try {
+      const post = await this.prisma.forumAnswer.update({
+        where: { ForumAnswerID },
+        data: {
+          View: {
+            increment: 1
+          }
+        }
+      })
+      return post
+    } catch (error) {
+      throw new HttpException("faild to increase view", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 

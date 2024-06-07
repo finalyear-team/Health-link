@@ -94,9 +94,9 @@ const PatientDahboard = () => {
               </Button>
             ) : null}
 
-            <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
+            {/* <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
               <QuickSettings />
-            </div>
+            </div> */}
           </div>
           {/* the illustration part */}
           <div>

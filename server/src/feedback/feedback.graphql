@@ -1,6 +1,12 @@
 type Feedback {
-  # Example field (placeholder)
-  exampleField: Int
+  FeedbackID:String
+  UserID:String
+  Content:String
+  CreatedAt:Date
+  UpdateAt:Date
+  Rating:Int
+  Review:String
+  
 }
 
 input CreateFeedbackInput {
@@ -13,12 +19,12 @@ input UpdateFeedbackInput {
 }
 
 type Query {
-  feedbacks: [Feedback]!
-  feedback(id: Int!): Feedback
+  Feedbacks: [Feedback]!
+  Feedback(id: Int!): Feedback
 }
 
 type Mutation {
-  createFeedback(createFeedbackInput: CreateFeedbackInput!): Feedback!
-  updateFeedback(updateFeedbackInput: UpdateFeedbackInput!): Feedback!
-  removeFeedback(id: Int!): Feedback
+  CreateFeedback(createFeedbackInput: CreateFeedbackInput!): Feedback!
+  UpdateFeedback(updateFeedbackInput: UpdateFeedbackInput!): Feedback!
+  RemoveFeedback(id: Int!): Feedback
 }

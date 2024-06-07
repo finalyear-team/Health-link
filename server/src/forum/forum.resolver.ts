@@ -5,53 +5,57 @@ import { UpdateForumAnswerInput, UpdateForumInput } from './dto/update-forum.inp
 
 @Resolver('Forum')
 export class ForumResolver {
-  constructor(private readonly forumService: ForumService) {}
+  constructor(private readonly forumService: ForumService) { }
 
-  @Mutation('createForumPost')
+  @Mutation('CreateForumPost')
   async create(@Args('createForumInput') createForumInput: CreateForumInput) {
     return this.forumService.createForumPost(createForumInput);
   }
-  @Mutation('createForumAnswer')
+  @Mutation('CreateForumAnswer')
   async createForumAnswer(@Args('createForumAnswerInput') createForumAnswerInput: CreateForumAnswerInput) {
     return this.forumService.createForumAnswer(createForumAnswerInput);
   }
 
-  @Query('getForumPosts')
+  @Query('GetForumPosts')
   async getForumPosts() {
     return this.forumService.getForumPosts();
   }
 
-  @Query('getForumPost')
+  @Query('GetForumPost')
   async getForumPost(@Args('ForumPostID') ForumPostID: string) {
     return this.forumService.getForumPost(ForumPostID);
   }
 
- @Query('getForumAnswers')
-  async getForumPostAnswers(@Args("ForumPostID") ForumPostID:string) {
+  @Query('GetForumAnswers')
+  async getForumPostAnswers(@Args("ForumPostID") ForumPostID: string) {
     return this.forumService.getForumPostAnswers(ForumPostID);
   }
 
-  @Query('getForumAnswer')
+  @Query('GetForumAnswer')
   async getForumAnswer(@Args('ForumAnswerID') ForumAnswerID: string) {
     return this.forumService.getForumAnswer(ForumAnswerID);
   }
 
-  @Mutation('updateForum')
+  @Mutation('UpdateForum')
   async updateForumPost(@Args('updateForumInput') updateForumInput: UpdateForumInput) {
     return this.forumService.updateForumPost(updateForumInput.ForumID, updateForumInput);
   }
 
-  @Mutation('updateForumAnswer')
+  @Mutation('UpdateForumAnswer')
   async updateForumAnswer(@Args('updateForumAnswerInput') updateForumAnswerInput: UpdateForumAnswerInput) {
     return this.forumService.updateForumAnswer(updateForumAnswerInput.ForumAnswerID, updateForumAnswerInput);
   }
 
-
-  @Mutation('removeForumPost')
-  async remove(@Args('ForumPostID') ForumPostID: string) {
-    const forumPost=await this.forumService.removeForumPost(ForumPostID)
-    return forumPost
-  
-
+  @Mutation('IncreaseForumAnswerView')
+  async IncreaseForumAnswerView(@Args('ForumAnswerID') ForumAnswerID: string) {
+    return this.forumService.increaseView(ForumAnswerID);
   }
+
+  @Mutation('RemoveForumPost')
+  async remove(@Args('ForumPostID') ForumPostID: string) {
+    const forumPost = await this.forumService.removeForumPost(ForumPostID)
+    return forumPost
+  }
+
+
 }

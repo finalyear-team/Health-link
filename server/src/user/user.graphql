@@ -128,6 +128,8 @@ type Query {
   GetUsers: [User!]
   GetUser(id: String!): User
   GetDoctors:[User!]
+  GetFollowers(UserID:String!):[User]
+  GetFollowing(UserID:String!):[User]
   SearchUsers(searchQuery:String):[User]
   SearchDoctors(searchQuery:String):[User]
 }
@@ -136,9 +138,11 @@ type Query {
 type Mutation {
   RegisterUser(RegisterInput: UserDetailsInput!): User!
   DoctorRegister(DoctorDetailInput:DoctorRegisterInput!):User!
-  RemoveUser(id: Int!): User!
+  RemoveUser(UserID: Int!): User!
+  Follow(FollowerID:String!,FollowingID:String!):User
+  UnFollow(FollowerID:String!,FollowingID:String!):User
   UpdateUser(updateUserInput:updateUserInput):User!
-  SuspendUser(id:String,suspendType:SuspendType!):User
+  SuspendUser(UserID:String,suspendType:SuspendType!):User
 }
 
 

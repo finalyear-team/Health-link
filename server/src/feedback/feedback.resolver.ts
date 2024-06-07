@@ -5,30 +5,30 @@ import { UpdateFeedbackInput } from './dto/update-feedback.input';
 
 @Resolver('Feedback')
 export class FeedbackResolver {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(private readonly feedbackService: FeedbackService) { }
 
-  @Mutation('createFeedback')
+  @Mutation('CreateFeedback')
   create(@Args('createFeedbackInput') createFeedbackInput: CreateFeedbackInput) {
     return this.feedbackService.create(createFeedbackInput);
   }
 
-  @Query('feedback')
+  @Query('Feedback')
   findAll() {
     return this.feedbackService.findAll();
   }
 
-  @Query('feedback')
+  @Query('Feedback')
   findOne(@Args('id') id: number) {
     return this.feedbackService.findOne(id);
   }
 
-  @Mutation('updateFeedback')
+  @Mutation('UpdateFeedback')
   update(@Args('updateFeedbackInput') updateFeedbackInput: UpdateFeedbackInput) {
     console.log("first")
     return this.feedbackService.update(updateFeedbackInput.id, updateFeedbackInput);
   }
 
-  @Mutation('removeFeedback')
+  @Mutation('RemoveFeedback')
   remove(@Args('id') id: number) {
     return this.feedbackService.remove(id);
   }

@@ -12,63 +12,76 @@ import { ClerkMiddleware } from 'src/clerk.middleware';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
-  lowerCase(field:string){
-    return field.toLowerCase()  }
+  lowerCase(field: string) {
+    return field.toLowerCase()
+  }
 
-  
-@Mutation('RegisterUser')
-  async register(@Args('RegisterInput') RegisterInput:UserDetailsInput,@Context("res") res:Response ) {
+
+  @Mutation('RegisterUser')
+  async register(@Args('RegisterInput') RegisterInput: UserDetailsInput, @Context("res") res: Response) {
     console.log(RegisterInput)
-     const input=new UserDetailsInput(RegisterInput)
-     const user=await this.userService.RegisterUser(input);
-     return user
-  }  
-  
+    const input = new UserDetailsInput(RegisterInput)
+    const user = await this.userService.RegisterUser(input);
+    return user
+  }
 
 
- @Mutation('DoctorRegister')
- async doctorRegister(@Args('DoctorDetailInput') doctorDetailInput:DoctorDetailInput){
-  console.log(DoctorDetailInput)
-  const input=new DoctorDetailInput(doctorDetailInput)  
-  const doctor=await this.userService.DoctorRegister(input)
-  console.log(doctor)
-  return doctor
- }
+
+  @Mutation('DoctorRegister')
+  async doctorRegister(@Args('DoctorDetailInput') doctorDetailInput: DoctorDetailInput) {
+    console.log(DoctorDetailInput)
+    const input = new DoctorDetailInput(doctorDetailInput)
+    const doctor = await this.userService.DoctorRegister(input)
+    console.log(doctor)
+    return doctor
+  }
 
   @Query("GetDoctors")
-  async findDoctors(){
-    const doctors=await this.userService.getDoctors()
+  async findDoctors() {
+    const doctors = await this.userService.getDoctors()
     console.log(doctors)
     return doctors
   }
   @Query('GetUsers')
   // @UseGuards(RoleGuard)
   // @UserRoles(UserType.ADMIN)
-  async findAll(@Context() context:{req:Request,res:Response,next:NextFunction }) {   
-    const Users=await this.userService.getUsers()
+  async findAll(@Context() context: { req: Request, res: Response, next: NextFunction }) {
+    const Users = await this.userService.getUsers()
     return Users
   }
-  
-  
+
+
 
   @Query('GetUser')
-  async findOne(@Args('id') id: string) {
-    const User=await this.userService.getUserDetails(id)
+  async findOne(@Args('UserID') UserID: string) {
+    const User = await this.userService.getUserDetails(UserID)
+    return User
+  }
+
+  @Query('GetUser')
+  async GetFollowers(@Args('UserID') UserID: string) {
+    const User = await this.userService.getFollowers(UserID)
+    return User
+  }
+
+  @Query('GetUser')
+  async GetFollowing(@Args('UserID') UserID: string) {
+    const User = await this.userService.getFollowing(UserID)
     return User
   }
 
 
   @Query('SearchUsers')
-  async searchUsers(@Args('searchQuery') searchQuery:string){
-    const users=await this.userService.searchUsers(searchQuery)    
+  async searchUsers(@Args('searchQuery') searchQuery: string) {
+    const users = await this.userService.searchUsers(searchQuery)
     return users
   }
-  
+
   @Query('SearchDoctors')
-  async searchDoctors(@Args('searchQuery') searchQuery:string){
-    const users=await this.userService.searchDoctors(searchQuery)    
+  async searchDoctors(@Args('searchQuery') searchQuery: string) {
+    const users = await this.userService.searchDoctors(searchQuery)
     return users
   }
 
@@ -76,26 +89,45 @@ export class UserResolver {
 
   @Mutation('UpdateUser')
   //  @UseGuards(ClerkAuthGuard)
- async update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {  
-    const user=await this.userService.updateUser(updateUserInput)
-    const Education=JSON.parse(`${user.EducationalBackground}`)
-    return {EducationalBackground:Education,...user}
-    
+  async update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+    const user = await this.userService.updateUser(updateUserInput)
+    const Education = JSON.parse(`${user.EducationalBackground}`)
+    return { EducationalBackground: Education, ...user }
+
   }
 
   @Mutation('SuspendUser')
   //  @UseGuards(ClerkAuthGuard)
   // @UseGuards(RoleGuard)
   // @UserRoles(UserType.ADMIN)
- async SuspendUser(@Args('id') UserID: string,@Args("suspendType") suspendType:SuspendType) {  
-    const user=await this.userService.suspendUser(UserID,suspendType)   
+  async SuspendUser(@Args('UserID') UserID: string, @Args("suspendType") suspendType: SuspendType) {
+    const user = await this.userService.suspendUser(UserID, suspendType)
     return user
-    
+
+  }
+
+  @Mutation('Follow')
+  //  @UseGuards(ClerkAuthGuard)
+  // @UseGuards(RoleGuard)
+  // @UserRoles(UserType.ADMIN)
+  async Follow(@Args('FollowerID') FollowerID: string, @Args("FollowingID") FollowingID: string) {
+    const user = await this.userService.follow(FollowerID, FollowingID)
+    return user
+
+  }
+
+  @Mutation('UnFollow')
+  //  @UseGuards(ClerkAuthGuard)
+  // @UseGuards(RoleGuard)
+  // @UserRoles(UserType.ADMIN)
+  async UnFollow(@Args('FollowerID') FollowerID: string, @Args("FollowingID") FollowingID: string) {
+    const user = await this.userService.unfollow(FollowerID, FollowingID)
+    return user
+
   }
 
 
- 
   @Mutation('RemoveUser')
-  RemoveUser(@Args('id') id: number) {
+  RemoveUser(@Args('UserID') UserID: string) {
   }
 }

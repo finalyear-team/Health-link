@@ -9,8 +9,7 @@ import {
 import useAppointmentStore from "@/store/appointmentStore";
 import { patientAppointments } from "@/public/data/patient-appointment";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { UpcomingAppointment } from "@/components/appointment/upcoming-appointments";
-import { PastAppointment } from "@/components/appointment/past-appointments";
+import { AppointmentCard } from "@/components/appointment/appointment-card";
 
 const Appointment = () => {
   const upcomingAppointments = patientAppointments.upcomingAppointments;
@@ -30,12 +29,13 @@ const Appointment = () => {
             </CardHeader>
             <CardContent>
               {upcomingAppointments.map((value) => (
-                <UpcomingAppointment
+                <AppointmentCard
                   key={value.id}
                   id={value.id}
                   appointmentDate={value.appointmentDate}
                   appointmentTime={value.appointmentTime}
                   doctorName={value.doctorName}
+                  doctorPhoto={value.doctorPhoto}
                   purpose={value.purpose}
                   status={value.status}
                 />
@@ -57,12 +57,13 @@ const Appointment = () => {
             </CardHeader>
             <CardContent>
               {pastAppointments.map((value) => (
-                <PastAppointment
+                <AppointmentCard
                   key={value.id}
                   id={value.id}
                   appointmentDate={value.appointmentDate}
                   appointmentTime={value.appointmentTime}
                   doctorName={value.doctorName}
+                  doctorPhoto={value.doctorPhoto}
                   purpose={value.purpose}
                   status={value.status}
                 />

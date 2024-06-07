@@ -60,10 +60,9 @@ const newRoom = async (token: string) => {
     } catch (error) {
         console.log(error)
         throw new Error("something")
-
-    }
-
+        }
 }
+
 const addNewRoom = async (room: any, doctor: string, patient: string, AppointmentDate: string, AppointmentTime: string) => {
     try {
         const response = await fetch(`http://localhost:4000/video-call/create-room`, {

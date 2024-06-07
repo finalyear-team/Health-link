@@ -1,4 +1,5 @@
 import { InputType ,Field} from "@nestjs/graphql";
+import { BlogCategory } from "@prisma/client";
 import { MediaInput } from "src/post/dto/create-post.input";
 
 @InputType()
@@ -10,17 +11,14 @@ export class CreateBlogInput {
     @Field()
     Content:string
     @Field()
+    Thumbnail?:string
+    @Field()
+    Category:BlogCategory
+    @Field()
     Publish?:boolean
+
+    constructor(){
+
+    }
 }
 
-@InputType()
-export class CreateCommentInput {
-    @Field()
-    Content:string
-    @Field()
-    PostID:string
-    @Field()
-    UserID:string
-    @Field()
-    Medias?: MediaInput[];    
-}

@@ -20,6 +20,32 @@ export enum SuspendType {
 
 
 
+
+export enum BlogCategory {
+  GeneralHealthAndWellness = 'GeneralHealthAndWellness',
+  MedicalConditions = 'MedicalConditions',
+  DiseaseManagement = 'DiseaseManagement',
+  MentalHealth = 'MentalHealth',
+  NutritionAndDiet = 'NutritionAndDiet',
+  FitnessAndExercise = 'FitnessAndExercise',
+  MedicationAndTreatment = 'MedicationAndTreatment',
+  PatientStoriesAndTestimonials = 'PatientStoriesAndTestimonials',
+  MedicalResearchAndBreakthroughs = 'MedicalResearchAndBreakthroughs',
+  MedicalEducation = 'MedicalEducation',
+  HealthTechnology = 'HealthTechnology',
+  HealthcarePolicyAndAdvocacy = 'HealthcarePolicyAndAdvocacy',
+  WomensHealth = 'WomensHealth',
+  MensHealth = 'MensHealth',
+  PediatricsAndChildHealth = 'PediatricsAndChildHealth',
+  ElderlyCareAndAging = 'ElderlyCareAndAging',
+  AlternativeMedicine = 'AlternativeMedicine',
+  GlobalHealth = 'GlobalHealth',
+  MedicalEthicsAndLegalIssues = 'MedicalEthicsAndLegalIssues',
+  CancerAwarenessAndSupport = 'CancerAwarenessAndSupport',
+}
+
+
+
 export enum AttachmentType {
   IMAGE = 'image',
   VIDEO = 'video',
