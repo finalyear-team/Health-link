@@ -23,10 +23,10 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import users from "@/public/data/users";
 import useAppointmentStore from "@/store/appointmentStore";
-import { Loader2 } from "lucide-react";
+import { Loader2, Frown } from "lucide-react";
 import AppointmentForm from "@/components/form/appointment/appointment-form";
 import { useQuery } from "@apollo/client";
-import { GET_DOCTORS } from "@/graphql/queries/userQueries";
+import { GET_DOCTORS, SEARCH_DOCTORS} from "@/graphql/queries/userQueries";
 
 type SortOrder = "ascending" | "descending";
 
@@ -36,6 +36,12 @@ const Consultation = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("ascending");
   const [noValue, setNoValue] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState(users);
+
+  const { data, loading, error } = useQuery(SEARCH_DOCTORS, {
+    variables: {
+      searchQuery: '',
+    },
+  });
 
   // cancel the appointment form
   const cancelAppointmentForm = useAppointmentStore(
@@ -55,7 +61,8 @@ const Consultation = () => {
   };
 
   const handleFilterAndSort = (searchValue = "") => {
-    let resultUsers = users;
+    let resultUsers = users;    
+    // let resultUsers = data?.SearchDoctors || [];
 
     // Search by name
     if (searchValue) {
@@ -94,6 +101,8 @@ const Consultation = () => {
     setSubmitting(false);
   };
 
+  
+
   return (
     <Container>
       {!selectedDoctor ? (
@@ -113,7 +122,7 @@ const Consultation = () => {
           </div>
           {/* search and filter */}
 
-          <div className="flex justify-center items-center space-x-5 mt-4">
+          <div className="sticky top-40 z-50 flex justify-center items-center space-x-5 mt-4">
             <div>
               <SpecializationPopover
                 specializationValue={specializationValue}
@@ -183,7 +192,9 @@ const Consultation = () => {
           </div>
           {/* list of doctors */}
           {noValue ? (
-            <div>No results found</div>
+            <div className="flex items-center flex-col space-y-2 w-full mt-4">No results found 
+              <Frown className="w-10 h-10" />
+            </div>
           ) : (
             <TopDoctors items={filteredUsers} />
           )}

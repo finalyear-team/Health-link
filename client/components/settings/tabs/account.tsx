@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,10 +22,14 @@ import {
 import { Loader2 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
+import SpecializationPopover from "@/components/form/popOver/SpecializationPopover";
+import EducationPopover from "@/components/form/popOver/EducationPopover";
 
 const Account = ({ value }: { value: string }) => {
   const { user } = useUser();
   const { toast } = useToast();
+  const [specializationValue, setSpecializationValue] = useState("");
+  const [educationValue, setEducationValue] = useState("");
 
   const personalInitialValues = {
     firstName: user?.firstName,
@@ -36,6 +41,12 @@ const Account = ({ value }: { value: string }) => {
     email: user?.emailAddresses,
     phone: "0901020304",
     address: "A.A",
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
   };
 
   const handlePersonalSubmit = async (values: any, { setSubmitting }: any) => {
@@ -120,6 +131,134 @@ const Account = ({ value }: { value: string }) => {
                     type="number"
                   />
                   <Input label="Address" name="phone" type="text" />
+                </div>
+                <div>
+                  <Button disabled={!isValid} type="submit">
+                    {isSubmitting ? (
+                      <div>
+                        <Button disabled={!isValid} type="submit">
+                          {isSubmitting ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            ""
+                          )}{" "}
+                          Save info
+                        </Button>
+                      </div>
+                    ) : (
+                      "Save info"
+                    )}
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </CardContent>
+
+        <CardHeader>
+          <span className="text-primary-700 font-medium">
+            Professional Information
+          </span>
+          <hr />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Formik
+            initialValues={ContactInitialValues}
+            onSubmit={handleContactSubmit}
+            validationSchema={validateContEditInfo}
+          >
+            {({ isValid, isSubmitting }) => (
+              <Form className="space-y-6" action="#" method="POST">
+                <div>
+                  {/* institution */}
+                  <div className="mt-3">
+                    <Input
+                      name="institution"
+                      type="text"
+                      placeholder="Academic Institution"
+                      label="Academic Institution"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-5">
+                    {/* Educational qualification/Degree */}
+                    <div className="mt-3 flex space-x-2">
+                      <EducationPopover
+                        educationValue={educationValue}
+                        setEducationValue={setEducationValue}
+                      />
+                      {!educationValue ? (
+                        <span className="input__error mr-3">*</span>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    {/* specialization form */}
+                    <div className="mt-3 flex space-x-2">
+                      <SpecializationPopover
+                        specializationValue={specializationValue}
+                        setSpecializationValue={setSpecializationValue}
+                      />
+                      {!specializationValue ? (
+                        <span className="input__error mr-3">*</span>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-5">
+                    {/*  Graduation Year */}
+                    <div className="mt-3">
+                      <Input
+                        name="graduationYear"
+                        type="number"
+                        onKeyDown={handleKeyDown}
+                        placeholder="Graduation Year"
+                        label="Graduation year"
+                      />
+                    </div>
+                    {/* license */}
+                    <div className="mt-3">
+                      <Input
+                        name="license"
+                        type="number"
+                        onKeyDown={handleKeyDown}
+                        placeholder="License Number"
+                        label="License Number"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-5">
+                    {/* experiance */}
+                    <div className="mt-3">
+                      <Input
+                        name="experiance"
+                        type="number"
+                        onKeyDown={handleKeyDown}
+                        placeholder="Experiance Year"
+                        label="Experiance Year"
+                      />
+                    </div>
+                    {/* consultation fee */}
+                    <div className="mt-3">
+                      <Input
+                        name="consultationFee"
+                        type="number"
+                        onKeyDown={handleKeyDown}
+                        placeholder="Charge(per Hour)"
+                        label="Consultation Charge"
+                      />
+                    </div>
+                  </div>
+                  {/* Additional Certification */}
+                  <div className="mt-3">
+                    <Input
+                      name="additionalInfo"
+                      type="file"
+                      placeholder="Additional Certification"
+                      label="Drop any Certification"
+                      optional={true}
+                    />
+                  </div>
                 </div>
                 <div>
                   <Button disabled={!isValid} type="submit">

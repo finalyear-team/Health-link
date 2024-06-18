@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { getRoom } from "@/Services/videoCallServices";
 import { toast, useToast } from "../ui/use-toast";
-import ChatBox from "../test/ChatBox";
+import Chat from "../layout/chat/chat";
 
 const ConsultationPage = ({ role }: any) => {
   const { user } = useUser() as any;
@@ -77,7 +77,10 @@ const ConsultationPage = ({ role }: any) => {
       {/* Participant List */}
       <div className="w-full md:w-1/4">
         {/* <ParticipantList participants={participants} /> */}
-        <ChatBox />
+        {/* <ChatBox /> */}
+        <div>
+          <Chat includeSider={false} />
+        </div>
       </div>
     </div>
   );

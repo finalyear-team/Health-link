@@ -7,7 +7,10 @@ import ChatMessages from "@/components/layout/chat/chat-message";
 import ChatInput from "@/components/layout/chat/chat-input";
 import Modal from "@/components/test/modalImage";
 
-const Chat = () => {
+interface ChatProps {
+    includeSider?: boolean; 
+  }
+  const Chat: React.FC<ChatProps> = ({ includeSider }) => {
   const [messages, setMessages] = useState<
     { text: string; time: string; type?: string; content?: string }[]
   >([]);
@@ -87,7 +90,7 @@ const Chat = () => {
   return (
     <div className="flex w-full flex-col dark:bg-gray-950">
       <div className="flex h-full ">
-        <RecentChats />
+        {includeSider ? <RecentChats /> : null}
         <div className="flex-1 mb-2 mx-2 dark:bg-slate-950">
           <ChatHeader />
           <ChatMessages

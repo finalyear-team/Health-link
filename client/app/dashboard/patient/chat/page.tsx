@@ -1,8 +1,10 @@
-import React from "react";
-import ChatBox from "@/components/test/ChatBox";
+import React from 'react'
+import Chat from '@/components/layout/chat/chat'
 
-const Chat = () => {
-  return <ChatBox />;
-};
+const TextChat = () => {
+  return (
+    <div><Chat includeSider={true}/></div>
+  )
+}
 
-export default Chat;
+export default TextChat

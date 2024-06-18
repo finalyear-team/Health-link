@@ -129,7 +129,7 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
           purpose={dummyData.purpose}
         />
         <CountdownTimer targetTime={ISOFormattedtime} expire={expire} />
-        <JoinButton isActive={isActive} onClick={onJoinClick} />
+        <JoinButton isActive={true} onClick={onJoinClick} />
       </div>
 
       <div className="absolute right-3 top-1 flex space-x-1 items-center">
