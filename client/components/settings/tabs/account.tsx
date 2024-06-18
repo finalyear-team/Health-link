@@ -177,32 +177,29 @@ const Account = ({ value }: { value: string }) => {
                       type="text"
                       placeholder="Academic Institution"
                       label="Academic Institution"
+                      className="max-w-xs"
                     />
                   </div>
                   <div className="flex items-center space-x-5">
                     {/* Educational qualification/Degree */}
-                    <div className="mt-3 flex space-x-2">
+                    <div className="mt-3 flex items-start flex-col">
+                      <label className="text-sm font-medium">
+                        Education Qualification
+                      </label>
                       <EducationPopover
                         educationValue={educationValue}
                         setEducationValue={setEducationValue}
                       />
-                      {!educationValue ? (
-                        <span className="input__error mr-3">*</span>
-                      ) : (
-                        ""
-                      )}
                     </div>
                     {/* specialization form */}
-                    <div className="mt-3 flex space-x-2">
+                    <div className="mt-3 flex items-start flex-col">
+                      <label className="text-sm font-medium">
+                        Specialization
+                      </label>
                       <SpecializationPopover
                         specializationValue={specializationValue}
                         setSpecializationValue={setSpecializationValue}
                       />
-                      {!specializationValue ? (
-                        <span className="input__error mr-3">*</span>
-                      ) : (
-                        ""
-                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-5">
@@ -248,16 +245,6 @@ const Account = ({ value }: { value: string }) => {
                         label="Consultation Charge"
                       />
                     </div>
-                  </div>
-                  {/* Additional Certification */}
-                  <div className="mt-3">
-                    <Input
-                      name="additionalInfo"
-                      type="file"
-                      placeholder="Additional Certification"
-                      label="Drop any Certification"
-                      optional={true}
-                    />
                   </div>
                 </div>
                 <div>
