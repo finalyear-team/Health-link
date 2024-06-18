@@ -24,7 +24,7 @@ const NavItem = ({
       href={goto}
       className={`flex items-center space-x-2 pr-4 ${
         isActive
-          ? "border-l-4 rounded-tr-sm rounded-br-sm border-primary-600 text-primary-600 bg-primary-50 dark:text-slate-50 dark:bg-slate-800"
+          ? "border-l-4 rounded-tr-sm rounded-br-sm border-primary-600 text-primary-600 bg-primary-50 dark:bg-slate-800"
           : "text-dark-700 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-50"
       }`}
     >

@@ -3,7 +3,6 @@ import NavItem from "../shared/nav-item";
 import {
   MdGrid3X3,
   MdGridView,
-  MdNotificationsNone,
   MdOutlineCalendarMonth,
   MdOutlineMarkUnreadChatAlt,
   MdOutlineForum,
