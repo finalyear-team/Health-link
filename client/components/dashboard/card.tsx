@@ -1,5 +1,12 @@
 import React from "react";
 import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 const DashboardCard = ({
   title,
@@ -15,14 +22,22 @@ const DashboardCard = ({
   height: number;
 }) => {
   return (
-    <div className="flex flex-col justify-between rounded border border-slate-200 dark:border-slate-600 p-3 max-w-md shadow-md">
-      <h2 className="text-xl font-bold mb-2">{title}</h2>
-      <div className="flex justify-between">
-        <div className="text-2xl font-bold flex">  {number} </div>
-        <Image src={link} width={width} height={height} alt="user" />
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>Total number of {title}</CardDescription>
+      </CardHeader>
+      <CardContent className="p-3">
+        <div className="text-2xl font-bold flex"> {number} </div>
+      </CardContent>
+    </Card>
   );
 };
 
 export default DashboardCard;
+
+{
+  /* <div className="flex justify-between">
+          <Image src={link} width={width} height={height} alt="user" />
+        </div> */
+}
