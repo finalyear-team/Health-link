@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as HMS from "@100mslive/server-sdk"
 import { SocketGateway } from 'src/socket/socket.gateway';
@@ -15,6 +15,15 @@ export class VideoCallService {
     }
 
 
+    async getManagmentToken() {
+        try {
+            const token = await this.hms.auth.getManagementToken()
+            return token
+        } catch (error) {
+            console.log(error)
+            throw new HttpException("Faild to generate token", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
     //
     async generateToken(roomId: string, host: string, member: string, notValidBefore: number, Duration?: number) {
         try {
@@ -38,8 +47,8 @@ export class VideoCallService {
             const HostAuthToken: any = await this.hms.auth.getAuthToken(hostTokenConfig)
             const MemberAuthToken: any = await this.hms.auth.getAuthToken(memberTokenConfig)
             return {
-                HostAuthToken:HostAuthToken.token,
-                MemberAuthToken:MemberAuthToken.token
+                HostAuthToken: HostAuthToken.token,
+                MemberAuthToken: MemberAuthToken.token
             }
         } catch (error) {
             console.log(error)
@@ -47,6 +56,7 @@ export class VideoCallService {
 
         }
     }
+
 
 
     // 
@@ -86,10 +96,11 @@ export class VideoCallService {
     }
 
 
+
     //
     async getRoom(HostID: string, MemberID: string) {
         console.log(HostID)
-        console.log(MemberID)        
+        console.log(MemberID)
         try {
             const createdRoom = await this.prisma.videoChatRoom.findFirst({
                 where: {
@@ -107,8 +118,8 @@ export class VideoCallService {
 
 
                 },
-                include:{
-                    Members:true
+                include: {
+                    Members: true
                 }
             })
             if (createdRoom) {

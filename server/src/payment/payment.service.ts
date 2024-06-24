@@ -4,12 +4,52 @@ import { CreatePaymentInput } from './dto/create-payment.input';
 import * as crypto from "crypto"
 import * as puppeteer from "puppeteer"
 import { elementAt } from 'rxjs';
+import { ConfirmPaymentInput } from './dto/confirm-payment.input';
+import { UserService } from 'src/user/user.service';
+import { string } from 'zod';
 
 @Injectable()
 export class PaymentService {
     private CHAPA_SECRET = process.env.CHAPA_SECRET
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(private readonly prisma: PrismaService, private readonly userService: UserService) { }
 
+    chapaPaymentBody(user: any, amount: number) {
+        const tx_ref = `chapaPay_${crypto.randomBytes(5).toString("hex")}`
+        return JSON.stringify({
+            "amount": `${amount}`,
+            "currency": "ETB",
+            "email": user.Email,
+            "first_name": user.FirstName,
+            "last_name": user.LastName,
+            "phone_number": user.phone_number,
+            "tx_ref": tx_ref,
+            "callback_url": " https://b7e5-213-55-102-49.ngrok-free.app/payment/webhook",
+            "return_url": "https://localhost:3000/dashboard",
+            "customization[title]": "Payment for my favourite merchant",
+            "customization[description]": "I love online payments"
+        })
+
+    }
+
+    async chapaTransactionIntialize(user: any, amount: number) {
+        try {
+            const response = await fetch('https://api.chapa.co/v1/transaction/initialize', {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${this.CHAPA_SECRET}`,
+                    'Content-Type': 'application/json'
+                },
+                body: this.chapaPaymentBody(user, amount)
+            })
+            const data = await response.json()
+            console.log(data.data)
+            const checkout = await this.chapaCheckoutConfrim(data.data.checkout_url)
+        } catch (error) {
+            throw error
+
+        }
+
+    }
 
     async chapaCheckoutConfrim(url: string) {
         console.log(url)
@@ -58,33 +98,51 @@ export class PaymentService {
 
 
     }
-
-    async confirmPayment() {
-        const tx_ref = `chapaPay_${crypto.randomBytes(5).toString("hex")}`
+    async updatePayment(PaymentID: string, Amount: number) {
         try {
-            const response = await fetch('https://api.chapa.co/v1/transaction/initialize', {
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${this.CHAPA_SECRET}`,
-                    'Content-Type': 'application/json'
+            const payment = await this.prisma.payment.update({
+                where: {
+                    PaymentID
                 },
-                body: JSON.stringify({
-                    "amount": "150",
-                    "currency": "ETB",
-                    "email": "dawitgem@gmail.com",
-                    "first_name": "dawit",
-                    "last_name": "wondwosen",
-                    "phone_number": "0912345678",
-                    "tx_ref": tx_ref,
-                    "callback_url": " https://b7e5-213-55-102-49.ngrok-free.app/payment/webhook",
-                    "return_url": "https://localhost:3000/dashboard",
-                    "customization[title]": "Payment for my favourite merchant",
-                    "customization[description]": "I love online payments"
-                })
+                data: {
+                    Amount,
+                    PaymentStatus: "completed"
+                }
             })
-            const data = await response.json()
-            console.log(data.data)
-            const checkout = await this.chapaCheckoutConfrim(data.data.checkout_url)
+        } catch (error) {
+            throw error
+
+        }
+    }
+
+    async confirmPayment(confirmPaymentInput: ConfirmPaymentInput) {
+        const { PatientID, DoctorID, AppointmentID, Duration } = confirmPaymentInput
+        try {
+            const patient = await this.userService.getUserDetails(PatientID)
+            const doctor = await this.userService.getUserDetails(DoctorID)
+
+            if (!doctor)
+                throw new HttpException("request faild unexpectedly", HttpStatus.INTERNAL_SERVER_ERROR)
+
+            const fee = doctor.DoctorDetails.ConsultationFee
+
+            const amount = parseFloat(fee.toString()) * Duration
+
+
+            const payment = await this.prisma.payment.findFirst({
+                where: {
+                    DoctorID,
+                    PatientID,
+                    AppointmentID,
+                    PaymentStatus: "pending"
+                }
+            })
+
+            this.chapaTransactionIntialize(patient, amount)
+
+            const updatedPayment = this.updatePayment(payment.PaymentID, amount)
+
+            return updatedPayment
 
         } catch (error) {
             console.log(error)

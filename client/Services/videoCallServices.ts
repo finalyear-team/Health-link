@@ -60,7 +60,7 @@ const newRoom = async (token: string) => {
     } catch (error) {
         console.log(error)
         throw new Error("something")
-        }
+    }
 }
 
 const addNewRoom = async (room: any, doctor: string, patient: string, AppointmentDate: string, AppointmentTime: string) => {
@@ -70,7 +70,7 @@ const addNewRoom = async (room: any, doctor: string, patient: string, Appointmen
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ RoomID:room.roomId,RoomName:room.name,HostID:doctor, MemberID:patient ,AppointmentDate,AppointmentTime}),
+            body: JSON.stringify({ RoomID: room.roomId, RoomName: room.name, HostID: doctor, MemberID: patient, AppointmentDate, AppointmentTime }),
             credentials: "include",
         },);
         if (!response.ok)
@@ -78,7 +78,8 @@ const addNewRoom = async (room: any, doctor: string, patient: string, Appointmen
         return response.json()
     } catch (error) {
         console.log(error)
-        throw new Error("something")    }
+        throw new Error("something")
+    }
 
 }
 
@@ -98,10 +99,10 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
             throw new Error("Request failed!")
 
         const { createdRoom, authToken } = await response.json()
-    
+
         if (createdRoom) {
             room = await checkRoom(createdRoom.RoomID, authToken.token)
-            return {room,hostToken:createdRoom.HostAuthToken,memberToken:createdRoom.Members[0].MemberAuthToken}
+            return { room, hostToken: createdRoom.HostAuthToken, memberToken: createdRoom.Members[0].MemberAuthToken }
         }
         else {
             room = await newRoom(authToken.token)
@@ -112,4 +113,50 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
     } catch (error) {
         console.log(error)
     }
+}
+
+const getManagementToken = async (): Promise<string | undefined> => {
+    try {
+        const response = await fetch("http://localhost:4000/video-call/management-token", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+        },
+        )
+        if (!response.ok)
+            throw new Error("Request failed!")
+        const token = await response.json()
+        console.log(token)
+        return token
+
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+// get Session
+
+export const getVideoSession = async (roomId: string, doctorId: string, patientId: string, start_time: Date, end_time: Date) => {
+    try {
+        const token = await getManagementToken()
+        if (!token)
+            throw new Error("Invalid token")
+        const sessions = await fetch(`https://api.100ms.live/v2/sessions?room_id=${roomId}&after=${start_time}&before=${end_time}`, {
+
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`,
+            },
+            credentials: "include",
+        })
+
+    } catch (error) {
+        throw error
+
+    }
+
 }
