@@ -5,15 +5,24 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { MdDehaze } from "react-icons/md";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuSubTrigger,
+  DropdownMenuSub,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const { isSignedIn } = useUser();
-  const [showMenu, setShowMenu] = useState(false);
-
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
+  
   return (
     <nav className="header__custom">
       <Link href={"/"}>
@@ -27,8 +36,44 @@ const Header = () => {
         />
       </Link>
       <div>
-        <div className="menu-toggle" onClick={toggleMenu}>
-          <MdDehaze size={20} />
+        <div className="menu-toggle">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <MdDehaze className="w-6 h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Health Link</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  {isSignedIn ? (
+                    <Link href={"/dashboard"} className="txt_dasbrd">
+                      Dashboard
+                    </Link>
+                  ) : (
+                    ""
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={""}>Find a Doctor</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={""}>Services</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={""}>About us</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={"/sign-in"}>Log in</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={"/sign-up"}>Sign up</Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="header__right horizontal_nav text-sm">
           {isSignedIn ? (
@@ -38,43 +83,30 @@ const Header = () => {
           ) : (
             ""
           )}
-          <Link href={""}>Find a Doctor</Link>
-          <Link href={""}>Services</Link>
-          <Link href={""}>About us</Link>
+          <Link href={""} className="hover:underline">
+            Find a Doctor
+          </Link>
+          <Link href={""} className="hover:underline">
+            Services
+          </Link>
+          <Link href={""} className="hover:underline">
+            About us
+          </Link>
           {!isSignedIn ? (
             <div className="header__right text-sm">
               {" "}
-              <Link href={"/sign-in"}>Log in</Link>
-              <Link href={"/sign-up"}>Sign up</Link>{" "}
+              <Link href={"/sign-in"} className="hover:underline">
+                Log in
+              </Link>
+              <Link href={"/sign-up"} className="hover:underline">
+                Sign up
+              </Link>{" "}
             </div>
           ) : (
             <UserButton showName afterSignOutUrl="/sign-in" />
           )}
         </div>
       </div>
-      {showMenu && (
-        <div className="sidebar text-sm">
-          {isSignedIn ? (
-            <Link href={"/dashboard"} className="txt_dasbrd">
-              Dashboard
-            </Link>
-          ) : (
-            ""
-          )}
-          <Link href={""}>Find a Doctor</Link>
-          <Link href={""}>Services</Link>
-          <Link href={""}>About us</Link>
-          {!isSignedIn ? (
-            <div className="flex flex-col">
-              {" "}
-              <Link href={"/sign-in"}>Log in</Link>
-              <Link href={"/sign-up"}>Sign up</Link>{" "}
-            </div>
-          ) : (
-            <UserButton showName afterSignOutUrl="/sign-in" />
-          )}
-        </div>
-      )}
     </nav>
   );
 };

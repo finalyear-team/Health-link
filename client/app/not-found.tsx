@@ -34,7 +34,7 @@ const Custom404 = () => {
           </span>{" "}
           in 5 seconds...
         </p>
-        <Button onClick={() => router.refresh()} variant={"ghost"}>
+        <Button onClick={() => location.reload()} variant={"ghost"}>
           <RotateCcw className="w-4 h-4 mr-2" />
           Refresh Page
         </Button>

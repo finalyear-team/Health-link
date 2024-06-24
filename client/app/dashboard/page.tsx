@@ -9,12 +9,12 @@ const PatDashboard = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // when the component mounted it directly redirect based on the user rolee
+    // when the component mounted it directly redirects based on the user rolee
     if (user && user.unsafeMetadata && user.unsafeMetadata.role) {
       if (user.unsafeMetadata.role === "provider") {
-        router.push("/dashboard/doctor");
+        router.push("/dashboard/doctor/feed");
       } else {
-        router.push("/dashboard/patient");
+        router.push("/dashboard/patient/feed");
       }
     }
   }, [user, router]);

@@ -14,6 +14,9 @@ export default authMiddleware({
     "/privacy-policy",
     "/security",
     "/terms-of-services",
+    "/sign-in",
+    "/sign-up/doctor",
+    "/sign-up/patient",
   ],
   afterAuth: async (auth, req, evt) => {
     const url = new URL(req.url);
