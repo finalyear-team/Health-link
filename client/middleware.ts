@@ -15,8 +15,7 @@ export default authMiddleware({
     "/security",
     "/terms-of-services",
     "/sign-in",
-    "/sign-up/doctor",
-    "/sign-up/patient",
+    "/sign-up(.*)",
   ],
   afterAuth: async (auth, req, evt) => {
     const url = new URL(req.url);
@@ -26,9 +25,15 @@ export default authMiddleware({
         const user = await clerkClient.users.getUser(auth.userId);
         const role = user.unsafeMetadata.role;
 
-        if (role === "provider" && !url.pathname.startsWith("/dashboard/doctor")) {
+        if (
+          role === "provider" &&
+          !url.pathname.startsWith("/dashboard/doctor")
+        ) {
           return NextResponse.rewrite(new URL("/dashboard/doctor", req.url));
-        } else if (role === "patient" && !url.pathname.startsWith("/dashboard/patient")) {
+        } else if (
+          role === "patient" &&
+          !url.pathname.startsWith("/dashboard/patient")
+        ) {
           return NextResponse.rewrite(new URL("/dashboard/patient", req.url));
         }
 
