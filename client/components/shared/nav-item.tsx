@@ -36,7 +36,9 @@ const NavItem = ({
             {icon}
           </div>
         </TooltipTrigger>
-        <TooltipContent>{text}</TooltipContent>
+        <TooltipContent align="center" side="right" sideOffset={20}>
+          {text}
+        </TooltipContent>
       </Tooltip>
       {showText && <div className="">{text}</div>}
     </Link>

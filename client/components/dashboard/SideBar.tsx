@@ -99,7 +99,7 @@ export const Sidebar = () => {
                   <TooltipTrigger>
                     <MdOutlinePowerSettingsNew size={20} />
                   </TooltipTrigger>
-                  <TooltipContent>Logout</TooltipContent>
+                  <TooltipContent align="center" side="right" sideOffset={10}>Logout</TooltipContent>
                 </Tooltip>
               </div>
               {showText && <div className="cursor-pointer">Logout</div>}
