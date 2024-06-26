@@ -8,19 +8,9 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { MdWavingHand } from "react-icons/md";
 import Link from "next/link";
-import QuickSettings from "@/components/settings/quick-settings/quick-settings";
-import DashboardCard from "@/components/dashboard/card";
-import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
 import { format } from "date-fns";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Analytics from "@/components/dashboard/DoctorAnalytics";
 import {
   Popover,
@@ -28,6 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Loader2 } from "lucide-react";
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
@@ -62,9 +53,16 @@ const PatientDahboard = () => {
   const { user, isSignedIn, isLoaded } = useUser();
   const Role = user?.unsafeMetadata.role;
 
+  if (!isLoaded) {
+    return (
+      <Container>
+        <Loader2 className="w-10 h-10" />
+      </Container>
+    );
+  }
+
   return (
     <div>
-      {/* <div className="w-full rounded border border-slate-200 dark:border-slate-600 shadow-md p-6"> */}
       <Card>
         <div className="flex items-center justify-between p-3">
           <div className="flex flex-col justify-between p-3">
@@ -95,19 +93,7 @@ const PatientDahboard = () => {
               </Button>
             </div>
           </div>
-          {/* radio button settings */}
-          {/* <div>
-            {Role === "provider" ? (
-              <Button size={"lg"} className="mb-2">
-                Generate a Summary
-              </Button>
-            ) : null}
-            {!isLoaded ? <Loader /> : null}
 
-            <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
-              <QuickSettings />
-            </div>
-          </div> */}
           {/* the illustration part */}
           <div>
             <Image
@@ -119,23 +105,12 @@ const PatientDahboard = () => {
           </div>
         </div>
       </Card>
-      {/* </div> */}
-      {/* small cards to display more detail */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-3">
-        {image.map((value) => (
-          <DashboardCard
-            key={value.title}
-            link={value.link}
-            width={value.width}
-            height={value.height}
-            title={value.title}
-            number={value.number}
-          />
-        ))}
-      </div> */}
+
       <div>
         <div className="flex items-center flex-between p-4">
-          <div className="font-semibold text-lg md:text-xl flex flex-row items-center"><PieChart className="w-6 h-6 mr-3"/> Analytics</div>
+          <div className="font-semibold text-lg md:text-xl flex flex-row items-center">
+            <PieChart className="w-6 h-6 mr-3" /> Analytics
+          </div>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="outline" className="hidden sm:flex">
               Today
