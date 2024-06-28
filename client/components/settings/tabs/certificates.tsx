@@ -67,6 +67,12 @@ const Certificates = ({ value }: { value: string }) => {
         },
       });
       console.log("Updated user:", data);
+      // show toast
+      toast({
+        title: "Certificate Added",
+        variant: "success",
+        description: "Your Certificate has been added successfully",
+      });
     } catch (error) {
       toast({
         title: "Error updating the Certificate",

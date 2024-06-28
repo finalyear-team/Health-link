@@ -55,11 +55,17 @@ const CertificateCard = ({
       const { data } = await updateUser({
         variables: {
           updateUserInput: {
-            // 
+            //
           },
         },
       });
       console.log("Updated user:", data);
+      // show toast
+      toast({
+        title: "Certificate Updated",
+        variant: "success",
+        description: "Your Certificate has been updated successfully",
+      });
     } catch (error) {
       toast({
         title: "Error updating the Certificate",
