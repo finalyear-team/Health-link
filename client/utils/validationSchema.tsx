@@ -178,3 +178,26 @@ export const validateSetAvailability: any = Yup.object().shape({
     .min(1, "Select at least one weekday")
     .required("Weekdays are required"),
 });
+
+export const validateCertificateInputs: any = Yup.object().shape({
+  name: Yup.string()
+    .required("Name is required")
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name cannot be longer than 50 characters")
+    .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
+  description: Yup.string().max(
+    200,
+    "Description must be less than 200 characters"
+  ),
+  certificateId: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9]{5,20}$/,
+      "Certificate ID must be 5-20 alphanumeric characters"
+    )
+    .required("Certificate ID is required"),
+
+  issueDate: Yup.date()
+    .required("Certificate issue date is required")
+    .max(new Date(), "Issue date cannot be in the future"),
+});

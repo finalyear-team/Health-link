@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Loader2 } from "lucide-react";
+import PageLoader from "@/common/Loader/PageLoader";
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
@@ -56,7 +57,7 @@ const PatientDahboard = () => {
   if (!isLoaded) {
     return (
       <Container>
-        <Loader2 className="w-10 h-10" />
+        <PageLoader />
       </Container>
     );
   }

@@ -1,9 +1,8 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
+import Head from "next/head";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,7 +29,7 @@ import {
 import Certificates from "@/components/settings/tabs/certificates";
 import { Formik, Form, Field } from "formik";
 import Container from "@/components/container/container";
-import { Loader2 } from "lucide-react";
+import PageLoader from "@/common/Loader/PageLoader";
 import {
   Popover,
   PopoverContent,
@@ -82,15 +81,15 @@ export default function TabsDemo() {
   if (!isLoaded) {
     return (
       <Container>
-        <Loader2 className="w-10 h-10" />
+        <PageLoader />
       </Container>
     );
   }
   return (
     <div>
-      <head>
+      <Head>
         <title>Setting | HealthLink</title>
-      </head>
+      </Head>
       {/* profile section */}
       <Card>
         <div className="h-[200px] flex items-center space-x-3 p-3 rounded">
@@ -248,8 +247,8 @@ export default function TabsDemo() {
                                 </div>
                                 <hr className="border dark:border-slate-500" />
                                 {!isValid ? (
-                                  <span className="text-xs text-red-600 dark:text-red-700">
-                                    Incorrect format, try again
+                                  <span className="text-xs text-red-600 dark:text-red-400">
+                                    Please select at least one time slot.
                                   </span>
                                 ) : null}
                                 <Button
