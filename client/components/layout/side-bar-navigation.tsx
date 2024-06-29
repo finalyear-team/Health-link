@@ -23,7 +23,7 @@ const SideBarNavigation = ({
   pathname: string;
 }) => {
   return (
-    <nav className="space-y-4 font-medium mt-2">
+    <nav className="space-y-1 font-medium mt-2">
       <NavItem
         showText={showText}
         icon={<MdGridView size={20} />}

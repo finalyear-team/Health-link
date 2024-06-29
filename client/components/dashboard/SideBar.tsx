@@ -70,8 +70,8 @@ export const Sidebar = () => {
   }, [showText]);
 
   return (
-    <div className="z-50 h-screen w-fit border border-stroke dark:border-slate-600 bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm z-">
-      <div className="py-4 pl-4 relative">
+    <div className="z-50 h-screen w-fit border border-stroke dark:border-slate-600 bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm">
+      <div className="py-4 relative">
         <div className="absolute top-0 -right-9">
           <button
             className="w-10 h-10 text-white flex items-center justify-center"
@@ -90,7 +90,7 @@ export const Sidebar = () => {
             width={81}
             height={72}
             alt="Logo"
-            className="w-8 h-8 auto pb-2 border-b"
+            className="w-8 h-8 auto pb-2 mx-4 border-b"
           />
         </Link>
         <SideBarNavigation
@@ -101,9 +101,9 @@ export const Sidebar = () => {
       </div>
       <TooltipProvider>
         <SignOutButton>
-          <div className="p-4">
-            <div className="flex items-center space-x-2  text-red-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800">
-              <div className={`w-8 h-8 pl-2 flex items-center`}>
+          <div className="px-4 hover:bg-slate-50 dark:hover:bg-slate-800 py-1">
+            <div className="flex items-center pl-2  text-red-600 font-medium ">
+              <div className={`w-8 h-8 flex items-center`}>
                 <Tooltip>
                   <TooltipTrigger>
                     <MdOutlinePowerSettingsNew size={20} />
