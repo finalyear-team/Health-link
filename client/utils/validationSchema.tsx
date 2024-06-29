@@ -149,7 +149,7 @@ export const validatePassEditInfo: any = Yup.object().shape({
       "*Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)"
     ),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "*Passwords must match")
+    .oneOf([Yup.ref("newPassword")], "*Passwords must match")
     .required("*Confirm Password is required!"),
 });
 
