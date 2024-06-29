@@ -42,6 +42,7 @@ type User{
    Email: String
    FirstName: String
    LastName: String
+   Verified:Boolean
    Bio: String
    PhoneNumber: String
    Address: String
@@ -59,7 +60,6 @@ type User{
 
 
 input UserDetailsInput {
-  UserID:String!
   FirstName: String!
   LastName: String!
   Username: String!
@@ -126,7 +126,9 @@ input updateUserInput{
 
 type Query {
   GetUsers: [User!]
+  GetUserByEmail(Email:String!):User
   GetUser(id: String!): User
+  GetSignedInUser:User
   GetDoctors:[User!]
   GetFollowers(UserID:String!):[User]
   GetFollowing(UserID:String!):[User]

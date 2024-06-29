@@ -66,6 +66,7 @@ input EmergencyAppointmentInput{
 
 type Query {
   UserAppointments(UserID:String!):[Appointment]
+  FilterUserAppointment(UserID:String!):[Appointment]
   FilterAppoinments(FilterQuery:String): [Appointment]
   GetAppointmentByID(Id:String!):Appointment
 }

@@ -1,60 +1,62 @@
-// import { MailerService } from '@nestjs-modules/mailer';
-// import { Injectable } from '@nestjs/common';
-// import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { getYear } from 'date-fns';
+import { Token } from 'graphql';
 // import { User } from 'src/user/entities/user.entity';
 
 
 
-// @Injectable()
-// export class MailService {
-//     constructor(private readonly mailerService:MailerService){}
+@Injectable()
+export class MailService {
+    constructor(private readonly mailerService: MailerService) { }
 
-//     @OnEvent("Email-verification")         
-//     async sendVerificationEmail(user:any,VerificationToken:string){
-//        const  verificationLink=`${process.env.API}/verify`
-//         try {
-//             await this.mailerService.sendMail({
-//                 to: user.Email,
-//                 subject: 'Account Verification',
-//                 template: './confirmation',
-//                 context: {
-//                   username: user.FullName,
-//                   verificationLink,
-//                 },
-//               });
-            
-//             } catch (error) {
-//             throw error
-            
-//         }
+    async sendVerificationEmail(Email: string, FirstName: string, otp: string) {
+        try {
+            const email = await this.mailerService.sendMail({
+                to: Email,
+                subject: 'Account Verification',
+                template: './email-verification',
+                context: {
+                    FirstName,
+                    otp,
+                    currentYear: getYear(new Date())
+                },
+            });
+            return email
 
-//     }
-    
 
-//     @OnEvent("Reset-password")
-//     async sendResetPasswordEmail(payload:any){
-//         console.log(" event  !!!")
-//         const {email,username,verificationLink}=payload
-//         console.log(email)
-//         try {
-//             await this.mailerService.sendMail({
-//                 to: email,
-//                 subject: 'Reset Password',
-//                 template: './reset-password-email',
-//                 context: {
-//                     username,
-//                     email,
-//                     verificationLink                  
-//                 },
-//               });          
-            
-//         } catch (error) {
-//             throw error
-            
-//         }
-//             }
- 
+        } catch (error) {
+            throw error
 
-   
+        }
 
-// }
+    }
+
+
+    async sendResetPasswordEmail(payload: any) {
+        console.log(" event  !!!")
+        const { email, FirstName, verificationLink } = payload
+        console.log(email)
+        try {
+            await this.mailerService.sendMail({
+                to: email,
+                subject: 'Reset Password',
+                template: './reset-password-email',
+                context: {
+                    FirstName,
+                    email,
+                    verificationLink
+                },
+            });
+
+        } catch (error) {
+            throw error
+
+        }
+    }
+
+
+
+
+}

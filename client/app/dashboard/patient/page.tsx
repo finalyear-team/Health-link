@@ -12,6 +12,7 @@ import QuickSettings from "@/components/settings/quick-settings/quick-settings";
 import DashboardCard from "@/components/dashboard/card";
 import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
+import useAuth from "@/hooks/useAuth";
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
@@ -51,8 +52,10 @@ const PatientDahboard = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const { user, isSignedIn, isLoaded } = useUser();
-  const Role = user?.unsafeMetadata.role;
+  // const { user, isSignedIn, isLoaded } = useUser();
+  const { user, isSignedIn, isLoaded } = useAuth()
+  console.log(user)
+  const Role = user?.Role;
 
   return (
     <div>
@@ -67,7 +70,7 @@ const PatientDahboard = () => {
                 {currentTime}{" "}
               </div>
               <span className="text-primary-600 dark:text-primary-700 flex items-center space-x-2">
-                Mr. {user?.firstName} {user?.lastName} {!isLoaded && <Loader />}
+                Mr. {user?.FirstName} {user?.LastName} {!isLoaded && <Loader />}
               </span>{" "}
             </div>
             {/* the time show */}

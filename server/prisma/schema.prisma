@@ -156,10 +156,11 @@ enum BlogCategory {
 }
 
 model Users {
-  UserID                String              @id
-  Username              String              @unique
+  UserID                String              @id @default(uuid())
+  Username              String
   FirstName             String?
   LastName              String?
+  Password              String?
   Email                 String              @unique
   DateOfBirth           DateTime?
   Gender                Gender?

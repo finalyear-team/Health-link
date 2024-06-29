@@ -32,6 +32,7 @@ const Appointment = () => {
                 <AppointmentCard
                   key={value.id}
                   id={value.id}
+                  doctorId={value.doctorId}
                   appointmentDate={value.appointmentDate}
                   appointmentTime={value.appointmentTime}
                   doctorName={value.doctorName}
@@ -60,6 +61,7 @@ const Appointment = () => {
                 <AppointmentCard
                   key={value.id}
                   id={value.id}
+                  doctorId={value.doctorId}
                   appointmentDate={value.appointmentDate}
                   appointmentTime={value.appointmentTime}
                   doctorName={value.doctorName}

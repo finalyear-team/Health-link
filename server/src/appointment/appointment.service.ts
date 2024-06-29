@@ -76,11 +76,12 @@ export class AppointmentService {
       return schedule
 
     } catch (error) {
+      console.log(error)
       throw error
 
     }
   }
-  
+
 
   //
   async updateVideoCallRoomMembersToken(appointment: Appointments) {

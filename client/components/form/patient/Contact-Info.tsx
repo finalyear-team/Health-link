@@ -8,6 +8,9 @@ import { validationSchemaContInfo } from "@/utils/validationSchema";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Loader2 } from "lucide-react";
 import useUserStore from "@/store/userStore";
+import client from "@/graphql/apollo-client";
+import { GET_USER_BY_EMAIL } from "@/graphql/queries/userQueries";
+import { useState } from "react";
 
 const ContactInfo = ({
   onNext,
@@ -17,6 +20,8 @@ const ContactInfo = ({
   onBack: () => void;
 }) => {
   const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const [error, setError] = useState<string | null>()
+  const [emailChecking, setEmailChecking] = useState(false)
   const [storedValues, setStoredValues] = useLocalStorage(
     "patient_contactInfo",
     {
@@ -27,18 +32,47 @@ const ContactInfo = ({
     }
   );
 
-  const handleSubmit = (values: any, { setSubmitting }: any) => {
+  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    console.log("additional infor loadeds")
     // Removing the password from local storage
-    const { password, ...valuesWithoutPassword } = values;
+    try {
+      const { password, ...valuesWithoutPassword } = values;
 
-    // setting the values into the store
-    setUserInformation(values);
+      const { data, loading } = await client.query({
+        query: GET_USER_BY_EMAIL,
+        variables: {
+          Email: values.email
+        }
 
-    setTimeout(() => {
-      setStoredValues(valuesWithoutPassword);
-      setSubmitting(false);
-      onNext();
-    }, 1000);
+      })
+      setEmailChecking(loading)
+
+      if (data.GetUserByEmail) {
+        setError("Email already registered. please use different email address")
+        return
+      }
+
+      setUserInformation(values);
+
+      setTimeout(() => {
+        setStoredValues(valuesWithoutPassword);
+        setSubmitting(false);
+        onNext();
+      }, 1000);
+
+    } catch (error) {
+
+    }
+    // const { password, ...valuesWithoutPassword } = values;
+
+    // // setting the values into the store
+    // setUserInformation(values);
+
+    // setTimeout(() => {
+    //   setStoredValues(valuesWithoutPassword);
+    //   setSubmitting(false);
+    //   onNext();
+    // }, 1000);
   };
 
   return (
@@ -68,6 +102,9 @@ const ContactInfo = ({
                       placeholder="Enter Email"
                       label="Email"
                     />
+                    {error && <p className="text-red-600 text-sm">
+                      {error}
+                    </p>}
                   </div>
                   {/* Password */}
                   <div className="mt-3">

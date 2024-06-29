@@ -34,7 +34,7 @@ type Schedule {
 
 input CreateScheduleInput{
   DoctorID:String!
-  WeekDay:WeekDay
+  WeekDay:[WeekDay]
   Date:Date
   StartTime:Date!
   EndTime:Date!

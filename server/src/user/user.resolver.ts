@@ -6,7 +6,7 @@ import { DoctorDetailInput, UserDetailsInput } from './dto/create-user.input';
 import { RoleGuard, UserRoles } from 'src/access-control/role.guard';
 import { SuspendType, UserType } from 'src/utils/types';
 import { UseGuards } from '@nestjs/common';
-import { ClerkAuthGuard } from 'src/auth/auth.guard';
+import { ClerkAuthGuard, JWTGuard } from 'src/auth/auth.guard';
 import { User } from '@clerk/clerk-sdk-node';
 import { ClerkMiddleware } from 'src/clerk.middleware';
 
@@ -18,10 +18,30 @@ export class UserResolver {
     return field.toLowerCase()
   }
 
+  @UseGuards(JWTGuard)
+  @Query("GetSignedInUser")
+  async getProfile(@Context() context: { req: Request, res: Response, next: NextFunction }) {
+    console.log("user profile searc")
+    const requestUser = context.req.user as any
+
+    const user = await this.userService.getUserDetails(requestUser.UserID)
+
+    return user
+  }
+
+
+  @Query("GetUserByEmail")
+  async getUserByEmail(@Args("Email") Email: string) {
+    const user = await this.userService.getUserByEmail(Email)
+    console.log(user)
+    return user
+  }
+
 
   @Mutation('RegisterUser')
   async register(@Args('RegisterInput') RegisterInput: UserDetailsInput, @Context("res") res: Response) {
     console.log(RegisterInput)
+    console.log("register")
     const input = new UserDetailsInput(RegisterInput)
     const user = await this.userService.RegisterUser(input);
     return user
@@ -31,17 +51,15 @@ export class UserResolver {
 
   @Mutation('DoctorRegister')
   async doctorRegister(@Args('DoctorDetailInput') doctorDetailInput: DoctorDetailInput) {
-    console.log(DoctorDetailInput)
     const input = new DoctorDetailInput(doctorDetailInput)
+    console.log(input)
     const doctor = await this.userService.DoctorRegister(input)
-    console.log(doctor)
     return doctor
   }
 
   @Query("GetDoctors")
   async findDoctors() {
     const doctors = await this.userService.getDoctors()
-    console.log(doctors)
     return doctors
   }
   @Query('GetUsers')

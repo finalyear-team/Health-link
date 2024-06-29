@@ -20,6 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useAuth from "@/hooks/useAuth";
+import { UserType } from "@/types/types";
 
 export const Sidebar = () => {
   const [showText, setShowText] = useState(true);
@@ -27,16 +29,22 @@ export const Sidebar = () => {
 
   const pathname = usePathname();
   const [role, setRole] = useState("");
-  const { user } = useUser();
+  const { user } = useAuth()
+  // const { user } = useUser();
 
   useEffect(() => {
-    if (user && user.unsafeMetadata && user.unsafeMetadata.role) {
-      if (user.unsafeMetadata.role === "provider") {
-        setRole("doctor");
-      } else {
-        setRole("patient");
-      }
-    }
+    // if (user && user.unsafeMetadata && user.unsafeMetadata.role) {
+    //   if (user.unsafeMetadata.role === "provider") {
+    //     setRole("doctor");
+    //   } else {
+    //     setRole("patient");
+    //   }
+    // }
+    if (user && user.Role && user.Role === UserType.DOCTOR)
+      setRole("doctor");
+    if (user && user.Role && user.Role === UserType.PATIENT)
+      setRole("patient");
+
   }, [user, pathname]);
 
   useEffect(() => {
@@ -91,7 +99,8 @@ export const Sidebar = () => {
         />
       </div>
       <TooltipProvider>
-        <SignOutButton>
+        <div>akjsds</div>
+        {/* <button>
           <div className="p-4">
             <div className="flex items-center space-x-2  text-red-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800">
               <div className={`w-8 h-8 pl-2 flex items-center`}>
@@ -105,7 +114,22 @@ export const Sidebar = () => {
               {showText && <div className="cursor-pointer">Logout</div>}
             </div>
           </div>
-        </SignOutButton>
+        </button> */}
+        {/* <SignOutButton>
+          <div className="p-4">
+            <div className="flex items-center space-x-2  text-red-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800">
+              <div className={`w-8 h-8 pl-2 flex items-center`}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <MdOutlinePowerSettingsNew size={20} />
+                  </TooltipTrigger>
+                  <TooltipContent>Logout</TooltipContent>
+                </Tooltip>
+              </div>
+              {showText && <div className="cursor-pointer">Logout</div>}
+            </div>
+          </div>
+        </SignOutButton> */}
       </TooltipProvider>
     </div>
   );

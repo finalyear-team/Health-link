@@ -6,16 +6,16 @@ interface AppointmentStore {
   AppointmentForm: boolean;
   showAppointmentForm: () => void;
   cancelAppointmentForm: () => void;
-  selectDoctor: (doctor: DoctorProfile) => void;
+  selectDoctor: (doctor: any) => void;
   clearSelection: () => void;
 }
 
 const useAppointmentStore = create<AppointmentStore>((set) => ({
   selectedDoctor: null,
   AppointmentForm: false,
-  showAppointmentForm: () => set((state) => ({  AppointmentForm: true })),
-  cancelAppointmentForm: () => set((state) => ({  AppointmentForm: false })),
-  selectDoctor: (doctor) => set((state) => ({  selectedDoctor: doctor })), 
+  showAppointmentForm: () => set((state) => ({ AppointmentForm: true })),
+  cancelAppointmentForm: () => set((state) => ({ AppointmentForm: false })),
+  selectDoctor: (doctor) => set((state) => ({ selectedDoctor: doctor })),
   clearSelection: () => set({ selectedDoctor: null }),
 }));
 

@@ -15,6 +15,7 @@ interface InputProps {
   accept?: string;
   showError?: boolean;
   optional?: boolean;
+  onChange?: (even: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 

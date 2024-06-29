@@ -15,8 +15,10 @@ interface TopDoctorsProps {
 }
 
 const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
+
+  console.log(items)
   const selectDoctor = useAppointmentStore((state) => state.selectDoctor);
-  const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
+
   const showAppointmentForm = useAppointmentStore(
     (state) => state.showAppointmentForm
   );
@@ -26,11 +28,11 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
     // handle follow logic
   };
 
-  useEffect(() => {
-    console.log("The selected Doctor is : ", selectedDoctor);
-  }, [selectedDoctor]);
+
+
 
   const handleMakeAppointment = (profile: DoctorProfile) => {
+    console.log(profile)
     selectDoctor(profile);
     setTimeout(() => {
       showAppointmentForm();
@@ -60,7 +62,7 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
           rating={4.5}
           speciality={profile.Speciality}
           experience={profile.ExperienceYears}
-          hourlyRate={profile.hourlyRate}
+          hourlyRate={profile.ConsultationFee}
           onFollow={handleFollow}
           onMakeAppointment={handleMakeAppointment}
           profile={profile}

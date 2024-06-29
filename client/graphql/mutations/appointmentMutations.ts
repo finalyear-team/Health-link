@@ -40,8 +40,8 @@ mutation UpdateAppointment($input: UpdateAppointmentInput!) {
 
 export const CREATE_EMERGENCY_APPOINTMENT = gql`
 mutation CreateEmergencyAppointment($input: EmergencyAppointmentInput!) {
-    CreateEmergencyAppointment(emergencyAppointmentInput: $input) {
-        AppointmentID
+  CreateEmergencyAppointment(emergencyAppointmentInput: $input) {
+  AppointmentID
   DoctorID
   PatientID
   ScheduleID
@@ -78,7 +78,7 @@ mutation AcceptAppointment($DoctorID: String!) {
 export const REMOVE_APPOINTMENT = gql`
 mutation RemoveAppointment($Id: Int!) {
   RemoveAppointment(Id: $Id) {
-    AppointmentID
+  AppointmentID
   DoctorID
   PatientID
   ScheduleID
@@ -88,7 +88,7 @@ mutation RemoveAppointment($Id: Int!) {
   Duration
   Status
   AppointmentType
-    Note  
+  Note  
   }
 }
 `;

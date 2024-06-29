@@ -1,3 +1,4 @@
+"use client"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,8 +25,13 @@ import {
 } from "react-icons/md";
 
 import { SignOutButton } from "@clerk/nextjs";
+import { signout } from "@/Services/authService";
+import { useRouter, redirect } from "next/navigation";
+import Link from "next/link";
 
 const Profile = () => {
+  const router = useRouter()
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -58,13 +64,15 @@ const Profile = () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <SignOutButton>
+            <DropdownMenuItem >
+              {/* <SignOutButton> */}
+              <Link href={"/sign-out"}>
                 <div className="flex items-center space-x-2 text-red-400">
                   <MdOutlinePowerSettingsNew size={20} />
                   <span>Log out</span>
                 </div>
-              </SignOutButton>
+              </Link>
+              {/* </SignOutButton> */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

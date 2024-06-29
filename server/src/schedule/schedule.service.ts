@@ -4,57 +4,83 @@ import { UpdateScheduleInput } from './dto/update-schedule.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { convertToIso } from 'src/utils/converToIso';
 import { validateEndTime } from 'src/utils/validateTime';
-import { ScheduleType, Weekday } from '@prisma/client';
+import { DoctorSchedule, ScheduleType, Weekday } from '@prisma/client';
 import { format } from 'date-fns';
 import { parseDate } from 'src/utils/parseDate';
+import { ScheduleStatus } from 'src/utils/types';
 
 @Injectable()
 export class ScheduleService {
   constructor(private readonly prisma: PrismaService) {
   }
   // 
-  async checkIfTheSlotIsAlreadyRegistered(DoctorID: string, StartTime: any, EndTime: any, ScheduleType: ScheduleType, WeekDay?: Weekday, date?: Date) {
+  async checkIfTheSlotIsAlreadyRegistered(DoctorID: string, StartTime: any, EndTime: any, ScheduleType: ScheduleType, WeekDay?: Weekday[], date?: Date) {
     try {
       console.log(WeekDay)
       console.log(date)
       const conditions = [];
+      const TimeCondition = {
+        OR: [
+          {
+            AND: [
+              { StartTime: { lte: StartTime } },
+              { EndTime: { gte: StartTime } },
+            ],
+          },
+          {
+            AND: [
+              { StartTime: { lte: EndTime } },
+              { EndTime: { gte: EndTime } },
+            ],
+          },
+          {
+            AND: [
+              { StartTime: { gte: StartTime } },
+              { EndTime: { lte: EndTime } },
+            ],
+          },
+          {
+            AND: [
+              { StartTime: { equals: StartTime } },
+              { EndTime: { equals: EndTime } },
+            ],
+          },
+        ],
+      };
 
-      conditions.push({
-        AND: [
-          { StartTime: { lte: StartTime } },
-          { EndTime: { gte: EndTime } }
-        ]
-      });
 
-
-      if (WeekDay) {
-        conditions.push({
+      if (WeekDay && WeekDay.length > 0) {
+        console.log(" weekday condition")
+        WeekDay.forEach(day => conditions.push({
           AND: [
-            { WeekDay },
-            { StartTime: { equals: StartTime } },
-            { EndTime: { equals: EndTime } }
-          ]
-        });
+            { WeekDay: day },
+            TimeCondition
+          ],
+
+        }))
+          ;
       }
 
       if (date) {
+        console.log("date condition")
         const dayOfWeek = format(date.toISOString(), 'EEEE').toLowerCase(); // Get the full name of the day of the week
-        console.log(dayOfWeek)
         conditions.push({
           AND: [
             { Date: { equals: date } },
-            { StartTime: { equals: StartTime } },
-            { EndTime: { equals: EndTime } }
+            TimeCondition
+
           ]
         });
         conditions.push({
           AND: [
             { WeekDay: dayOfWeek },
-            { StartTime: { equals: StartTime } },
-            { EndTime: { equals: EndTime } }
+            TimeCondition
           ]
         });
       }
+
+      console.log(conditions.forEach(condition => console.log(condition)))
+
       const slot = await this.prisma.doctorSchedule.findFirst({
         where: {
           DoctorID,
@@ -79,18 +105,34 @@ export class ScheduleService {
 
     if (await this.checkIfTheSlotIsAlreadyRegistered(DoctorID, StartTime, EndTime, "normal", WeekDay, Date))
       throw new HttpException("already scheduled", HttpStatus.BAD_REQUEST)
+
     try {
-      const schedule = await this.prisma.doctorSchedule.create({
-        data: {
-          DoctorID,
-          Date,
-          WeekDay,
-          StartTime,
-          EndTime,
-          Note,
-        }
-      })
-      console.log(schedule)
+      const scheduleInput = WeekDay && WeekDay.map((weekday) => ({
+        DoctorID,
+        WeekDay: weekday,
+        StartTime,
+        EndTime,
+        Status
+      }))
+      let schedule: any
+
+      if (WeekDay && WeekDay.length > 0) {
+        schedule = await this.prisma.doctorSchedule.createMany({
+          data: scheduleInput
+        })
+      }
+
+      if (Date) {
+        schedule = await this.prisma.doctorSchedule.create({
+          data: {
+            DoctorID,
+            Date,
+            StartTime,
+            EndTime,
+            Note,
+          }
+        })
+      }
       return schedule
     } catch (error) {
       console.log(error)
@@ -103,7 +145,7 @@ export class ScheduleService {
   async createEmergencySchedule(EmergencyScheduleInput: EmergencyScheduleInput) {
     const { DoctorID, EndTime } = EmergencyScheduleInput
     const scheduleDate = new Date(format(new Date().toDateString(), "yyy-MM-dd"))
-    const WeekDay=format(scheduleDate.toISOString(),"EEEE").toLowerCase() as Weekday
+    const WeekDay = format(scheduleDate.toISOString(), "EEEE").toLowerCase() as Weekday
     const StartTime = new Date()
     try {
       const isEndTimeOccupied = await this.prisma.doctorSchedule.findFirst({
@@ -112,17 +154,16 @@ export class ScheduleService {
           Status: "available",
           OR: [
             {
-                EndTime: { lte: EndTime },
-                Date: { equals: scheduleDate }
+              EndTime: { lte: EndTime },
+              Date: { equals: scheduleDate }
             },
             {
-                EndTime: { lte: EndTime },
-                WeekDay
+              EndTime: { lte: EndTime },
+              WeekDay
             }
-        ]
+          ]
         }
       })
-      console.log(isEndTimeOccupied)
       if (isEndTimeOccupied)
         throw new Error("already scheduled")
       const emergencySchedule = await this.prisma.doctorSchedule.create({
@@ -155,7 +196,6 @@ export class ScheduleService {
         },
         data: { ...others }
       })
-      console.log(schedule)
       return schedule
     } catch (error) {
       console.log(error)
@@ -193,6 +233,7 @@ export class ScheduleService {
 
   //
   async schedules(DoctorID: string) {
+    console.log("schedulessss")
     try {
       const schedules = await this.prisma.doctorSchedule.findMany({
         where: {
@@ -269,7 +310,7 @@ export class ScheduleService {
   }
 
   //
-  
+
 
 
 }

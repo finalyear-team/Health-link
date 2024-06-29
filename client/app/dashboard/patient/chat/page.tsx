@@ -23,15 +23,15 @@ import 'stream-chat-react/dist/css/v2/index.css';
 const apiKey = process.env.NEXT_PUBLIC_STREAM_CHAT_API_KEY as string
 
 const ChatPage = () => {
-  const channel=useChannelListContext()  
+  const channel = useChannelListContext()
 
   const [client, setClient] = useState<StreamChat>()
   const { user } = useUser()
   const [token, setToken] = useState()
-  const [filters,setFilter]=useState({members:{},type:""})
+  const [filters, setFilter] = useState({ members: {}, type: "" })
 
-const options = { presence: true, state: true };
-const sort = { last_message_at: -1 };
+  const options = { presence: true, state: true };
+  const sort = { last_message_at: -1 };
 
   console.log(user)
   useEffect(() => {
@@ -53,12 +53,12 @@ const sort = { last_message_at: -1 };
       client.connectUser(
         {
           id: user?.id,
-          name:user?.fullName as string
+          name: user?.fullName as string
         },
-        token                                            
+        token
       );
-    
-  setFilter({ members: { $in: [user.id] }, type: 'messaging' });
+
+      setFilter({ members: { $in: [user.id] }, type: 'messaging' });
 
       setClient(client);
 
@@ -73,7 +73,7 @@ const sort = { last_message_at: -1 };
 
   return (
     <Chat client={client}>
-       <ChannelList sort={sort as any} filters={filters as any} options={options} />
+      <ChannelList sort={sort as any} filters={filters as any} options={options} />
       <Channel>
         <Window>
           <ChannelHeader />

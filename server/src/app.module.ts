@@ -15,7 +15,7 @@ import { AccessControlService } from './access-control/access-control.service';
 import { VideoCallModule } from './video-call/video-call.module';
 import { StreamChatModule } from './stream-chat/stream-chat.module';
 import { ClerkMiddleware } from './clerk.middleware';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { SymptomCheckerModule } from './symptom-checker/symptom-checker.module';
@@ -29,6 +29,10 @@ import { CommentModule } from './comment/comment.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { DoctorReviewModule } from './doctor-review/doctor-review.module';
 import { PaymentModule } from './payment/payment.module';
+import { MailService } from './mail/mail.service';
+import { MailModule } from './mail/mail.module';
+import { JwtStrategy } from './auth/jwt.strategy ';
+import { PassportModule } from '@nestjs/passport';
 
 
 @Module({
@@ -38,11 +42,18 @@ import { PaymentModule } from './payment/payment.module';
     playground: true,
     typePaths: ["./**/*.graphql"],
   }),
+
   nestSchedule.ScheduleModule.forRoot(),
   EventEmitterModule.forRoot()
     ,
-    UserModule, AuthModule, VideoCallModule, StreamChatModule, JwtModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule],
-  providers: [AppService, SocketGateway, AuthService, UserService, UserResolver, PrismaService, AccessControlService, SocketService],
+    PassportModule,
+  JwtModule.register({
+    global: true,
+    secret: process.env.JWT_SECRET_KEY,
+    signOptions: { expiresIn: '15m' },
+  }),
+    UserModule, AuthModule, VideoCallModule, StreamChatModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule, MailModule],
+  providers: [AppService, SocketGateway, AuthService, UserService, UserResolver, PrismaService, AccessControlService, SocketService, MailService, JwtStrategy, JwtService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

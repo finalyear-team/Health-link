@@ -3,7 +3,7 @@ import Container from "@/components/container/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useSignIn } from "@clerk/nextjs";
+import { SignIn, useSignIn } from "@clerk/nextjs";
 import { MdCircle } from "react-icons/md";
 import React from "react";
 import { Formik, Form } from "formik";
@@ -13,11 +13,12 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { signIn } from "@/Services/authService";
 
 
 const LoginPage = () => {
   const [error, setError] = useState(null);
-  const { isLoaded, signIn, setActive } = useSignIn();
+  // const { isLoaded, signIn, setActive } = useSignIn();
   const router = useRouter();
 
   // validation for the input fields
@@ -45,27 +46,26 @@ const LoginPage = () => {
     values: any,
     { setSubmitting, resetForm }: any
   ) => {
-    console.log("Form values:", values);
-
-    if (!isLoaded) {
-      // setLoading(true);
-      return;
-    }
-
     try {
-      const result = await signIn.create({
-        identifier: values.email,
-        password: values.password,
-      });
-      console.log(result)
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
+
+      const user = await signIn(values.email, values.password)
+      if (user)
         router.push("/dashboard");
-      } else {
-        console.log(result);
-      }
+
+      // const result = await signIn.create({
+      //   identifier: values.email,
+      //   password: values.password,
+      // });
+      // console.log(result)
+      // if (result.status === "complete") {
+      //   await setActive({ session: result.createdSessionId });
+      //   router.push("/dashboard");
+      // } else {
+      //   console.log(result);
+      // }
     } catch (err: any) {
-      setError(err.errors[0].longMessage);
+      setError(err.response.data.message)
+      // setError(err.errors[0].longMessage);
     }
 
     setSubmitting(false);

@@ -60,6 +60,7 @@ export class UserService {
       })
       return user
     } catch (error) {
+      console.log(error)
       throw new HttpException("faild to register ", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
@@ -67,6 +68,7 @@ export class UserService {
 
 
   async DoctorRegister(DoctorRegisterInput: DoctorDetailInput) {
+    console.log(DoctorRegisterInput)
     const { UserDetails, ...others } = DoctorRegisterInput
     try {
       const { DoctorDetails, ...UsersDetail } = await this.prisma.users.create({
@@ -85,8 +87,10 @@ export class UserService {
           DoctorDetails: true
         }
       })
+      console.log("success")
       return { ...UsersDetail, ...DoctorDetails }
     } catch (error) {
+      console.log(error)
       throw new HttpException("faild to register  ", HttpStatus.INTERNAL_SERVER_ERROR)
 
     }
@@ -125,6 +129,18 @@ export class UserService {
     }
   }
 
+  async getUserByEmail(email: string) {
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: {
+          Email: email
+        }
+      })
+      return user
+    } catch (error) {
+
+    }
+  }
 
   async searchUsers(searchQuery: string): Promise<Users[]> {
     try {
@@ -209,8 +225,6 @@ export class UserService {
       })
 
       const Followers = await Promise.all(doctors.map(async (doctor) => this.countFollowersAndFollowing(doctor.UserID)))
-      console.log(Followers)
-      console.log(doctors.map((doctor, i) => ({ ...doctor.DoctorDetails, ...doctor, ...Followers[i] })))
       return Promise.all(doctors.map((doctor, i) => ({ ...doctor.DoctorDetails, ...doctor, ...Followers[i] })))
 
     } catch (error) {

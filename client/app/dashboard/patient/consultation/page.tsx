@@ -41,7 +41,7 @@ const Consultation = () => {
   const cancelAppointmentForm = useAppointmentStore(
     (state) => state.cancelAppointmentForm
   );
-  
+
   // to check whether the doctor is selected or not
 
   const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
@@ -185,7 +185,7 @@ const Consultation = () => {
           {noValue ? (
             <div>No results found</div>
           ) : (
-            <TopDoctors items={filteredUsers} />
+            <div>Doctors</div>
           )}
         </div>
       ) : (

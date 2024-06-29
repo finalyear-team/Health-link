@@ -1,18 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { MdDehaze } from "react-icons/md";
+import { useQuery } from "@apollo/client";
+import { GET_SIGNEDIN_USER } from "@/graphql/queries/userQueries";
+import { refreshAccessToken } from "@/Services/authService";
+import useAuth from "@/hooks/useAuth";
 
 const Header = () => {
-  const { isSignedIn } = useUser();
+  // const { isSignedIn } = useUser();
+  const { user, isSignedIn } = useAuth()
+
+  console.log(user)
+  console.log(isSignedIn)
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
 
   return (
     <nav className="header__custom">
@@ -48,7 +57,8 @@ const Header = () => {
               <Link href={"/sign-up"}>Sign up</Link>{" "}
             </div>
           ) : (
-            <UserButton showName afterSignOutUrl="/sign-in" />
+            <div>userbutton</div>
+            // <UserButton showName afterSignOutUrl="/sign-in" />
           )}
         </div>
       </div>
@@ -71,7 +81,8 @@ const Header = () => {
               <Link href={"/sign-up"}>Sign up</Link>{" "}
             </div>
           ) : (
-            <UserButton showName afterSignOutUrl="/sign-in" />
+            <div>userbutton</div>
+            // <UserButton showName afterSignOutUrl="/sign-in" />
           )}
         </div>
       )}

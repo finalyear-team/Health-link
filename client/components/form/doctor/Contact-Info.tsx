@@ -10,6 +10,9 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { validationSchemaContInfo } from "@/utils/validationSchema";
 import { Loader2 } from "lucide-react";
 import useUserStore from "@/store/userStore";
+import client from "@/graphql/apollo-client";
+import { GET_USER_BY_EMAIL } from "@/graphql/queries/userQueries";
+import { useState } from "react";
 
 
 const ContactInfoForm = ({
@@ -20,6 +23,8 @@ const ContactInfoForm = ({
   onBack: () => void;
 }) => {
   const setUserInformation = useUserStore((state) => state.setUserInformation);
+  const [emailChecking, setEmailChecking] = useState(false)
+  const [error, setError] = useState<string | null>()
   const [storedValues, setStoredValues] = useLocalStorage("contactInfo", {
     email: "",
     password: "",
@@ -27,18 +32,49 @@ const ContactInfoForm = ({
     address: "",
   });
 
-  const handleSubmit = (values: any, { setSubmitting }: any) => {
+  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    console.log("additional infor loadeds")
     // Removing the password from local storage
-    const { password, ...valuesWithoutPassword } = values;
+    try {
+      const { password, ...valuesWithoutPassword } = values;
 
-    // setting the values into the store
-    setUserInformation(values);
+      const { data, loading } = await client.query({
+        query: GET_USER_BY_EMAIL,
+        variables: {
+          Email: values.email
+        }
 
-    setTimeout(() => {
-      setStoredValues(valuesWithoutPassword);
-      setSubmitting(false);
-      onNext();
-    }, 1000);
+      })
+      setEmailChecking(loading)
+
+      if (data.GetUserByEmail) {
+        setError("Email already registered. please use different email address")
+        client.clearStore()
+        return
+      }
+
+      setUserInformation(values);
+
+      setTimeout(() => {
+        setStoredValues(valuesWithoutPassword);
+        setSubmitting(false);
+        onNext();
+      }, 1000);
+
+    } catch (error) {
+
+    }
+    // Removing the password from local storage
+    // const { password, ...valuesWithoutPassword } = values;
+
+    // // setting the values into the store
+    // setUserInformation(values);
+
+    // setTimeout(() => {
+    //   setStoredValues(valuesWithoutPassword);
+    //   setSubmitting(false);
+    //   onNext();
+    // }, 1000);
   };
 
   return (
@@ -69,6 +105,9 @@ const ContactInfoForm = ({
                       placeholder="Enter Email"
                       label="Email"
                     />
+                    {error && <p className="text-red-600 text-sm">
+                      {error}
+                    </p>}
                   </div>
                   {/* Password */}
                   <div className="mt-3">
@@ -106,8 +145,8 @@ const ContactInfoForm = ({
                     </Button>
                   </div>
                   <div>
-                    <Button  type="submit">
-                      {isSubmitting ? (
+                    <Button type="submit">
+                      {isSubmitting || emailChecking ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
                         ""

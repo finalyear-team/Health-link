@@ -18,9 +18,10 @@ export interface DoctorProfile {
 }
 
 export interface AppointmentType {
-  id: number;
+  id: string;
   appointmentDate: string;
   appointmentTime: string;
+  doctorId: string;
   doctorName: string;
   doctorPhoto: string;
   purpose: string;
@@ -40,7 +41,7 @@ export interface UserRegister {
   password: string;
   phone: string;
   address: string;
-  role:UserType
+  role: UserType
   specialization: string;
   education: string;
   consultationFee: number;

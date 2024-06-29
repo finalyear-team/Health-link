@@ -16,11 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-
-      <html lang="en" suppressHydrationWarning>
-        <body>
-          <ApolloWrappper>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ApolloWrappper>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -30,9 +28,8 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
-            </ApolloWrappper>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ApolloWrappper>
+      </body>
+    </html>
   );
 }

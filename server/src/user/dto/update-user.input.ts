@@ -1,39 +1,41 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { PartialType } from '@nestjs/mapped-types';
-import {  DoctorDetailInput, UserDetailsInput } from './create-user.input';
+import { DoctorDetailInput, UserDetailsInput } from './create-user.input';
 import { Gender, UserStatus } from '@prisma/client';
 
 
 @InputType()
-export class UpdateUserInput  {
-  UserID:string
+export class UpdateUserInput {
+  UserID: string
   FirstName?: string
   LastName?: string
   Username?: string
   Gender?: Gender
   Bio?: string
-  DateOfBirth?:Date
+  DateOfBirth?: Date
   PhoneNumber?: string
-  Address?: string 
+  Address?: string
   ProfilePicture?: string
-  DoctorDetails?:{
-  Speciality?: string
-  LicenseNumber?: string
-  ExperienceYears?:number
-  EducationalBackground?:{
-    Institution:string,
-    Degree:string,
-    Specialization:string,
-    GraduationYear:number    
-    AdditionalCertifications: string[]
-  }  }
+  Verified: boolean
+  DoctorDetails?: {
+    Speciality?: string
+    LicenseNumber?: string
+    ExperienceYears?: number
+    EducationalBackground?: {
+      Institution: string,
+      Degree: string,
+      Specialization: string,
+      GraduationYear: number
+      AdditionalCertifications: string[]
+    }
+  }
 }
 
 @InputType()
-export class ResetInput{ 
-    @Field()
-    Id:string
-    @Field()
-    newPassword:string
+export class ResetInput {
+  @Field()
+  Id: string
+  @Field()
+  newPassword: string
 
 }

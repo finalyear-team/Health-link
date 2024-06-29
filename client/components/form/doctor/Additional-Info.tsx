@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Container from "@/components/container/container";
 import { Formik, Form } from "formik";
 import { MdCircle } from "react-icons/md";
@@ -14,10 +14,15 @@ import VerifyAccount from "@/components/layout/VerifyAccount";
 import EducationPopover from "../popOver/EducationPopover";
 import SpecializationPopover from "../popOver/SpecializationPopover";
 import { Loader2 } from "lucide-react";
+import { formatBytes, validateFiles } from "@/utils/fileinputValidator";
+import CertificateFileList from "@/components/shared/CertificateFileList";
 
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const [specializationValue, setSpecializationValue] = useState("");
   const [educationValue, setEducationValue] = useState("");
+  const [fileErrors, setFileErrors] = useState<string | null>(null)
+
+
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -25,17 +30,34 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
+  const [selectedFiles, setSelectedFiles] = useState<File[] | null>(null)
+
+  const handleCertificateRemove = (removedFile: File) => {
+    const remainingFiles = selectedFiles?.filter((file) => removedFile.name != file.name && removedFile.size != file.size)
+    setSelectedFiles(remainingFiles || null)
+  }
+
+  const handleCertificateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    console.log("upload certificate")
+    const file = event.target?.files?.[0]
+    const currentFiles = event.target.files && Array.from(event.target.files)
+
+    const validFiles = validateFiles(selectedFiles, file, setSelectedFiles, setFileErrors)
+
+
+  }
+
   const [storedValues, setStoredValues] = useLocalStorage("professionalInfo", {
     consultationFee: "",
     license: "",
     experiance: "",
     agreedToTerms: true,
     institution: "",
-
     // additionalInfo causes a warning message in the console if no value is assigned to it
     // Warning: `value` prop on `input` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
     additionalInfo: "",
-    
+
     graduationYear: "",
   });
 
@@ -44,7 +66,8 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     error: submitError,
     pendingVerification,
     completed,
-  } = useSubmit(setStoredValues, "provider");
+  } = useSubmit(setStoredValues, "provider", selectedFiles);
+
 
   return (
     <Container>
@@ -59,7 +82,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
               Professional Information (3/3)
             </h2>
             <Formik
-              initialValues={{...storedValues,specialization:specializationValue,education:educationValue}}
+              initialValues={{ ...storedValues, specialization: specializationValue, education: educationValue }}
               onSubmit={handleSubmit}
               validationSchema={validationSchemaAddInfo}
               enableReinitialize
@@ -107,6 +130,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       onKeyDown={handleKeyDown}
                       placeholder="Graduation Year"
                       label="Enter your Graduation year"
+
                     />
                   </div>
                   {/* license */}
@@ -137,17 +161,30 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       onKeyDown={handleKeyDown}
                       placeholder="Enter Charge(per Hour)"
                       label="Consultation Charge"
+
                     />
                   </div>
                   {/* Additional Certification */}
-                  <div className="mt-3">
+                  <div className="mt-3 ">
                     <Input
                       name="additionalInfo"
                       type="file"
+                      accept=""
                       placeholder="Additional Certification"
                       label="Drop any Certification"
                       optional={true}
+                      onChange={handleCertificateChange}
+
                     />
+                    {fileErrors && <p className="text-red-600 text-sm">
+                      {fileErrors}
+
+                    </p>}
+                    {selectedFiles && selectedFiles.length > 0 && <CertificateFileList SelectedFiles={selectedFiles} handleFileRemove={handleCertificateRemove} formatBytes={formatBytes} />}
+
+
+
+
                   </div>
                   <div className="mt-3">
                     <Input
@@ -178,6 +215,7 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                           !specializationValue ||
                           !educationValue ||
                           completed
+
                         }
                         type="submit"
                       >

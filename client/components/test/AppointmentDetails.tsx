@@ -1,9 +1,12 @@
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 interface AppointmentDetailsProps {
   doctorName: string;
   doctorPhoto: string;
+  appointmentId: string;
   appointmentTime: string;
   purpose: string;
 }
@@ -11,9 +14,12 @@ interface AppointmentDetailsProps {
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
   doctorName,
   doctorPhoto,
+  appointmentId,
   appointmentTime,
   purpose,
 }) => {
+  const { user } = useUser();
+  const Role = user?.unsafeMetadata.role === "provider" ? "doctor" : "patient";
   return (
     <div className="flex items-center p-4">
       <Image
@@ -29,6 +35,12 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
         <p className="font-medium text-primary-600 dark:text-primary-700">
           {purpose}
         </p>
+        <Link
+          href={`/dashboard/${Role}/appointment/${appointmentId}`}
+          className="hover:underline text-sm text-center"
+        >
+          view detail
+        </Link>
       </div>
     </div>
   );

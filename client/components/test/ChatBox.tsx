@@ -45,7 +45,7 @@ const ChatBox: React.FC = () => {
         { text: value.message, time: currentTime },
       ]);
 
-      // Possible place for a database interaction to save the message
+      // Possible place to save the message
       // ({ text: value.message, time: currentTime });
     }
 
@@ -64,7 +64,7 @@ const ChatBox: React.FC = () => {
           },
         ]);
 
-        // Possible place for a database interaction to save the image
+        // Possible place to save the image
         // ({ content: reader.result, time: currentTime });
 
         setPreviewImage(reader.result as string);
