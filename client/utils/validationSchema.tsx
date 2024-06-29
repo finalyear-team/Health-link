@@ -109,6 +109,28 @@ export const validateContEditInfo: any = Yup.object().shape({
     .required("*Phone number is required"),
 });
 
+export const validateProffessionalEditInfo: any = Yup.object().shape({
+  consultationFee: Yup.number()
+    .typeError("Consultation fee must be a number")
+    .required("Consultation fee is required")
+    .positive("Consultation fee must be a positive amount"),
+  license: Yup.string()
+    .matches(/^\d{10}$/, "License number must be 10 digits")
+    .required("License number is required"),
+  experiance: Yup.number()
+    .typeError("Experience must be a number")
+    .positive("Experience must be a positive number")
+    .integer("Experience must be a whole number")
+    .max(50, "Experience cannot be more than 50 years")
+    .required("Experience is required"),
+  graduationYear: Yup.number()
+    .typeError("Graduation year must be a number")
+    .min(1900, "Graduation year cannot be earlier than 1900")
+    .max(currentYear, `Graduation year cannot be later than ${currentYear}`)
+    .required("Graduation year is required"),
+  institution: Yup.string().required("Institution is required"),
+});
+
 export const validatePassEditInfo: any = Yup.object().shape({
   previousPassword: Yup.string()
     .min(8, "*Password must be at least 8 characters")
@@ -178,6 +200,42 @@ export const validateSetAvailability: any = Yup.object().shape({
     .min(1, "Select at least one weekday")
     .required("Weekdays are required"),
 });
+// updated validation for the availabilty of the doctor
+// export const validateSetAvailability = Yup.object().shape({
+//   startTime: Yup.string()
+//     .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time format")
+//     .required("Start time is required"),
+//   endTime: Yup.string()
+//     .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time format")
+//     .required("End time is required")
+//     .test(
+//       "is-after",
+//       "End time must be at least one hour after start time",
+//       function (value) {
+//         const { startTime } = this.parent;
+//         if (!startTime || !value) return true;
+//         const [startHour, startMinute] = startTime.split(":").map(Number);
+//         const [endHour, endMinute] = value.split(":").map(Number);
+//         const start = new Date(0, 0, 0, startHour, startMinute).getTime();
+//         const end = new Date(0, 0, 0, endHour, endMinute).getTime();
+//         return end - start >= 3600000; // 1 hour in milliseconds
+//       }
+//     ),
+//   weekday: Yup.array()
+//     .of(
+//       Yup.string().oneOf([
+//         "sunday",
+//         "monday",
+//         "tuesday",
+//         "wednesday",
+//         "thursday",
+//         "friday",
+//         "saturday",
+//       ])
+//     )
+//     .min(1, "Select at least one weekday")
+//     .required("Weekdays are required"),
+// });
 
 export const validateCertificateInputs: any = Yup.object().shape({
   name: Yup.string()
