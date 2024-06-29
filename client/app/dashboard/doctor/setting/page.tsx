@@ -321,12 +321,13 @@ export default function TabsDemo() {
           <TabsTrigger value="account">
             <User className="w-4 h-4 mr-2" /> Account
           </TabsTrigger>
-          <TabsTrigger value="certificates">
-            <Award className="w-4 h-4 mr-2" /> Certificates
-          </TabsTrigger>
           <TabsTrigger value="loginAndSecurity">
             <KeyRound className="w-4 h-4 mr-2" /> Password
           </TabsTrigger>
+          <TabsTrigger value="certificates">
+            <Award className="w-4 h-4 mr-2" /> Certificates
+          </TabsTrigger>
+
           <TabsTrigger value="Network">
             <Users className="w-4 h-4 mr-2" /> Network
           </TabsTrigger>
@@ -335,8 +336,8 @@ export default function TabsDemo() {
           </TabsTrigger>
         </TabsList>
         <Account value="account" />
-        <Certificates value="certificates" />
         <LoginAndSecurity value="loginAndSecurity" />
+        <Certificates value="certificates" />
         <Network value="Network" />
         <MyPosts value="myPosts" />
       </Tabs>

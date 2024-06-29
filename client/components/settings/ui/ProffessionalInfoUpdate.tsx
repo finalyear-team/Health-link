@@ -65,7 +65,7 @@ const ProffessionalInfoUpdate = () => {
                   className="max-w-xs"
                 />
               </div>
-              <div className="flex items-center space-x-5">
+              <div className="flex space-x-5">
                 {/* Educational qualification/Degree */}
                 <div className="mt-3 flex items-start flex-col">
                   <label className="text-sm font-medium">
@@ -85,7 +85,7 @@ const ProffessionalInfoUpdate = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center space-x-5">
+              <div className="flex space-x-5">
                 {/*  Graduation Year */}
                 <div className="mt-3">
                   <Input
@@ -107,7 +107,7 @@ const ProffessionalInfoUpdate = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center space-x-5">
+              <div className="flex space-x-5">
                 {/* experiance */}
                 <div className="mt-3">
                   <Input

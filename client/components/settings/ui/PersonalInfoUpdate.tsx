@@ -40,7 +40,7 @@ const PersonalInfoUpdate = () => {
       >
         {({ isValid, isSubmitting }) => (
           <Form className="space-y-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex space-x-5">
               <Input label="First Name" name="firstName" type="text" />
               <Input label="Last Name" name="lastName" type="text" />
               <Input label="User Name" name="userName" type="text" />
