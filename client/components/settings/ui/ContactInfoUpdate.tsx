@@ -76,7 +76,7 @@ const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
       >
         {({ isValid, isSubmitting }) => (
           <Form className="space-y-6">
-            <div className="flex space-x-5">
+            <div className="flex space-x-5 flex-wrap">
               <Input label="Email" name="email" type="email" />
               <Input label="Phone Number" name="phoneNumber" type="number" />
               <Input label="Address" name="address" type="text" />

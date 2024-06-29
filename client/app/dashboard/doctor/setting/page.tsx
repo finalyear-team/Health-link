@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Head from "next/head";
@@ -64,6 +65,7 @@ export default function TabsDemo() {
   const firstName = user?.firstName;
   const lastName = user?.lastName;
   const { toast } = useToast();
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
 
   // handle availabilty
   const handleAvailablity = (value: any) => {
@@ -77,6 +79,25 @@ export default function TabsDemo() {
       variant: "success",
     });
   };
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth < 500) {
+        setIsSmallScreen(true);
+      } else {
+        setIsSmallScreen(false);
+      }
+    };
+
+    // Initial check
+    checkScreenSize();
+
+    // Add event listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Clean up event listener on component unmount
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -92,8 +113,8 @@ export default function TabsDemo() {
       </Head>
       {/* profile section */}
       <Card>
-        <div className="h-[200px] flex items-center space-x-3 p-3 rounded">
-          <div className="flex items-center ">
+        <div className=" flex items-center space-x-3 p-3 rounded">
+          <div className="flex items-center flex-wrap space-y-2 ">
             <div className="flex items-center space-x-4">
               <Image
                 src="/image/profile-picture.jpg"
@@ -121,7 +142,7 @@ export default function TabsDemo() {
                   <span className="mr-3">Monday to Friday: 10 AM - 11 PM</span>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost">
+                      <Button variant="ghost" className="mr-3">
                         <Settings2 className="w-4 h-4 cursor-pointer" />
                       </Button>
                     </PopoverTrigger>
@@ -317,22 +338,22 @@ export default function TabsDemo() {
         </div>
       </Card>
       <Tabs defaultValue="account" className="relative mt-2">
-        <TabsList className="sticky -top-2 bg-white dark:bg-slate-800 grid w-full grid-cols-7">
+        <TabsList className="sticky -top-2 z-10 bg-white dark:bg-slate-800 w-full grid grid-cols-5">
           <TabsTrigger value="account">
-            <User className="w-4 h-4 mr-2" /> Account
+            <User className="w-4 h-4 mr-2" />  {isSmallScreen ? null : "Account"}
           </TabsTrigger>
           <TabsTrigger value="loginAndSecurity">
-            <KeyRound className="w-4 h-4 mr-2" /> Password
+            <KeyRound className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Password"}
           </TabsTrigger>
           <TabsTrigger value="certificates">
-            <Award className="w-4 h-4 mr-2" /> Certificates
+            <Award className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Certificates"}
           </TabsTrigger>
 
           <TabsTrigger value="Network">
-            <Users className="w-4 h-4 mr-2" /> Network
+            <Users className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Network"}
           </TabsTrigger>
           <TabsTrigger value="myPosts">
-            <Rss className="w-4 h-4 mr-2" /> my Posts
+            <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
           </TabsTrigger>
         </TabsList>
         <Account value="account" />
