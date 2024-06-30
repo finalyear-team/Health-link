@@ -82,7 +82,7 @@ export default function TabsDemo() {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      if (window.innerWidth < 500) {
+      if (window.innerWidth < 750) {
         setIsSmallScreen(true);
       } else {
         setIsSmallScreen(false);

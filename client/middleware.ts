@@ -23,7 +23,7 @@ export default authMiddleware({
         const user = await clerkClient.users.getUser(auth.userId);
         const role = user.unsafeMetadata.role;
 
-        if (url.pathname.startsWith("/user/")) {
+        if (url.pathname.startsWith("/profile/")) {
           return NextResponse.next();
         }
 
