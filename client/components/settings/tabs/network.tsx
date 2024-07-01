@@ -172,7 +172,13 @@ const following: NetworkType[] = [
   // },
 ];
 
-const Network = ({ value }: { value: string }) => {
+const Network = ({
+  value,
+  isPatient,
+}: {
+  value: string;
+  isPatient: boolean;
+}) => {
   const router = useRouter();
   const handleFollowingSearch = () => {};
   const handleFollwersSearch = () => {};
@@ -185,7 +191,7 @@ const Network = ({ value }: { value: string }) => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-background shadow-lg rounded-lg overflow-hidden">
+            {!isPatient ? <Card className="bg-background shadow-lg rounded-lg overflow-hidden">
               <CardHeader className="bg-slate-100 dark:bg-slate-800 flex flex-row flex-wrap items-center justify-between py-4 px-6 ">
                 <h2 className="text-lg font-semibold">Followers</h2>
                 <Formik
@@ -232,7 +238,7 @@ const Network = ({ value }: { value: string }) => {
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </Card> : null}
             <Card className="bg-background shadow-lg rounded-lg overflow-hidden">
               <CardHeader className="bg-slate-100 dark:bg-slate-800  flex flex-row flex-wrap items-center justify-between py-4 px-6">
                 <h2 className="text-lg font-semibold">Following</h2>

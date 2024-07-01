@@ -340,26 +340,29 @@ export default function TabsDemo() {
       <Tabs defaultValue="account" className="relative mt-2">
         <TabsList className="sticky -top-2 z-10 bg-white dark:bg-slate-800 w-full grid grid-cols-5">
           <TabsTrigger value="account">
-            <User className="w-4 h-4 mr-2" />  {isSmallScreen ? null : "Account"}
+            <User className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Account"}
           </TabsTrigger>
           <TabsTrigger value="loginAndSecurity">
-            <KeyRound className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Password"}
+            <KeyRound className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Password"}
           </TabsTrigger>
           <TabsTrigger value="certificates">
-            <Award className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Certificates"}
+            <Award className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Certificates"}
           </TabsTrigger>
 
           <TabsTrigger value="Network">
-            <Users className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Network"}
+            <Users className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Network"}
           </TabsTrigger>
           <TabsTrigger value="myPosts">
             <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
           </TabsTrigger>
         </TabsList>
-        <Account value="account" />
+        <Account value="account" isPatient={false} />
         <LoginAndSecurity value="loginAndSecurity" />
         <Certificates value="certificates" />
-        <Network value="Network" />
+        <Network value="Network" isPatient={false}/>
         <MyPosts value="myPosts" />
       </Tabs>
     </div>

@@ -29,7 +29,13 @@ import ContactInfoUpdate from "../ui/ContactInfoUpdate";
 import ProffessionalInfoUpdate from "../ui/ProffessionalInfoUpdate";
 import { useUser, useClerk } from "@clerk/nextjs";
 
-const Account = ({ value }: { value: string }) => {
+const Account = ({
+  value,
+  isPatient,
+}: {
+  value: string;
+  isPatient: boolean;
+}) => {
   // ========== for updating email ==========
   // const [code, setCode] = React.useState("");
   const [isVerifying, setIsVerifying] = React.useState(false);
@@ -188,14 +194,18 @@ const Account = ({ value }: { value: string }) => {
           ""
         )}
 
-        <CardHeader>
-          <span className="text-primary-700 font-medium">
-            Professional Information
-          </span>
-          <hr />
-        </CardHeader>
-
-        <ProffessionalInfoUpdate />
+        {!isPatient ? (
+          <div>
+            {" "}
+            <CardHeader>
+              <span className="text-primary-700 font-medium">
+                Professional Information
+              </span>
+              <hr />
+            </CardHeader>
+            <ProffessionalInfoUpdate />
+          </div>
+        ) : null}
       </Card>
     </TabsContent>
   );
