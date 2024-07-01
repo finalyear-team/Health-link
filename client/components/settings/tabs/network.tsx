@@ -18,150 +18,158 @@ import { Formik, Form } from "formik";
 import { UserCheck, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const followers = [
-  {
-    id: 1,
-    name: "John Doe",
-    username: "@johndoe",
-    bio: "Web Developer | Tech Enthusiast",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    username: "@janesmith",
-    bio: "Designer | Creative Visionary",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    username: "@mjohnson",
-    bio: "Entrepreneur | Growth Hacker",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    username: "@emilydavis",
-    bio: "Photographer | Nature Lover",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 5,
-    name: "David Lee",
-    username: "@davidlee",
-    bio: "Software Engineer | Open Source Contributor",
-    avatar: "/placeholder-user.jpg",
-  },
+interface NetworkType {
+  id: string;
+  name: string;
+  username: string;
+  bio: string;
+  avatar: string;
+}
+
+const followers: NetworkType[] = [
+  // {
+  //   id: 1,
+  //   name: "John Doe",
+  //   username: "@johndoe",
+  //   bio: "Web Developer | Tech Enthusiast",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Jane Smith",
+  //   username: "@janesmith",
+  //   bio: "Designer | Creative Visionary",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Michael Johnson",
+  //   username: "@mjohnson",
+  //   bio: "Entrepreneur | Growth Hacker",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 4,
+  //   name: "Emily Davis",
+  //   username: "@emilydavis",
+  //   bio: "Photographer | Nature Lover",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 5,
+  //   name: "David Lee",
+  //   username: "@davidlee",
+  //   bio: "Software Engineer | Open Source Contributor",
+  //   avatar: "/placeholder-user.jpg",
+  // },
 ];
 
-const following = [
-  {
-    id: 1,
-    name: "Sarah Lee",
-    username: "@sarahlee",
-    bio: "Lifestyle Blogger | Minimalist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 2,
-    name: "Alex Chen",
-    username: "@alexchen",
-    bio: "Product Manager | Growth Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 3,
-    name: "Olivia Patel",
-    username: "@oliviapatel",
-    bio: "Fitness Enthusiast | Wellness Coach",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 4,
-    name: "Ryan Kim",
-    username: "@ryankim",
-    bio: "Data Scientist | Machine Learning Expert",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 5,
-    name: "Isabella Gonzalez",
-    username: "@isabellagonzalez",
-    bio: "Graphic Designer | Brand Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 6,
-    name: "Sarah Lee",
-    username: "@sarahlee",
-    bio: "Lifestyle Blogger | Minimalist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 7,
-    name: "Alex Chen",
-    username: "@alexchen",
-    bio: "Product Manager | Growth Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 8,
-    name: "Olivia Patel",
-    username: "@oliviapatel",
-    bio: "Fitness Enthusiast | Wellness Coach",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 9,
-    name: "Ryan Kim",
-    username: "@ryankim",
-    bio: "Data Scientist | Machine Learning Expert",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 10,
-    name: "Isabella Gonzalez",
-    username: "@isabellagonzalez",
-    bio: "Graphic Designer | Brand Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 11,
-    name: "Sarah Lee",
-    username: "@sarahlee",
-    bio: "Lifestyle Blogger | Minimalist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 12,
-    name: "Alex Chen",
-    username: "@alexchen",
-    bio: "Product Manager | Growth Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 13,
-    name: "Olivia Patel",
-    username: "@oliviapatel",
-    bio: "Fitness Enthusiast | Wellness Coach",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 14,
-    name: "Ryan Kim",
-    username: "@ryankim",
-    bio: "Data Scientist | Machine Learning Expert",
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 15,
-    name: "Isabella Gonzalez",
-    username: "@isabellagonzalez",
-    bio: "Graphic Designer | Brand Strategist",
-    avatar: "/placeholder-user.jpg",
-  },
+const following: NetworkType[] = [
+  // {
+  //   id: 1,
+  //   name: "Sarah Lee",
+  //   username: "@sarahlee",
+  //   bio: "Lifestyle Blogger | Minimalist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Alex Chen",
+  //   username: "@alexchen",
+  //   bio: "Product Manager | Growth Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Olivia Patel",
+  //   username: "@oliviapatel",
+  //   bio: "Fitness Enthusiast | Wellness Coach",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 4,
+  //   name: "Ryan Kim",
+  //   username: "@ryankim",
+  //   bio: "Data Scientist | Machine Learning Expert",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 5,
+  //   name: "Isabella Gonzalez",
+  //   username: "@isabellagonzalez",
+  //   bio: "Graphic Designer | Brand Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 6,
+  //   name: "Sarah Lee",
+  //   username: "@sarahlee",
+  //   bio: "Lifestyle Blogger | Minimalist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 7,
+  //   name: "Alex Chen",
+  //   username: "@alexchen",
+  //   bio: "Product Manager | Growth Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 8,
+  //   name: "Olivia Patel",
+  //   username: "@oliviapatel",
+  //   bio: "Fitness Enthusiast | Wellness Coach",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 9,
+  //   name: "Ryan Kim",
+  //   username: "@ryankim",
+  //   bio: "Data Scientist | Machine Learning Expert",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 10,
+  //   name: "Isabella Gonzalez",
+  //   username: "@isabellagonzalez",
+  //   bio: "Graphic Designer | Brand Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 11,
+  //   name: "Sarah Lee",
+  //   username: "@sarahlee",
+  //   bio: "Lifestyle Blogger | Minimalist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 12,
+  //   name: "Alex Chen",
+  //   username: "@alexchen",
+  //   bio: "Product Manager | Growth Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 13,
+  //   name: "Olivia Patel",
+  //   username: "@oliviapatel",
+  //   bio: "Fitness Enthusiast | Wellness Coach",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 14,
+  //   name: "Ryan Kim",
+  //   username: "@ryankim",
+  //   bio: "Data Scientist | Machine Learning Expert",
+  //   avatar: "/placeholder-user.jpg",
+  // },
+  // {
+  //   id: 15,
+  //   name: "Isabella Gonzalez",
+  //   username: "@isabellagonzalez",
+  //   bio: "Graphic Designer | Brand Strategist",
+  //   avatar: "/placeholder-user.jpg",
+  // },
 ];
 
 const Network = ({ value }: { value: string }) => {
