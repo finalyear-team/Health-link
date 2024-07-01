@@ -15,7 +15,7 @@ const PersonalInfoUpdate = () => {
   const initialValues = {
     firstName: user?.firstName,
     lastName: user?.lastName,
-    userName: "alexo",
+    userName: "",
   };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
@@ -38,13 +38,14 @@ const PersonalInfoUpdate = () => {
         onSubmit={handleSubmit}
         validationSchema={validatePersEditInfo}
       >
-        {({ isValid, isSubmitting }) => (
+        {({ isValid, isSubmitting, resetForm }) => (
           <Form className="space-y-6">
             <div className="flex space-x-5 flex-wrap">
-              <Input label="First Name" name="firstName" type="text"/>
+              <Input label="First Name" name="firstName" type="text" />
               <Input label="Last Name" name="lastName" type="text" />
               <Input label="User Name" name="userName" type="text" />
             </div>
+
             <Button disabled={!isValid} type="submit">
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -52,6 +53,9 @@ const PersonalInfoUpdate = () => {
                 ""
               )}
               Save info
+            </Button>
+            <Button className="ml-2" type="button" onClick={() => resetForm()}>
+              Reset
             </Button>
           </Form>
         )}

@@ -52,7 +52,7 @@ const ProffessionalInfoUpdate = () => {
         onSubmit={handleProffestionalInfo}
         validationSchema={validateProffessionalEditInfo}
       >
-        {({ isValid, isSubmitting }) => (
+        {({ isValid, isSubmitting, resetForm }) => (
           <Form className="space-y-6" action="#" method="POST">
             <div>
               {/* institution */}
@@ -138,6 +138,9 @@ const ProffessionalInfoUpdate = () => {
                 ""
               )}
               Save info
+            </Button>
+            <Button className="ml-2" type="button" onClick={() => resetForm()}>
+              Reset
             </Button>
           </Form>
         )}

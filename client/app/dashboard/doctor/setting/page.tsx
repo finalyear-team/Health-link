@@ -115,7 +115,7 @@ export default function TabsDemo() {
       <Card>
         <div className=" flex items-center space-x-3 p-3 rounded">
           <div className="flex items-center flex-wrap space-y-2 ">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 mr-4">
               <Image
                 src="/image/profile-picture.jpg"
                 width={128}
@@ -124,17 +124,22 @@ export default function TabsDemo() {
                 className="rounded-full border-2 border-secondary-700"
               />
               <div>
-                <h2 className="text-xl font-bold">
-                  <span>Dr. </span> {firstName} {lastName}
-                </h2>
-                <p className="text-slate-400">@alexisSan</p>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-200">
-                    Oncologist
+                <div className="relative text-xl font-bold">
+                  <span>
+                    Dr. {firstName} {lastName}
                   </span>
-                  <MdVerified size={20} className="text-secondary-600 ml-2" />
-                  <Badge>Doctor</Badge>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-slate-400">@alexisSan</span>{" "}
+                  <div className="flex items-center">
+                    <MdVerified size={20} className="text-secondary-600" />
+                    <Badge>Doctor</Badge>
+                  </div>
+                </div>
+
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-200">
+                  Oncologist
+                </span>
                 <div className="flex items-center space-x-2">
                   <Rating value={4.5} />
                 </div>
@@ -362,7 +367,7 @@ export default function TabsDemo() {
         <Account value="account" isPatient={false} />
         <LoginAndSecurity value="loginAndSecurity" />
         <Certificates value="certificates" />
-        <Network value="Network" isPatient={false}/>
+        <Network value="Network" isPatient={false} />
         <MyPosts value="myPosts" />
       </Tabs>
     </div>

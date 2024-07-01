@@ -74,7 +74,7 @@ const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
         onSubmit={handleContactSubmit}
         validationSchema={validateContEditInfo}
       >
-        {({ isValid, isSubmitting }) => (
+        {({ isValid, isSubmitting,resetForm }) => (
           <Form className="space-y-6">
             <div className="flex space-x-5 flex-wrap">
               <Input label="Email" name="email" type="email" />
@@ -88,6 +88,9 @@ const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
                 ""
               )}
               Save info
+            </Button>
+            <Button className="ml-2" type="button" onClick={() => resetForm()}>
+              Reset
             </Button>
           </Form>
         )}
