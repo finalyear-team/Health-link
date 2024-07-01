@@ -20,10 +20,12 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Loader2 } from "lucide-react";
 import PageLoader from "@/common/Loader/PageLoader";
+import { Progress } from "@/components/ui/progress";
 
 const PatientDahboard = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [timeString, setTimeString] = useState("");
+  const [progress, setProgress] = useState(13);
 
   useEffect(() => {
     const updateGreetingAndTime = () => {
@@ -51,6 +53,10 @@ const PatientDahboard = () => {
     // Clean up the interval on unmount
     return () => clearInterval(intervalId);
   }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
   const { user, isSignedIn, isLoaded } = useUser();
   const Role = user?.unsafeMetadata.role;
 
@@ -69,7 +75,7 @@ const PatientDahboard = () => {
           <div className="flex flex-col justify-between p-3">
             {/* the greeting and the name part */}
             <div className="flex flex-col space-y-4 text-4xl font-bold text-center">
-              <div className="flex space-x-3 items-center">
+              <div className="flex space-x-3 justify-start">
                 {" "}
                 <MdWavingHand size={30} color="#ffd700" className="mr-2" />{" "}
                 {currentTime}{" "}
@@ -92,6 +98,12 @@ const PatientDahboard = () => {
                   Manage Calendar
                 </Link>
               </Button>
+            </div>
+            <div className="flex flex-col items-center mt-2">
+              <Progress value={progress} className="w-[100%]" />
+              <p className="text-sm mt-2">
+                Setting Account {progress}% Completed{" "}
+              </p>
             </div>
           </div>
 
