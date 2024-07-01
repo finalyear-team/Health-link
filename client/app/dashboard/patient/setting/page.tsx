@@ -104,9 +104,11 @@ export default function TabsDemo() {
                 <h2 className="text-xl font-bold">
                   <span>Mr. </span> {firstName} {lastName}
                 </h2>
-                <p className="text-slate-400">@alexisSan</p>
                 <div className="flex items-center space-x-2">
-                  <Badge variant={"secondary"}>Patient</Badge>
+                  <span className="text-slate-400">@alexisSan</span>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant={"secondary"}>Patient</Badge>
+                  </div>
                 </div>
               </div>
             </div>
