@@ -73,7 +73,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="bg-container">
+    <div className="bg-login-light dark:bg-login-dark bg-cover bg-center">
       <Header />
       <Container>
         <div className="custom-container bg-white dark:bg-dark-700 mt-8">
@@ -144,10 +144,7 @@ const LoginPage = () => {
                 </div>
 
                 <div>
-                  <Button
-                    className="w-full"
-                    type="submit"
-                  >
+                  <Button className="w-full" type="submit">
                     {isSubmitting ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (

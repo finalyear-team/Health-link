@@ -3,15 +3,21 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Container from "@/components/container/container";
-import { Clock, CalendarClock, X } from "lucide-react";
+import { Clock, CalendarClock, X, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { MdWavingHand } from "react-icons/md";
 import Link from "next/link";
-import QuickSettings from "@/components/settings/quick-settings/quick-settings";
-import DashboardCard from "@/components/dashboard/card";
-import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
+import { Card } from "@/components/ui/card";
+import Analytics from "@/components/dashboard/DoctorAnalytics";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Loader2 } from "lucide-react";
 import { format } from 'date-fns';
 import useAuth from "@/hooks/useAuth";
 
@@ -22,17 +28,17 @@ const PatientDahboard = () => {
   useEffect(() => {
     const updateGreetingAndTime = () => {
       const now = new Date();
-      const formattedTime = format(now, 'hh:mm aa');
+      const formattedTime = format(now, "hh:mm aa");
 
       setTimeString(formattedTime);
 
       const hours = now.getHours();
       if (hours >= 5 && hours < 12) {
-        setCurrentTime('Good morning');
+        setCurrentTime("Good morning");
       } else if (hours >= 12 && hours < 17) {
-        setCurrentTime('Good afternoon');
+        setCurrentTime("Good afternoon");
       } else {
-        setCurrentTime('Good evening');
+        setCurrentTime("Good evening");
       }
     };
 
@@ -51,9 +57,17 @@ const PatientDahboard = () => {
   console.log(user)
   const Role = user?.Role;
 
+  if (!isLoaded) {
+    return (
+      <Container>
+        <Loader2 className="w-10 h-10" />
+      </Container>
+    );
+  }
+
   return (
     <div>
-      <div className="w-full rounded border border-slate-200 dark:border-slate-600 shadow-md p-6">
+      <Card>
         <div className="flex items-center justify-between p-3">
           <div className="flex flex-col justify-between p-3">
             {/* the greeting and the name part */}
@@ -83,19 +97,7 @@ const PatientDahboard = () => {
               </Button>
             </div>
           </div>
-          {/* radio button settings */}
-          {/* <div>
-            {Role === "provider" ? (
-              <Button size={"lg"} className="mb-2">
-                Generate a Summary
-              </Button>
-            ) : null}
-            {!isLoaded ? <Loader /> : null}
 
-            <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
-              <QuickSettings />
-            </div>
-          </div> */}
           {/* the illustration part */}
           <div>
             <Image
@@ -106,23 +108,38 @@ const PatientDahboard = () => {
             />
           </div>
         </div>
-      </div>
-      {/* small cards to display more detail */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
-        {image.map((value) => (
-          <DashboardCard
-            key={value.title}
-            link={value.link}
-            width={value.width}
-            height={value.height}
-            title={value.title}
-            number={value.number}
-          />
-        ))}
-        {/* <DashboardCard />
-        <DashboardCard />
-        <DashboardCard />
-        <DashboardCard /> */}
+      </Card>
+
+      <div>
+        <div className="flex items-center flex-between p-4">
+          <div className="font-semibold text-lg md:text-xl flex flex-row items-center">
+            <PieChart className="w-6 h-6 mr-3" /> Analytics
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <Button variant="outline" className="hidden sm:flex">
+              Today
+            </Button>
+            <Button variant="outline" className="hidden md:flex">
+              This Month
+            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant="outline"
+                  className="w-[280px] justify-start text-left font-normal"
+                >
+                  <CalendarClock className="mr-2 h-4 w-4" />
+                  June 01, 2023 - June 30, 2023
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar initialFocus mode="range" numberOfMonths={2} />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        <Analytics />
       </div>
     </div>
   );

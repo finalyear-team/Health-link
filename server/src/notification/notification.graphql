@@ -1,0 +1,63 @@
+enum notificationStatus {
+  read
+  unread
+}
+
+enum notificationType {
+  newAppointment
+  cancelAppointment
+  newChat
+  newVideoCall
+  newPost
+  newForumQuestion
+  newForumAnswer
+  newComment
+}
+
+# Define the Notification type
+type Notification {
+  NotificationID: ID!
+  UserID: String!
+  Message: String!
+  CreatedAt: String!
+  ReadAt: String
+  Status: notificationStatus
+  NotificationType: notificationType
+  UpdatedAt: String!
+}
+
+# Define the input type for creating a notification
+input CreateNotificationInput {
+  UserID: String!
+  Message: String!
+  Status: notificationStatus
+  NotificationType: notificationType
+}
+
+# Define the input type for updating a notification
+input UpdateNotificationInput {
+  NotificationID: ID!
+  Message: String
+  ReadAt: String
+  Status: notificationStatus
+  NotificationType: notificationType
+}
+
+# Define the Query type
+type Query {
+  notificationsForUser(UserID: String!): [Notification!]!
+  notification(NotificationID: ID!): Notification
+}
+
+# Define the Mutation type
+type Mutation {
+  createNotification(createNotificationInput: CreateNotificationInput!): Notification!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
+  removeNotification(NotificationID: ID!): Notification!
+}
+
+# Define the schema
+schema {
+  query: Query
+  mutation: Mutation
+}

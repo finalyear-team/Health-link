@@ -1,72 +1,53 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import VideoChatInitiation from "@/components/layout/video-chat";
-import { Button } from "@/components/ui/button";
-import AppointmentDetails from "@/components/test/AppointmentDetails";
-import CountdownTimer from "@/components/test/CountdownTimer";
-import JoinButton from "@/components/test/JoinButton";
-import ChatBox from "@/components/test/ChatBox";
-import AppointmentForm from "@/components/form/appointment/appointment-form";
-import { Formik, Form } from "formik";
-import { CircleArrowOutUpRight, Settings2, Trash2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-import { Input } from "@/components/ui/input";
+import VideoAppointmentCard from "@/components/appointment/video-appointment-card";
+import { CircleArrowOutUpRight } from "lucide-react";
+import { patientAppointments } from "@/public/data/patient-appointment";
+import { useQuery } from "@apollo/client";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import useAuth from "@/hooks/useAuth";
+import Loading from "@/common/Loader/Loading";
+import { Gender, UserType } from "@/types/types";
+import useVideoCallInfoStore from "@/store/videoCallInfo";
+import { addHours, format } from "date-fns";
+import formatScheduleTime from "@/utils/formatDate";
 
 const Video = () => {
   const [showVideoChat, setShowVideoChat] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+  const { user } = useAuth()
+  const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: {
+      userID: user?.UserID
+    }
+  })
 
-  const appointmentTime = "2024-06-01T14:50:00";
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const currentTime = new Date().toISOString();
-      setIsActive(new Date(currentTime) >= new Date(appointmentTime));
-    }, 1000);
+  const {
+    appointmentId,
+    doctorId,
+    patientId,
+    room,
+    setVideoCallInfo,
+  } = useVideoCallInfoStore();
 
-    return () => clearInterval(intervalId); // Clean up on unmount
-  }, [appointmentTime]);
+  if (loading)
+    return <Loading />
 
-  const initialValues = {
-    name: "",
-    username: "",
-  };
+  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments.filter((appointment: any) => appointment.Status === "booked");
 
-  const handleJoinClick = () => {
+  console.log(upcomingAppointments)
+
+
+  const handleJoinClick = (
+    appointmentId: string,
+    doctorId: string,
+    patientId: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ) => {
+    console.log(doctorId, patientId)
+    setVideoCallInfo(appointmentId, doctorId, patientId, appointmentDate, appointmentTime);
     setShowVideoChat(true);
-  };
-
-  const handleSchedule = () => {
-    // some Logic
-  };
-
-  const dummyData = {
-    doctorId: "1",
-    doctorName: "Dr. John Doe",
-    doctorPhoto: "/image/profile-picture.jpg",
-    appointmentTime: "June 1, 2024, 10:00 AM",
-    purpose: "General consultation",
   };
 
   return (
@@ -74,79 +55,42 @@ const Video = () => {
       {!showVideoChat && (
         <div className="relative w-full rounded border border-secondary-700 dark:border-slate-600 shadow-sm p-6">
           <div className="flex items-center text-xl font-bold">
-            {" "}
             <CircleArrowOutUpRight className="h-6 w-6 mr-2" /> Upcoming Live
             Consultation
           </div>
-          <hr className="mt-2" />
-          <div className="flex items-center justify-between flex-wrap mt-2">
-            <AppointmentDetails
-              doctorName={dummyData.doctorName}
-              doctorPhoto={dummyData.doctorPhoto}
-              appointmentTime={dummyData.appointmentTime}
-              purpose={dummyData.purpose}
-            />
-            <div className="mt-4">
-              <CountdownTimer expire={true} targetTime={appointmentTime} />
-            </div>
-            <div className="mt-4">
-              <JoinButton isActive={isActive} onClick={handleJoinClick} />
-            </div>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size={"sm"}>
-                  <Settings2 className="w-4 h-4 mr-2" /> Reschedule
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center mb-2">
-                    {" "}
-                    <Settings2 className="w-4 h-4 mr-2" /> Reschedule
-                    Appointment
-                  </DialogTitle>
-                  <DialogDescription>
-                    Make changes to the Appointment here. Click save when
-                    you&apos;re done.
-                  </DialogDescription>
-                </DialogHeader>
-                <AppointmentForm doctorId={dummyData.doctorId} />
-              </DialogContent>
-            </Dialog>
+          <hr className="my-2" />
+          {upcomingAppointments?.length === 0 ? <div>
+            No upcoming appointments
+          </div> :
+            <>
+              {upcomingAppointments?.map((value: any) => (
+                <VideoAppointmentCard
+                  key={value.AppointmentID}
+                  dummyData={{
+                    appointmentId: value.AppointmentID,
+                    doctorId: value.DoctorID,
+                    appointmentTime: value.AppointmentTime,
+                    appointmentDate: value.AppointmentDate,
+                    doctorName: value.DoctorName,
+                    doctorPhoto: value.DoctorPhoto,
+                    purpose: value.Note,
+                    role: UserType.DOCTOR
+                  }}
+                  appointmentTime={value.AppointmentTime}
+                  onJoinClick={() => {
+                    handleJoinClick(value.AppointmentID, value.DoctorID, value.PatientID, format(addHours(value.AppointmentDate, 24), "yyyy-MM-dd"), formatScheduleTime(value.AppointmentDate))
+                  }}
+                />
+              ))}
+            </>
+          }
 
-            {/* Show dialog for the cancel appointment */}
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size={"sm"} variant={"destructive"}>
-                  <Trash2 className="w-4 h-4 mr-2" /> Cancel
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. It will permanently delete
-                    your current appointment and remove all its related data
-                    from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Continue</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
         </div>
       )}
 
-      {/* conditionally showing the video chat */}
       {showVideoChat && (
         <div>
-          <VideoChatInitiation role={"patient"} />
+          <VideoChatInitiation role={UserType.PATIENT} />
         </div>
       )}
     </div>

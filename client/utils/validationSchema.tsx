@@ -150,3 +150,31 @@ export const validatePaymentInformation: any = Yup.object().shape({
     )
     .required("*Phone number is required"),
 });
+
+export const validateSetAvailability: any = Yup.object().shape({
+  startTime: Yup.string()
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time format")
+    .required("Start time is required"),
+  endTime: Yup.string()
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time format")
+    .required("End time is required")
+    .test("is-after", "End time must be after start time", function (value) {
+      const { startTime } = this.parent;
+      if (!startTime || !value) return true;
+      return startTime < value;
+    }),
+  weekday: Yup.array()
+    .of(
+      Yup.string().oneOf([
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ])
+    )
+    .min(1, "Select at least one weekday")
+    .required("Weekdays are required"),
+});

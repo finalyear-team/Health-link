@@ -52,7 +52,8 @@ type User{
    Speciality:String
    ExperienceYears:Int
    ConsultationFee:Float
-   EducationalBackground:EducationalBackground
+   EducationalBackground:String
+   Rating:Float
    Followers:Int
    Following:Int
 }
@@ -131,9 +132,7 @@ type Query {
   GetSignedInUser:User
   GetDoctors:[User!]
   GetFollowers(UserID:String!):[User]
-  GetFollowing(UserID:String!):[User]
-  SearchUsers(searchQuery:String):[User]
-  SearchDoctors(searchQuery:String):[User]
+  GetFollowing(UserID:String!):[User]  
 }
 
 
@@ -144,6 +143,8 @@ type Mutation {
   Follow(FollowerID:String!,FollowingID:String!):User
   UnFollow(FollowerID:String!,FollowingID:String!):User
   UpdateUser(updateUserInput:updateUserInput):User!
+  SearchDoctors(searchQuery:String,sortingQuery:String,sortingOrder:String):[User]
+  SearchUsers(searchQuery:String):[User]
   SuspendUser(UserID:String,suspendType:SuspendType!):User
 }
 

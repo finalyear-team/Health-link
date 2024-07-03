@@ -99,7 +99,7 @@ export const Sidebar = () => {
         />
       </div>
       <TooltipProvider>
-        <div>akjsds</div>
+        <div></div>
         {/* <button>
           <div className="p-4">
             <div className="flex items-center space-x-2  text-red-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800">
@@ -108,7 +108,7 @@ export const Sidebar = () => {
                   <TooltipTrigger>
                     <MdOutlinePowerSettingsNew size={20} />
                   </TooltipTrigger>
-                  <TooltipContent>Logout</TooltipContent>
+                  <TooltipContent align="center" side="right" sideOffset={10}>Logout</TooltipContent>
                 </Tooltip>
               </div>
               {showText && <div className="cursor-pointer">Logout</div>}

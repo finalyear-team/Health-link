@@ -162,7 +162,6 @@ body{
 }
 
 .bg-container {
-  background-image: url(/image/Login.jpg);
   background-size: cover;
   background-position: center;
 }
@@ -192,3 +191,11 @@ body{
   }
 }
 
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}

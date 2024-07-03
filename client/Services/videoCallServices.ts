@@ -14,14 +14,17 @@ const fetchWithRetry = async (url: string, options: any) => {
 
 const checkRoom = async (id: string, token: string) => {
     try {
-        const response = await fetch(`https://api.100ms.live/v2/rooms/${id}`, {
+        console.log(token)
+        const response = await fetchWithRetry(`https://api.100ms.live/v2/rooms/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
         });
         if (!response.ok)
             throw new Error("request failed")
-        return response.json()
+        const room = await response.json()
+        console.log(room)
+        return room
     } catch (error) {
         throw new Error("something")
 
@@ -64,13 +67,14 @@ const newRoom = async (token: string) => {
 }
 
 const addNewRoom = async (room: any, doctor: string, patient: string, AppointmentDate: string, AppointmentTime: string) => {
+    console.log(room)
     try {
         const response = await fetch(`http://localhost:4000/video-call/create-room`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ RoomID: room.roomId, RoomName: room.name, HostID: doctor, MemberID: patient, AppointmentDate, AppointmentTime }),
+            body: JSON.stringify({ RoomID: room.id, RoomName: room.name, HostID: doctor, MemberID: patient, AppointmentDate, AppointmentTime }),
             credentials: "include",
         },);
         if (!response.ok)
@@ -86,6 +90,8 @@ const addNewRoom = async (room: any, doctor: string, patient: string, Appointmen
 
 export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTime }: any) => {
     try {
+        console.log(doctor, patient)
+
         let room: any
         const response = await fetchWithRetry(`http://localhost:4000/video-call/get-room?Doctor=${doctor}&Patient=${patient}`, {
             method: "GET",
@@ -107,7 +113,7 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
         else {
             room = await newRoom(authToken.token)
             const createdRoom = await addNewRoom(room, doctor, patient, appointmentDate, appointmentTime)
-            return room
+            return { room, hostToken: createdRoom.HostAuthToken, memberToken: createdRoom.Members[0].MemberAuthToken }
         }
 
     } catch (error) {

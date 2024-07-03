@@ -21,7 +21,7 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
   experience,
   hourlyRate,
   onFollow,
-  onMakeAppointment = (profile: DoctorProfile) => {},
+  onMakeAppointment = (profile: DoctorProfile) => { },
   profile,
 }) => {
   return (
@@ -70,7 +70,7 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
             </div>
           </div>
           <span>
-            <Rating />
+            <Rating value={rating} />
           </span>
         </div>
         {/* <span className="py-4"> {""} </span> */}

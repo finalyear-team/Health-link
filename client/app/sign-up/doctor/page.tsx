@@ -18,7 +18,7 @@ const DoctorSignUp = () => {
   };
 
   return (
-    <div className="bg-container">
+    <div className="bg-login-light dark:bg-login-dark bg-cover bg-center">
       <Header />
       <div className="container flex items-center justify-center flex-col mx-auto relative">
         <h1 className="text-2xl font-semibold mb-4">Doctor Sign Up</h1>
@@ -38,12 +38,12 @@ const DoctorSignUp = () => {
               top: 0;
               left: 0;
               width: 100%;
-              z-index: 999; 
+              z-index: 999;
             }
 
             .progress-bar-wrapper {
-              width: 100%; 
-              margin: 0 auto; 
+              width: 100%;
+              margin: 0 auto;
             }
 
             @keyframes progressAnimation {

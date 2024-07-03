@@ -1,6 +1,6 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { AppointmentStatus, AppointmentType } from "@prisma/client";
-import { format, parse, isBefore, startOfDay } from "date-fns";
+import { format, parse, isBefore, startOfDay, formatDate } from "date-fns";
 import { ScheduleStatus, WeekDay } from "src/utils/types";
 import { z } from "zod";
 import { convertToIso } from "src/utils/converToIso";
@@ -81,8 +81,9 @@ export class CreateAppointmentInput {
     constructor(input: CreateAppointmentInput) {
         const validatedAppointment = createAppointmentSchema.parse(input); // Validate input with Zod schema
         Object.assign(this, validatedAppointment)
-        this.AppointmentDate = new Date(format(parseDate(validatedAppointment.AppointmentDate), "yyyy-MM-dd"))
+        this.AppointmentDate = new Date(validatedAppointment.AppointmentDate)
         this.AppointmentTime = new Date(convertToIso(validatedAppointment.AppointmentTime))
+        console.log(this.AppointmentTime)
     }
 }
 
@@ -96,11 +97,11 @@ const createEmergencyAppointmentSchema = z.object({
     ScheduleID: z.string().min(1, "scheduleID is required"),
     AppointmentTime: z.string().refine(time => {
         const appointmentTime = new Date(convertToIso(time));
-          if (appointmentTime.getTime() <= new Date().getTime())
+        if (appointmentTime.getTime() <= new Date().getTime())
             throw new Error("Appointment time can't be in the past")
 
     }),
-    Note:z.string().optional()
+    Note: z.string().optional()
 
 });
 

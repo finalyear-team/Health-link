@@ -26,26 +26,26 @@ const Footer = () => {
       <div className="footer__custom">
         <span className="footer__custome__title">User Support and Info</span>
         <div className="footer__custome__list">
-          <Link href={"/faqs"}>FAQs</Link>
-          <Link href={"/terms-of-service"}>Terms of Services</Link>
-          <Link href={"/privacy-policy"}>Privacy Policy</Link>
-          <Link href={"/security"}>Security</Link>
-          <Link href={"/accessibility"}>Accessibility</Link>
+          <Link href={"/faqs"} className="hover:underline">FAQs</Link>
+          <Link href={"/terms-of-service"} className="hover:underline">Terms of Services</Link>
+          <Link href={"/privacy-policy"} className="hover:underline">Privacy Policy</Link>
+          <Link href={"/security"} className="hover:underline">Security</Link>
+          <Link href={"/accessibility"} className="hover:underline">Accessibility</Link>
         </div>
       </div>
       <div className="footer__custom">
         <span className="footer__custome__title">Resources</span>
         <div className="footer__custome__list">
-          <Link href={"/blogs"}>Blogs</Link>
-          <Link href={"/feedback"}>Feedback and Suggestion</Link>
-          <Link href={"/partners"}>Partnership</Link>
+          <Link href={"/blogs"} className="hover:underline">Blogs</Link>
+          <Link href={"/feedback"} className="hover:underline">Feedback and Suggestion</Link>
+          <Link href={"/partners"} className="hover:underline">Partnership</Link>
         </div>
       </div>
       <div className="footer__custom">
         <span className="footer__custome__title">Contact us</span>
         <div className="footer__custome__list">
-          <Link href={""}>contact@HealthLink.com</Link>
-          <Link href={""}>+251908403423</Link>
+          <Link href={""} className="hover:underline">contact@HealthLink.com</Link>
+          <Link href={""} className="hover:underline">+251908403423</Link>
           <div className="footer__custome__social">
             <Link href={""}>
               <MdFacebook size={20} />

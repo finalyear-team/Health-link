@@ -62,7 +62,7 @@ mutation UpdateUser($updateUserInput:updateUserInput) {
   }
 }
 `
-export const SUSPEND_USER=gql`
+export const SUSPEND_USER = gql`
   mutation SuspendUser($id:String!,
   $suspendType:SuspendType!) {
       SuspendUser(id:$id,suspendType:$suspendType) {
@@ -84,3 +84,36 @@ export const SUSPEND_USER=gql`
   }
 }
 `
+export const SEARCH_USERS = gql`
+  mutation SearchUsers($searchQuery: String) {
+    SearchUsers(searchQuery: $searchQuery) {
+      UserID
+      FirstName
+      LastName
+    }
+  }
+`;
+export const SEARCH_DOCTORS = gql`
+  mutation SearchDoctors($searchQuery: String,$sortingQuery:String,$sortingOrder:String) {
+    SearchDoctors(searchQuery: $searchQuery,sortingQuery:$sortingQuery,sortingOrder:$sortingOrder) {
+      UserID
+      Username
+      Email
+      FirstName
+      LastName
+      Verified
+      Bio
+      PhoneNumber
+      Address
+      ProfilePicture
+      Role
+      Status
+      Speciality
+      ExperienceYears
+      ConsultationFee
+      EducationalBackground
+      Followers
+      Following
+    }
+  }
+`;

@@ -7,8 +7,9 @@
 // }
 
 // export default Appointment
+"use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -20,10 +21,54 @@ import useAppointmentStore from "@/store/appointmentStore";
 import { patientAppointments } from "@/public/data/patient-appointment";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AppointmentCard } from "@/components/appointment/appointment-card";
+import Loading from "@/common/Loader/Loading";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import { useQuery } from "@apollo/client";
+import useAuth from "@/hooks/useAuth";
+import { UserType } from "@/types/types";
+import formatScheduleTime from "@/utils/formatDate";
+import { addHours, format, parseISO } from "date-fns";
+import { io } from "socket.io-client";
+
 
 const Appointment = () => {
-  const upcomingAppointments = patientAppointments.upcomingAppointments;
-  const pastAppointments = patientAppointments.pastAppointments;
+  const { user, isLoaded, isSignedIn } = useAuth()
+  useEffect(() => {
+    console.log(user)
+    const socket = io("http://localhost:4000", {
+      query: {
+        userId: user?.UserID,
+      }
+    })
+    socket.on("connect", () => {
+      console.log("connected");
+    });
+    socket.on("new-appointment", (appointment, Message) => {
+      console.log("new appointment")
+      console.log(appointment)
+
+    })
+  }, [user])
+
+  const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: {
+      userID: user?.UserID
+    }
+  })
+
+  if (loading)
+    return <Loading />
+
+
+
+
+
+
+
+  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments.filter((appointment: any) => appointment.Status === "booked");
+
+  const pastAppointments = data?.UserAppointments?.pastAppointments;
+
   return (
     <div className="flex items-start flex-col space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,22 +83,28 @@ const Appointment = () => {
               <hr className="mt-2" />
             </CardHeader>
             <CardContent>
-              {upcomingAppointments.map((value) => (
-                <AppointmentCard
-                  key={value.id}
-                  id={value.id}
-                  appointmentDate={value.appointmentDate}
-                  appointmentTime={value.appointmentTime}
-                  doctorId={value.doctorId}
-                  doctorName={value.doctorName}
-                  doctorPhoto={value.doctorPhoto}
-                  purpose={value.purpose}
-                  status={value.status}
-                />
-              ))}
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illo
-              alias sed vero ipsum velit eaque voluptates saepe dolorum maiores
-              tenetur!
+              {upcomingAppointments?.length === 0 ? <div>
+                No upcoming appointments
+              </div> :
+                <>
+                  {upcomingAppointments?.map((value: any) => (
+                    <AppointmentCard
+                      key={value.AppointmentID}
+                      id={value.AppointmentID}
+                      doctorId={value.PatientID}
+                      appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
+                      appointmentTime={formatScheduleTime(value.AppointmentTime)}
+                      doctorName={value.PatientName}
+                      doctorPhoto={value.PatientPhoto || ""}
+                      purpose={value.Note}
+                      status={value.Status}
+                      gender={value.PatientGender}
+                      role={UserType.PATIENT}
+                    />
+                  ))}
+                </>
+              }
+
             </CardContent>
           </Card>
         </div>
@@ -67,22 +118,29 @@ const Appointment = () => {
               <hr className="mt-2" />
             </CardHeader>
             <CardContent>
-              {pastAppointments.map((value) => (
-                <AppointmentCard
-                  key={value.id}
-                  id={value.id}
-                  appointmentDate={value.appointmentDate}
-                  appointmentTime={value.appointmentTime}
-                  doctorId={value.doctorId}
-                  doctorName={value.doctorName}
-                  doctorPhoto={value.doctorPhoto}
-                  purpose={value.purpose}
-                  status={value.status}
-                />
-              ))}
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illo
-              alias sed vero ipsum velit eaque voluptates saepe dolorum maiores
-              tenetur!
+              {pastAppointments?.length === 0 ? <div>
+                No past appointments
+              </div> :
+                <>
+                  {pastAppointments?.map((value: any) => (
+                    <AppointmentCard
+                      key={value.AppointmentID}
+                      id={value.AppointmentID}
+                      doctorId={value.PatientID}
+                      appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
+                      appointmentTime={formatScheduleTime(value.AppointmentTime)}
+                      doctorName={value.PatientName}
+                      doctorPhoto={value.PatientPhoto || ""}
+                      purpose={value.Note}
+                      status={value.Status}
+                      gender={value.PatientGender}
+                      role={UserType.DOCTOR}
+                    />
+                  ))}
+
+                </>
+              }
+
             </CardContent>
           </Card>
         </div>

@@ -33,6 +33,8 @@ import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 import { JwtStrategy } from './auth/jwt.strategy ';
 import { PassportModule } from '@nestjs/passport';
+import { NotificationModule } from './notification/notification.module';
+import { NotificationService } from './notification/notification.service';
 
 
 @Module({
@@ -47,13 +49,15 @@ import { PassportModule } from '@nestjs/passport';
   EventEmitterModule.forRoot()
     ,
     PassportModule,
+
   JwtModule.register({
     global: true,
     secret: process.env.JWT_SECRET_KEY,
     signOptions: { expiresIn: '15m' },
+
   }),
-    UserModule, AuthModule, VideoCallModule, StreamChatModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule, MailModule],
-  providers: [AppService, SocketGateway, AuthService, UserService, UserResolver, PrismaService, AccessControlService, SocketService, MailService, JwtStrategy, JwtService],
+    UserModule, AuthModule, VideoCallModule, StreamChatModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule, MailModule, NotificationModule,],
+  providers: [AppService, SocketGateway, AuthService, UserService, UserResolver, PrismaService, AccessControlService, SocketService, MailService, JwtStrategy, JwtService, NotificationService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

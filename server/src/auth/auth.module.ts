@@ -9,11 +9,12 @@ import { SocketService } from 'src/socket/socket.service';
 import { MailService } from 'src/mail/mail.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy ';
+import { NotificationService } from 'src/notification/notification.service';
 
 
 
 @Module({
-  providers: [AuthService, PrismaService, UserService, JwtService, SocketGateway, SocketService, MailService, UserService],
+  providers: [AuthService, PrismaService, UserService, JwtService, SocketGateway, SocketService, MailService, UserService, NotificationService],
   controllers: [AuthController]
 })
 export class AuthModule { }

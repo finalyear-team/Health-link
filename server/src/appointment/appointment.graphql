@@ -9,6 +9,12 @@ enum AppointmentStatus {
   completed
   cancelled
 }
+enum Gender {
+  male
+  female
+}
+
+
 
 scalar Date
 
@@ -20,11 +26,21 @@ type Appointment {
   AppointmentDate:Date!
   AppointmentTime:Date!
   Duration:Int
+  PatientName:String
+  PatientPhoto:String
+  PatientGender:Gender
+  DoctorGender:Gender
+  DoctorName:String
+  DoctorPhoto:String
   Status:AppointmentStatus
   AppointmentType:AppointmentType
   Note:String
 }
 
+type UserAppointmentResponse{
+  upcomingAppointments:[Appointment]
+  pastAppointments:[Appointment]
+}
 
 
 
@@ -65,16 +81,26 @@ input EmergencyAppointmentInput{
     }
 
 type Query {
-  UserAppointments(UserID:String!):[Appointment]
-  FilterUserAppointment(UserID:String!):[Appointment]
-  FilterAppoinments(FilterQuery:String): [Appointment]
+  UserAppointments(UserID:String!):UserAppointmentResponse
+
+  DoctorsAppointments(DoctorID:String!):[Appointment]
+
+  FilterUserAppointment(UserID:String!,Query:String!):[Appointment]
+  
+  FilterDoctorAppointment(DoctorID:String!,Query:String!):[Appointment]
+
+  FilterAppointments(Query:String): [Appointment]
   GetAppointmentByID(Id:String!):Appointment
 }
 
 type Mutation {
   CreateAppointment(createAppointmentInput: CreateAppointmentInput!): Appointment!
+  
   UpdateAppointment(updateAppointmentInput: UpdateAppointmentInput!): Appointment!
+
   CreateEmergencyAppointment(emergencyAppointmentInput:EmergencyAppointmentInput):Appointment  
+
   AcceptAppointment(DoctorID:String!,AppointmentID:String!,Duration:Int!):Appointment
+
   RemoveAppointment(Id: String!): Appointment
 }

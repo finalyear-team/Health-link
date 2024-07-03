@@ -10,7 +10,8 @@ mutation CreateAppointment($createAppointmentInput: CreateAppointmentInput!) {
   ScheduleID
   AppointmentDate
   AppointmentTime
-  VideoChatRoomID
+  DoctorName
+  DoctorPhoto
   Duration
   Status
   AppointmentType
@@ -27,7 +28,6 @@ mutation UpdateAppointment($input: UpdateAppointmentInput!) {
   ScheduleID
   AppointmentDate
   AppointmentTime
-  VideoChatRoomID
   Duration
   Status
   AppointmentType
@@ -56,8 +56,8 @@ mutation CreateEmergencyAppointment($input: EmergencyAppointmentInput!) {
 }
 `;
 export const ACCEPT_APPOINTMENT = gql`
-mutation AcceptAppointment($DoctorID: String!) {
-    AcceptAppointment(DoctorID: $DoctorID) {
+mutation AcceptAppointment($AppointmentID:String!,$DoctorID: String!,$Duration:Int!) {
+    AcceptAppointment(DoctorID: $DoctorID,AppointmentID:$AppointmentID,Duration:$Duration) {
     AppointmentID
     DoctorID
     PatientID

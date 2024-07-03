@@ -1,5 +1,14 @@
+
+// const TextChat = () => {
+//   return (
+//     <div><Chat includeSider={true} /></div>
+//   )
+// }
+
+// export default TextChat
 "use client"
 import { tokenProvider } from '@/Services/streamChatServices';
+import useAuth from '@/hooks/useAuth';
 import { useUser } from '@clerk/nextjs';
 import React, { useEffect, useState } from 'react'
 import { StreamChat } from 'stream-chat';
@@ -26,7 +35,7 @@ const ChatPage = () => {
   const channel = useChannelListContext()
 
   const [client, setClient] = useState<StreamChat>()
-  const { user } = useUser()
+  const { user } = useAuth()
   const [token, setToken] = useState()
   const [filters, setFilter] = useState({ members: {}, type: "" })
 

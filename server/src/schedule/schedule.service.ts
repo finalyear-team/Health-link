@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateScheduleInput, EmergencyScheduleInput } from './dto/create-schedule.input';
 import { UpdateScheduleInput } from './dto/update-schedule.input';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { convertToIso } from 'src/utils/converToIso';
+import { convertToIso, createCurrentDateWithTimeString } from 'src/utils/converToIso';
 import { validateEndTime } from 'src/utils/validateTime';
 import { DoctorSchedule, ScheduleType, Weekday } from '@prisma/client';
 import { format } from 'date-fns';
@@ -104,7 +104,7 @@ export class ScheduleService {
     const { Date, StartTime, EndTime, WeekDay, Note, DoctorID, Status } = createScheduleInput
 
     if (await this.checkIfTheSlotIsAlreadyRegistered(DoctorID, StartTime, EndTime, "normal", WeekDay, Date))
-      throw new HttpException("already scheduled", HttpStatus.BAD_REQUEST)
+      throw new HttpException("availablity already occupied", HttpStatus.BAD_REQUEST)
 
     try {
       const scheduleInput = WeekDay && WeekDay.map((weekday) => ({
@@ -117,22 +117,49 @@ export class ScheduleService {
       let schedule: any
 
       if (WeekDay && WeekDay.length > 0) {
-        schedule = await this.prisma.doctorSchedule.createMany({
-          data: scheduleInput
-        })
+        schedule = await this.prisma.$transaction(async (prisma) => {
+          // Create many files
+          await prisma.doctorSchedule.createMany({
+            data: scheduleInput,
+            skipDuplicates: true
+          });
+
+          // Retrieve the created files
+          const createdFiles = await prisma.doctorSchedule.findMany({
+            where: {
+              DoctorID
+            }
+          });
+
+          return createdFiles;
+        });
       }
 
       if (Date) {
-        schedule = await this.prisma.doctorSchedule.create({
-          data: {
-            DoctorID,
-            Date,
-            StartTime,
-            EndTime,
-            Note,
-          }
-        })
+        schedule = await this.prisma.$transaction(async (prisma) => {
+          // Create many files
+          await prisma.doctorSchedule.createMany({
+            data: {
+              DoctorID,
+              Date,
+              StartTime,
+              EndTime,
+              Note,
+            },
+            skipDuplicates: true
+          });
+
+          // Retrieve the created files
+          const createdFiles = await prisma.doctorSchedule.findMany({
+            where: {
+              DoctorID
+            }
+          });
+
+          return createdFiles;
+        });
       }
+
       return schedule
     } catch (error) {
       console.log(error)
@@ -165,7 +192,7 @@ export class ScheduleService {
         }
       })
       if (isEndTimeOccupied)
-        throw new Error("already scheduled")
+        throw new Error("Endtime already occupied")
       const emergencySchedule = await this.prisma.doctorSchedule.create({
         data: {
           DoctorID,
@@ -303,6 +330,8 @@ export class ScheduleService {
 
         }
       })
+
+
       return schedules
     } catch (error) {
       throw error

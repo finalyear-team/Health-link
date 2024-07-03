@@ -1,18 +1,53 @@
 "use client";
-
 import React, { useState } from "react";
 import VideoChatInitiation from "@/components/layout/video-chat";
 import VideoAppointmentCard from "@/components/appointment/video-appointment-card";
 import { CircleArrowOutUpRight } from "lucide-react";
-import { patientAppointments } from "@/public/data/patient-appointment";
+import { useQuery } from "@apollo/client";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import useAuth from "@/hooks/useAuth";
+import Loading from "@/common/Loader/Loading";
+import { UserType } from "@/types/types";
+import useVideoCallInfoStore from "@/store/videoCallInfo";
+import { addHours, format } from "date-fns";
+import formatScheduleTime from "@/utils/formatDate";
 
 const Video = () => {
   const [showVideoChat, setShowVideoChat] = useState(false);
-  const upcomingAppointments = patientAppointments.upcomingAppointments;
+  const { user } = useAuth();
+  const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: {
+      userID: user?.UserID,
+    },
+  });
 
-  const handleJoinClick = () => {
+  const {
+    appointmentId,
+    doctorId, patientId,
+    setVideoCallInfo,
+  } = useVideoCallInfoStore();
+
+  if (loading) return <Loading />;
+
+  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments.filter(
+    (appointment: any) => appointment.Status === "booked"
+  );
+
+  console.log(upcomingAppointments);
+
+  const handleJoinClick = (
+    appointmentId: string,
+    doctorId: string,
+    patientId: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ) => {
+    console.log(appointmentId, doctorId, patientId)
+    setVideoCallInfo(appointmentId, doctorId, patientId, appointmentDate, appointmentTime);
     setShowVideoChat(true);
   };
+  console.log(appointmentId, doctorId, patientId)
+
 
   return (
     <div>
@@ -23,28 +58,43 @@ const Video = () => {
             Consultation
           </div>
           <hr className="my-2" />
-          {upcomingAppointments.map((value) => (
-            <VideoAppointmentCard
-              key={value.id}
-              dummyData={{
-                appointmentId: value.id,
-                doctorId: value.id,
-                appointmentTime: value.appointmentTime,
-                appointmentDate: value.appointmentDate,
-                doctorName: value.doctorName,
-                doctorPhoto: value.doctorPhoto,
-                purpose: value.purpose,
-              }}
-              appointmentTime={value.appointmentTime}
-              onJoinClick={handleJoinClick}
-            />
-          ))}
+          {upcomingAppointments?.length === 0 ? (
+            <div>No upcoming appointments</div>
+          ) : (
+            <>
+              {upcomingAppointments?.map((value: any) => (
+                <VideoAppointmentCard
+                  key={value.AppointmentID}
+                  dummyData={{
+                    appointmentId: value.AppointmentID,
+                    doctorId: value.DoctorID,
+                    appointmentTime: value.AppointmentTime,
+                    appointmentDate: value.AppointmentDate,
+                    doctorName: value.DoctorName,
+                    doctorPhoto: value.DoctorPhoto,
+                    purpose: value.Note,
+                    role: UserType.DOCTOR,
+                  }}
+                  appointmentTime={value.AppointmentTime}
+                  onJoinClick={() =>
+                    handleJoinClick(
+                      value.AppointmentID,
+                      value.DoctorID,
+                      value.PatientID,
+                      format(addHours(value.AppointmentDate, 24), "yyyy-MM-dd"),
+                      formatScheduleTime(value.AppointmentDate)
+                    )
+                  }
+                />
+              ))}
+            </>
+          )}
         </div>
       )}
 
       {showVideoChat && (
         <div>
-          <VideoChatInitiation role={"doctor"} />
+          <VideoChatInitiation role={UserType.PATIENT} />
         </div>
       )}
     </div>

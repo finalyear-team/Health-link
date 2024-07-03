@@ -127,7 +127,7 @@ const ForgetPassword = () => {
   }
 
   return (
-    <div className="bg-container">
+    <div className="bg-login-light dark:bg-login-dark bg-cover bg-center">
       <Container>
         <div className="max-w-md w-full border border-solid shadow-sm border-stroke dark:border-gray-700 dark:text-gray-100 py-12 px-4 rounded-lg space-y-4 bg-white dark:bg-slate-800 bg-opacity-50 backdrop-blur-sm">
           <span className="flex justify-center">

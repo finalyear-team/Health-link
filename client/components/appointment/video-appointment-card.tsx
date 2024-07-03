@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import AppointmentDetails from "@/components/test/AppointmentDetails";
 import CountdownTimer from "@/components/test/CountdownTimer";
 import JoinButton from "@/components/test/JoinButton";
+import { Button } from "@/components/ui/button";
+import { Video } from "lucide-react";
 import AppointmentForm from "@/components/form/appointment/appointment-form";
 import { Settings2, Trash2 } from "lucide-react";
 import {
@@ -35,9 +37,12 @@ import { useMutation } from "@apollo/client";
 import { REMOVE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
 import { useToast } from "../ui/use-toast";
 import Loading from "@/common/Loader/Loading";
-import { format, parse } from 'date-fns';
+import { addHours, format, parse, setHours, setMinutes, setSeconds } from 'date-fns';
+import formatScheduleTime from "@/utils/formatDate";
 
 const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
+
+
   const [ISOFormattedtime, setISOFormattedTime] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [expire, setExpire] = useState(false);
@@ -47,29 +52,41 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
   const { toast } = useToast();
 
   // convert string format date and time into combined ISO format
-  const convertToISO = (date: string, time: string): string => {
-    const dateTime = new Date(`${date}T${time}`);
-    return dateTime.toISOString();
-  };
+  // const convertToISO = (date: string, time: string): string => {
+  //   const dateTime = new Date(`${date}T${time}`);
+  //   return dateTime.toISOString();
+  // };
+  const combineDateAndTime = (date: any, time: any) => {
+    console.log("come on now")
+    return new Date(format(addHours(date, 24), "yyyy-MM-dd") + "T" + format(addHours(time, 1), "HH:mm:ss.SSS'Z'")).toISOString()
+
+
+  }
 
   // change the format of the appointment time from HH:mm:ss to hh:mm a to display
   const parsedTime = parse(dummyData.appointmentTime, 'HH:mm:ss', new Date());
-  
+
   // Format the parsed time to 'hh:mm a'
-  const formattedTime = format(parsedTime, 'hh:mm a');
+  // const formattedTime = format(dummyData.appointmentTime, 'hh:mm a');
+  const formattedTime = formatScheduleTime(dummyData.appointmentTime)
+
 
   // assign combined ISO format date and time to state
   useEffect(() => {
-    const formattedTime = convertToISO(
+    const formattedDateTime = combineDateAndTime(
       dummyData.appointmentDate,
-      dummyData.appointmentTime
-    );
-    setISOFormattedTime(formattedTime);
+      dummyData.appointmentTime)
+
+    console.log(formattedDateTime)
+    setISOFormattedTime(formattedDateTime)
 
     const intervalId = setInterval(() => {
       const currentTime = new Date();
-      const appointmentTime = new Date(formattedTime);
-      const oneHourLater = new Date(appointmentTime.getTime() + 3600 * 1000);
+      const appointmentTime = new Date(formattedDateTime);
+      const oneHourLater = addHours(appointmentTime, 0.5);
+      console.log(currentTime)
+      console.log(oneHourLater)
+      console.log(oneHourLater)
 
       if (currentTime >= appointmentTime && currentTime <= oneHourLater) {
         setIsActive(true);
@@ -107,6 +124,8 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     }
   };
 
+  console.log(ISOFormattedtime)
+
   if (loading)
     return (
       <div className="w-full flex justify-center my-2">
@@ -122,14 +141,25 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     >
       <div className="flex items-center justify-between flex-wrap">
         <AppointmentDetails
+
           doctorName={dummyData.doctorName}
           doctorPhoto={dummyData.doctorPhoto}
           appointmentId={dummyData.appointmentId}
-          appointmentTime={`${dummyData.appointmentDate} | ${formattedTime}`}
+          appointmentTime={`${format(addHours(dummyData.appointmentDate, 24), "EEE, d MMM yyyy")} | ${formattedTime}`}
           purpose={dummyData.purpose}
+          role={dummyData?.role}
+          gender={dummyData.gender}
         />
         <CountdownTimer targetTime={ISOFormattedtime} expire={expire} />
-        <JoinButton isActive={isActive} onClick={onJoinClick} />
+        {/* <JoinButton isActive={true} onClick={onJoinClick} /> */}
+        <Button
+          onClick={onJoinClick}
+          className={`${isActive ? "" : "bg-slate-300 cursor-not-allowed"}`}
+          disabled={false}
+        >
+          <Video className="w-4 h-4 mr-2" /> Join Live Consultation
+        </Button>
+
       </div>
 
       <div className="absolute right-3 top-1 flex space-x-1 items-center">

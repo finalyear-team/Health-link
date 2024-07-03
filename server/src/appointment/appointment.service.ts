@@ -2,17 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { CreateAppointmentInput, createEmergencyAppointmentInput } from './dto/create-appointment.input';
 import { UpdateAppointmentInput } from './dto/update-appointment.input';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { format } from 'date-fns';
-import { Appointments, Weekday } from '@prisma/client';
+import { addHours, format, parse, parseISO } from 'date-fns';
+import { AppointmentStatus, AppointmentType, Appointments, Weekday } from '@prisma/client';
 import { VideoCallService } from 'src/video-call/video-call.service';
 import { getTimeMilliSeconds } from 'src/utils/timeInMilliSeconds';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import { ScheduleStatus } from 'src/utils/types';
+import { equal, strict } from 'assert';
+import { decreaseHourByOne } from 'src/utils/converToIso';
+import { SocketGateway } from 'src/socket/socket.gateway';
+import { databaseDate } from 'src/utils/parseDate';
 
 
 @Injectable()
 export class AppointmentService {
-  constructor(private readonly prisma: PrismaService, private readonly videoCallService: VideoCallService, private readonly scheduleService: ScheduleService) { }
+  constructor(private readonly prisma: PrismaService, private readonly videoCallService: VideoCallService, private readonly scheduleService: ScheduleService, private readonly socket: SocketGateway) { }
 
   //
   notValidBeforTime(AppointmentDate: Date, AppointmentTime: Date) {
@@ -24,30 +28,52 @@ export class AppointmentService {
 
   //
   async isSelectedDateAvailable(ScheduleID: string, DoctorID: string, date: Date, time: Date) {
+
     const selectedDay = format(date.toISOString(), "EEEE").toLowerCase()
+
     console.log(selectedDay)
+
+    const selectedTime = decreaseHourByOne(time)
+
+
+
     try {
       const schedule = await this.prisma.doctorSchedule.findFirst({
         where: {
-          AND: [{
-            ScheduleID,
-          }, {
-            DoctorID
+          ScheduleID,
+          DoctorID,
+          OR: [{
+            WeekDay: selectedDay as Weekday
           },
           {
-            OR: [
-              { Date: { equals: date } },
-              { WeekDay: selectedDay as Weekday }
-            ]
-          },
-          { ScheduleType: "normal" },
-          { Status: "available" },
-          {
-            EndTime: {
-              gt: time
+            Date: {
+              equals: date
             }
           }
+          ],
+          AND: [
+            {
+              Status: "available",
+            },
+            {
+              ScheduleType: "normal"
+            }, {
+              OR: [
+                {
+                  EndTime: {
+                    lte: selectedTime
+                  },
+                }, {
+                  EndTime: {
+                    gte: selectedTime
+                  }
+                }
+              ]
+
+            }
+
           ]
+
         }
 
       })
@@ -58,21 +84,59 @@ export class AppointmentService {
     }
   }
 
+
+  async isAppointmentPendingOrBooked(ScheduleID: string, DoctorID: string, PatientID: string, AppointmentDate: Date, AppointmentTime: Date) {
+
+    try {
+      const pendingAppo = await this.prisma.appointments.findFirst({
+        where: {
+          ScheduleID,
+          PatientID,
+          DoctorID,
+          AppointmentDate: {
+            equals: databaseDate(AppointmentDate)
+          },
+          OR: [{
+            Status: "booked",
+          }, {
+            Status: "pending"
+          }],
+          AppointmentTime: {
+            equals: AppointmentTime
+          }
+        }
+      })
+      return pendingAppo
+
+
+    } catch (error) {
+      throw error
+
+
+    }
+  }
+
   // checks slot availablity and update availablity of the slot
   async findAndUpdateSchedule(appointment: Appointments) {
-    const WeekDay = format(appointment.AppointmentDate.toISOString(), "EEEE").toLowerCase() as Weekday
+    const WeekDay = format(addHours(appointment.AppointmentDate, 24).toISOString(), "EEEE").toLowerCase() as Weekday
+
+    console.log(WeekDay)
 
     const EndTime = new Date(this.notValidBeforTime(appointment.AppointmentDate, appointment.AppointmentTime))
-    try {
-      let schedule = await this.isSelectedDateAvailable(appointment.ScheduleID, appointment.DoctorID, appointment.AppointmentDate, appointment.AppointmentTime)
 
-      if (schedule.WeekDay === WeekDay) {
+    try {
+
+      let schedule = await this.isSelectedDateAvailable(appointment.ScheduleID, appointment.DoctorID, addHours(appointment.AppointmentDate, 24), appointment.AppointmentTime)
+      console.log(schedule?.WeekDay === WeekDay)
+
+      if (schedule?.WeekDay === WeekDay) {
         schedule = await this.scheduleService.createSchedule({ Date: appointment.AppointmentDate, StartTime: appointment.AppointmentTime, EndTime, DoctorID: appointment.DoctorID, Status: ScheduleStatus.UNAVAILABLE })
       }
       else {
         schedule = await this.scheduleService.updateSchedule({ ScheduleID: appointment.ScheduleID, Date: appointment.AppointmentDate, StartTime: appointment.AppointmentTime, EndTime, DoctorID: appointment.DoctorID, Status: ScheduleStatus.UNAVAILABLE })
         console.log(schedule)
       }
+
       return schedule
 
     } catch (error) {
@@ -81,6 +145,8 @@ export class AppointmentService {
 
     }
   }
+
+
 
 
   //
@@ -107,14 +173,13 @@ export class AppointmentService {
 
   //
   async createAppointment(createAppointmentInput: CreateAppointmentInput) {
-    const { DoctorID, ScheduleID, PatientID, AppointmentDate, AppointmentTime, Note, Status, AppointmentType } = createAppointmentInput
+    const { DoctorID, ScheduleID, PatientID, AppointmentDate, AppointmentTime, Note, Status, AppointmentType, VideoChatRoomID } = createAppointmentInput
+
     if (!await this.isSelectedDateAvailable(ScheduleID, DoctorID, AppointmentDate, AppointmentTime))
       throw new Error("this slot is not available")
+    if (await this.isAppointmentPendingOrBooked(ScheduleID, DoctorID, PatientID, AppointmentDate, AppointmentTime))
+      throw new Error("this appointment is already pending or booked. try different date")
 
-    const { createdRoom: { RoomID } } = await this.videoCallService.getRoom(DoctorID, PatientID)
-
-    if (!RoomID)
-      throw new Error("no room created for consultation")
     try {
       const Appointment = await this.prisma.appointments.create({
         data: {
@@ -125,11 +190,16 @@ export class AppointmentService {
           AppointmentTime,
           Status,
           AppointmentType,
-          VideoChatRoomID: RoomID,
+          VideoChatRoomID,
           Note
+        },
+        include: {
+          Doctor: true,
+          Patient: true
         }
       })
-      console.log(Appointment)
+
+      this.socket.create(Appointment)
       return Appointment
     } catch (error) {
       console.log(error)
@@ -140,19 +210,16 @@ export class AppointmentService {
 
 
   //
-  async AcceptedAppointment(DoctorID: string, AppointmentID: string, Duration: number) {
+  async AcceptAppointment(DoctorID: string, AppointmentID: string, Duration: number) {
     try {
-      let appointment = await this.prisma.appointments.update({
+      let appointment = await this.prisma.appointments.findFirst({
         where: {
           AppointmentID,
           DoctorID,
           Status: "pending"
-        },
-        data: {
-          Status: "booked",
-          Duration,
         }
       })
+
 
       const schedule = await this.findAndUpdateSchedule(appointment)
 
@@ -161,7 +228,9 @@ export class AppointmentService {
           AppointmentID: appointment.AppointmentID
         },
         data: {
-          ScheduleID: schedule.ScheduleID
+          ScheduleID: schedule.ScheduleID,
+          Status: "booked",
+          Duration
         }
       })
       const Room = await this.updateVideoCallRoomMembersToken(appointment)
@@ -217,18 +286,72 @@ export class AppointmentService {
 
 
 
+
   //
   async getAppointments(UserID: string) {
     try {
-      const appointments = await this.prisma.appointments.findMany({
+      const upcomingAppointment = await this.prisma.appointments.findMany({
         where: {
+          OR: [
+            { Status: "pending" },
+            { Status: "booked" },
+            { DoctorID: UserID },
+            { PatientID: UserID }
+          ]
+        },
+        include: {
+          Doctor: true,
+          Patient: true
+
+        },
+        orderBy: {
+          AppointmentDate: "asc"
+        }
+      })
+
+      const pastAppointment = await this.prisma.appointments.findMany({
+        where: {
+          Status: "completed",
           OR: [
             { DoctorID: UserID },
             { PatientID: UserID }
           ]
+        },
+        include: {
+          Doctor: true,
+          Patient: true
+
+        },
+        orderBy: {
+          AppointmentDate: "desc"
         }
       })
-      return appointments
+
+      const upcomingAppointments = upcomingAppointment.map((appointment) => ({
+        ...appointment,
+        DoctorName: appointment.Doctor.FirstName + " " + appointment.Doctor.LastName,
+        DoctorPhoto: appointment.Doctor.ProfilePicture,
+        DoctorGender: appointment.Doctor.Gender,
+        PatientName: appointment.Patient.FirstName + " " + appointment.Patient.LastName,
+        PatientPhoto: appointment.Patient.ProfilePicture,
+        PatientGender: appointment.Patient.Gender
+      }))
+
+
+      const pastAppointments = pastAppointment.map((appointment) => ({
+        ...appointment,
+        DoctorName: appointment.Doctor.FirstName + " " + appointment.Doctor.LastName,
+        DoctorPhoto: appointment.Doctor.ProfilePicture,
+        DoctorGender: appointment.Doctor.Gender,
+        PatientName: appointment.Patient.FirstName + " " + appointment.Patient.LastName,
+        PatientPhoto: appointment.Patient.ProfilePicture,
+        PatientGender: appointment.Patient.Gender
+      }))
+
+      return {
+        upcomingAppointments,
+        pastAppointments
+      }
     } catch (error) {
       throw error
     }
@@ -251,6 +374,152 @@ export class AppointmentService {
 
   }
 
+
+  // 
+
+  async filterUserAppointments(UserID: string, Query: string) {
+    try {
+      const appointments = await this.prisma.appointments.findMany({
+        where: {
+          PatientID: UserID,
+          OR: [
+            {
+              AppointmentID: {
+                contains: Query
+              }
+            },
+            {
+              DoctorID: {
+                contains: Query
+              }
+            },
+            {
+              AppointmentType: {
+                equals: Query as AppointmentType
+              },
+            },
+            {
+              Status: {
+                equals: Query as AppointmentStatus
+              },
+
+            },
+            {
+              Doctor: {
+                OR: [{
+                  FirstName: {
+                    contains: Query
+                  }
+                },
+                {
+                  LastName: {
+                    contains: Query
+                  }
+                },
+                {
+                  Username: {
+                    contains: Query
+                  }
+                }
+
+                ]
+              }
+            }
+
+          ]
+
+        }
+      })
+
+      return appointments
+
+    } catch (error) {
+      throw error
+
+    }
+
+  }
+
+  async filterDoctorAppointments(DoctorID: string, Query: string) {
+    try {
+
+      const appointments = await this.prisma.appointments.findMany({
+        where: {
+          DoctorID,
+          OR: [
+            {
+              AppointmentID: {
+                contains: Query
+              }
+            },
+            {
+              PatientID: {
+                contains: Query
+              }
+            },
+            {
+              AppointmentType: {
+                equals: Query as AppointmentType
+              },
+            },
+            {
+              Status: {
+                equals: Query as AppointmentStatus
+              },
+
+            },
+            {
+              Patient: {
+                OR: [{
+                  FirstName: {
+                    contains: Query
+                  }
+                },
+                {
+                  LastName: {
+                    contains: Query
+                  }
+                },
+                {
+                  Username: {
+                    contains: Query
+                  }
+                }
+
+                ]
+              }
+            }
+
+          ]
+
+        }
+      })
+
+      return appointments
+
+    } catch (error) {
+      throw error
+
+    }
+
+  }
+
+  async filterAppointments(Query: string) {
+    try {
+      const appointments = await this.prisma.appointments.findMany({
+        where: {
+          OR: [{
+
+          }]
+        }
+      })
+
+    } catch (error) {
+
+    }
+
+  }
+
   async remove(AppointmentID: string) {
     try {
       const appointment = await this.prisma.appointments.delete({
@@ -265,3 +534,5 @@ export class AppointmentService {
     }
   }
 }
+
+

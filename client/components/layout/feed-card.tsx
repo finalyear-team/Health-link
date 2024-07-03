@@ -1,130 +1,124 @@
 "use client";
 
-import { FC, useState } from "react";
-import { Card } from "../ui/card";
-import {
-  BadgeCheck,
-  BellPlus,
-  BookMarked,
-  Ellipsis,
-  Flag,
-  MessageCircle,
-  Share,
-  ThumbsUp,
-} from "lucide-react";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { useState, FC } from "react";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+} from "@/components/ui/card";
 
-interface SocialMediaCardProps {
-  profilePicture: string;
-  name: string;
-  isVerified: boolean;
-  username: string;
-  userType: string;
-  postContent: string;
-  postImage: string;
-}
+const PostCard = ({ post }: any) => {
+  const [likes, setLikes] = useState(post.likes);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState(post.comments);
+  const [newComment, setNewComment] = useState("");
 
-const SocialMediaCard: FC<SocialMediaCardProps> = ({
-  profilePicture,
-  name,
-  isVerified,
-  username,
-  userType,
-  postContent,
-  postImage,
-}) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const toggleLike = () => {
+    setLikes((prevLikes: any) => (prevLikes === likes ? likes - 1 : likes + 1));
+  };
+
+  const addComment = () => {
+    setComments([...comments, newComment]);
+    setNewComment("");
+  };
+
+  const sharePost = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("URL copied to clipboard!");
+  };
 
   return (
-    <Card className="shadow rounded-lg p-4 mb-4 max-w-lg dark:bg-slate-900">
-      <div className="flex items-center">
-        <img
-          src={profilePicture}
-          alt={name}
-          className="w-12 h-12 rounded-full mr-3 border border-stroke"
-        />
-        <div>
-          <div className="flex items-center">
-            <h2 className="font-semibold">{name}</h2>
-            {isVerified && (
-              <BadgeCheck className="w-4 h-4 text-secondary-600 ml-2" />
-            )}
+    <Card className="mb-4">
+      <CardHeader>
+        <p>{post.content}</p>
+        {post.image && (
+          <div className="mt-2">
+            <Image
+              src={URL.createObjectURL(post.image)}
+              width={200}
+              height={200}
+              alt="Post image"
+              className="w-full h-auto"
+            />
           </div>
-          <div className="text-sm text-gray-500">
-            @{username} - <Badge>{userType}</Badge>
-          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center space-x-4 mt-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="focus:outline-none" onClick={toggleLike}>
+                  {likes} Likes
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Like</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="focus:outline-none"
+                  onClick={() => setShowComments(!showComments)}
+                >
+                  Comments
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Comment</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="focus:outline-none" onClick={sharePost}>
+                  Share
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Share</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <div className="mx-2">
-          <Button variant={"follow"}>Follow</Button>
-        </div>
-        <div className="ml-auto relative">
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="text-gray-500"
-          >
-            <Ellipsis className="w-6 h-6" />
-          </button>
-          {dropdownOpen && (
-            <div className="absolute bg-slate-50 right-0 mt-2 w-40 border rounded shadow-lg">
-              <button className="flex space-x-2 items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                <BookMarked className="w-4 h-4 mr-2" /> Save
-              </button>
-              <hr className="" />
-              <button className="flex space-x-2 items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                <Flag className="w-4 h-4 mr-2" /> Report
+      </CardContent>
+      {showComments && (
+        <CardFooter>
+          <div className="mt-4">
+            <div className="space-y-2">
+              {comments.map((comment: any, index: any) => (
+                <p key={index}>{comment}</p>
+              ))}
+            </div>
+            <div className="mt-2 flex">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="flex-1 p-2 border rounded"
+                placeholder="Add a comment..."
+              />
+              <button
+                onClick={addComment}
+                className="ml-2 p-2 bg-blue-500 text-white rounded"
+              >
+                Reply
               </button>
             </div>
-          )}
-        </div>
-      </div>
-      <p className="mt-4">{postContent}</p>
-      {postImage && (
-        <img src={postImage} alt="Post content" className="mt-4 rounded-lg" />
+          </div>
+        </CardFooter>
       )}
-
-      <TooltipProvider>
-        <div className="flex justify-around mt-4">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button>
-                <Share className="w-4 h-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Share</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button>
-                <ThumbsUp className="w-4 h-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Like</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button>
-                <MessageCircle className="w-4 h-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Comment</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </TooltipProvider>
     </Card>
   );
 };
 
-export default SocialMediaCard;
+export default PostCard;

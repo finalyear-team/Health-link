@@ -71,7 +71,7 @@ type Query {
 
 
 type Mutation {
-  CreateSchedule(createScheduleInput: CreateScheduleInput!): Schedule!
+  CreateSchedule(createScheduleInput: CreateScheduleInput!): [Schedule]
   UpdateSchedule(updateScheduleInput: UpdateScheduleInput!): Schedule!
   CreateEmergencySchedule(emergencyScheduleInput: EmergencyScheduleInput!): Schedule!
   RemoveSchedule(id: Int!): Schedule

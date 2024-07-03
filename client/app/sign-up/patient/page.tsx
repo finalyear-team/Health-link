@@ -19,7 +19,7 @@ const PatientSignUp = () => {
   };
 
   return (
-    <div className="bg-container">
+    <div className="bg-login-light dark:bg-login-dark bg-cover bg-center">
       <Header />
       <div className="container mx-auto">
         <h1 className="text-2xl font-semibold mb-4">Doctor Sign Up</h1>

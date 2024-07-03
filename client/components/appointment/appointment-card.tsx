@@ -38,6 +38,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useToast } from "../ui/use-toast";
 import { REMOVE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
 import Loading from "@/common/Loader/Loading";
+import useAuth from "@/hooks/useAuth";
+import { Gender, UserType } from "@/types/types";
 
 export const AppointmentCard = ({
   id,
@@ -48,13 +50,19 @@ export const AppointmentCard = ({
   doctorName,
   purpose,
   status,
+  gender,
+  role
+
 }: AppointmentType) => {
-  const [year, month, day] = appointmentDate.split("-");
+  console.log(appointmentDate)
+  const [year, month, day] = appointmentDate?.split("-");
   const [isHovered, setIsHovered] = useState(false);
   const [RemoveAppointment, { data, loading, error }] =
     useMutation(REMOVE_APPOINTMENT);
   const { toast } = useToast();
-  const { user } = useUser();
+  // const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useAuth()
+
   const monthNames = [
     "Jan",
     "Feb",
@@ -74,7 +82,8 @@ export const AppointmentCard = ({
   const monthNumber = month ? parseInt(month) : 0;
 
   const monthText = monthNames[monthNumber - 1];
-  const Role = user?.unsafeMetadata.role === "provider" ? "doctor" : "Patient";
+  // const Role = user?.unsafeMetadata.role === "provider" ? "doctor" : "Patient";
+  const Role = user && user.Role === UserType.DOCTOR ? "doctor" : "patient"
   const RemoveAppointmentHandler = async () => {
     try {
       await RemoveAppointment({
@@ -95,7 +104,7 @@ export const AppointmentCard = ({
       });
     }
   };
-;
+  ;
   return (
     <div
       className="relative flex flex-col"
@@ -114,7 +123,7 @@ export const AppointmentCard = ({
           />
           {/* the content */}
           <div className="flex justify-between items-start flex-col">
-            <span className="text-lg md:text-xl font-bold">{doctorName}</span>
+            <span className="text-lg md:text-xl font-bold">{role === UserType.DOCTOR ? "Dr.  " : (gender === Gender.MALE ? "Mr . " : "Ms")}{doctorName}</span>
             <div className="flex items-center flex-wrap">
               <span className="text-slate-500 dark:text-slate-300 mr-2">
                 {appointmentTime}

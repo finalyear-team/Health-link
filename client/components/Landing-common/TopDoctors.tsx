@@ -31,9 +31,22 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
 
 
 
-  const handleMakeAppointment = (profile: DoctorProfile) => {
+  const handleMakeAppointment = (profile: any) => {
     console.log(profile)
-    selectDoctor(profile);
+    selectDoctor({
+      id: profile.UserID,
+      profilePicture: profile.ProfilePicture,
+      name: `$profile.FirstName  $profile.LastName`,
+      username: profile.Username,
+      type: profile.Role,
+      followers: profile.Followers,
+      following: profile.Following,
+      rating: profile.Rating,
+      speciality: profile.Speciality,
+      experience: profile.ExperienceYears,
+      hourlyRate: profile.ConsultationFee
+    });
+    console.log(profile)
     setTimeout(() => {
       showAppointmentForm();
     }, 1000);
@@ -42,16 +55,15 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
 
 
   if (loading) return <Loading />;
+  if (error) return <div>{error.message}</div>
 
-  console.log(data.
-    GetDoctors
-  );
+  console.log(data);
   return (
     <div className="flex flex-wrap justify-center mt-3">
       {/* {data.Getdata.map((profile: any) => ( */}
-      {data.GetDoctors.map((profile: any) => (
+      {items && items.map((profile: any) => (
         <DoctorProfileCard
-          key={profile.id}
+          key={profile.UserID}
           id={profile.UserID}
           profilePicture={profile.profilePicture}
           name={`${profile.FirstName}  ${profile.LastName}`}
@@ -59,7 +71,7 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
           type={profile.Role}
           followers={profile.Followers}
           following={profile.Following}
-          rating={4.5}
+          rating={profile.Rating}
           speciality={profile.Speciality}
           experience={profile.ExperienceYears}
           hourlyRate={profile.ConsultationFee}

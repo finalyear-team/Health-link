@@ -25,9 +25,9 @@ export class VideoCallService {
         }
     }
     //
-    async generateToken(roomId: string, host: string, member: string, notValidBefore: number, Duration?: number) {
+    async generateToken(roomId: string, host: string, member: string, notValidBefore?: number, Duration?: number) {
+
         try {
-            console.log(Duration)
             const hostTokenConfig: HMS.AuthTokenConfig = {
                 roomId,
                 role: "host",
@@ -65,7 +65,6 @@ export class VideoCallService {
         const appointmentTimeInMilliseconds = getTimeMilliSeconds(AppointmentTime)
         const tokenNotValidBefore = (AppointmentDate.getTime() + appointmentTimeInMilliseconds) / 1000
         const { HostAuthToken } = await this.generateToken(RoomID, HostID, MemberID, tokenNotValidBefore)
-        console.log(HostAuthToken)
         const { MemberAuthToken } = await this.generateToken(RoomID, HostID, MemberID, tokenNotValidBefore)
         try {
             const Room = await this.prisma.videoChatRoom.create({
@@ -87,7 +86,6 @@ export class VideoCallService {
                 }
 
             })
-            console.log(Room)
             return Room
         } catch (error) {
             console.log(error)
@@ -99,8 +97,6 @@ export class VideoCallService {
 
     //
     async getRoom(HostID: string, MemberID: string) {
-        console.log(HostID)
-        console.log(MemberID)
         try {
             const createdRoom = await this.prisma.videoChatRoom.findFirst({
                 where: {
@@ -122,10 +118,10 @@ export class VideoCallService {
                     Members: true
                 }
             })
-            if (createdRoom) {
-                const authToken = await this.hms.auth.getManagementToken()
-                return { createdRoom, authToken }
-            }
+
+            const authToken = await this.hms.auth.getManagementToken()
+
+            return { createdRoom, authToken }
         } catch (error) {
             console.log(error)
             throw error
@@ -157,7 +153,6 @@ export class VideoCallService {
                     },
                 }
             })
-            console.log(Room)
             return Room
         } catch (error) {
             throw error

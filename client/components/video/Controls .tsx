@@ -39,19 +39,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare } from "@100mslive/react-sdk";
+import useAuth from "@/hooks/useAuth";
 
 const Controls = () => {
-  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo} = useAVToggle();
-  const {screenShareAudioTrackId,screenShareVideoTrackId,toggleScreenShare}=useScreenShare()
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
+  const { screenShareAudioTrackId, screenShareVideoTrackId, toggleScreenShare } = useScreenShare()
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const hmsActions=useHMSActions()
+  const hmsActions = useHMSActions()
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user } = useAuth();
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
 
-  const role = user?.unsafeMetadata.role;
+  const role = user?.Role;
 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [inputAudioSetting, setInputAudioSetting] = useState("");
@@ -60,7 +61,7 @@ const Controls = () => {
 
 
   const endCall = () => {
-     hmsActions.leave()
+    hmsActions.leave()
     toast({
       title: "Call ended",
       description: "Thank u .",

@@ -18,6 +18,8 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
     }
   );
 
+
+
   const {
     handleSubmit,
     error: submitError,

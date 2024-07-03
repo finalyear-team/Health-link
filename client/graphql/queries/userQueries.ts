@@ -55,25 +55,9 @@ export const GET_DOCTORS = gql`
       ConsultationFee
       Followers
       Following
+      Rating
     }
   }
 `;
 
-export const SEARCH_USERS = gql`
-  query SearchUsers($searchQuery: String) {
-    SearchUsers(searchQuery: $searchQuery) {
-      UserID
-      FirstName
-      LastName
-    }
-  }
-`;
-export const SEARCH_DOCTORS = gql`
-  query SearchDoctors($searchQuery: String) {
-    SearchDoctors(searchQuery: $searchQuery) {
-      UserID
-      FirstName
-      LastName
-    }
-  }
-`;
+

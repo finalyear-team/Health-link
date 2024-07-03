@@ -17,14 +17,14 @@
       link: "/image/product/total-prescriptions(122x105).svg",
       width: 122,
       height: 105,
-      title: "Total Prescriptions",
+      title: "Prescriptions",
       number: 5,
     },
     {
       link: "/image/product/total-transaction(155x84).svg",
       width: 155,
       height: 84,
-      title: "Total Transaction",
+      title: "Transaction",
       number: 40000,
     },
   ];

@@ -14,6 +14,7 @@ export class ScheduleResolver {
   // @UserRoles(UserType.ADMIN)
   @Mutation('CreateSchedule')
   async createSchedule(@Args('createScheduleInput') createScheduleInput: CreateScheduleInput) {
+    console.log(createScheduleInput)
     const input = new CreateScheduleInput(createScheduleInput)
     console.log(input)
     const schedule = await this.scheduleService.createSchedule(input)
@@ -67,8 +68,6 @@ export class ScheduleResolver {
 
   @Query('GetScheduleByDate')
   async GetScheduleByDate(@Args("DoctorID") DoctorID: string, @Args("Date") Date: string) {
-    console.log(DoctorID)
-    console.log(Date)
     const schedule = await this.scheduleService.getScheduleByDate(DoctorID, Date)
     return schedule
   }

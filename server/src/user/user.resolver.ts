@@ -21,8 +21,8 @@ export class UserResolver {
   @UseGuards(JWTGuard)
   @Query("GetSignedInUser")
   async getProfile(@Context() context: { req: Request, res: Response, next: NextFunction }) {
-    console.log("user profile searc")
     const requestUser = context.req.user as any
+    console.log(requestUser)
 
     const user = await this.userService.getUserDetails(requestUser.UserID)
 
@@ -91,15 +91,19 @@ export class UserResolver {
   }
 
 
-  @Query('SearchUsers')
+  @Mutation('SearchUsers')
   async searchUsers(@Args('searchQuery') searchQuery: string) {
     const users = await this.userService.searchUsers(searchQuery)
     return users
   }
 
-  @Query('SearchDoctors')
-  async searchDoctors(@Args('searchQuery') searchQuery: string) {
-    const users = await this.userService.searchDoctors(searchQuery)
+  @Mutation('SearchDoctors')
+  async searchDoctors(@Args('searchQuery') searchQuery: string, @Args('sortingQuery') sortingQuery: string, @Args('sortingOrder') sortingOrder: string) {
+    console.log(searchQuery)
+    console.log(sortingOrder)
+    console.log(sortingQuery)
+
+    const users = await this.userService.searchDoctors(searchQuery, sortingQuery, sortingOrder)
     return users
   }
 

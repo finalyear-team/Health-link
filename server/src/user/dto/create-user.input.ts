@@ -9,16 +9,17 @@ const RoleValues = Object.values(UserType) as [string, ...string[]]
 const GenderValues = Object.values(Gender) as [string, ...string[]]
 
 export const RegisterSchema = z.object({
-    FirstName: z.string({ message: "First name is not correct" }),
-    LastName: z.string({ message: "Last name is not correct" }),
-    Username: z.string({ message: "Username is not correct" }),
-    Email: z.string().email({ message: "Email is not correct" }),
-    Role: z.enum(RoleValues, { message: "Role error" }),
-    Gender: z.enum(GenderValues, { message: "Gender is error" }),
-    DateOfBirth: z.string({ message: "Date of birth error" }),
+    UserID: z.string({ message: "id not  correct" }),
+    FirstName: z.string({ message: "first name not correct" }),
+    LastName: z.string({ message: "last name not correct" }),
+    Username: z.string({ message: "user name not correct" }),
+    Email: z.string().email("email not correct"),
+    Role: z.enum(RoleValues, { message: "role error" }),
+    Gender: z.enum(GenderValues, { message: "gender is error" }),
+    DateOfBirth: z.string({ message: "date of birth error" }),
     PhoneNumber: z.string().optional()
 }).refine(({ DateOfBirth }) => {
-    console.log(DateOfBirth)
+    console.log("come on man")
     const today = new Date();
     const birthDate = new Date(DateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -26,11 +27,10 @@ export const RegisterSchema = z.object({
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
-    return age >= 18;
-}, {
-    message: "Age not acceptable, must be at least 18 years old",
-    path: ["DateOfBirth"]
-});
+    if (age < 18)
+        throw new Error("age is not acceptable")
+
+})
 
 @InputType()
 export class UserDetailsInput {

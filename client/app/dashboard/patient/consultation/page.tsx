@@ -23,19 +23,29 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import users from "@/public/data/users";
 import useAppointmentStore from "@/store/appointmentStore";
-import { Loader2 } from "lucide-react";
+import { Loader2, Frown } from "lucide-react";
 import AppointmentForm from "@/components/form/appointment/appointment-form";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { GET_DOCTORS } from "@/graphql/queries/userQueries";
+import { SEARCH_DOCTORS } from "@/graphql/mutations/userMutations";
 
-type SortOrder = "ascending" | "descending";
+type SortOrder = "asc" | "desc";
 
 const Consultation = () => {
   const [specializationValue, setSpecializationValue] = useState("");
   const [criteria, setCriteria] = useState("");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("ascending");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [noValue, setNoValue] = useState(false);
-  const [filteredUsers, setFilteredUsers] = useState(users);
+  // const [filteredUsers, setFilteredUsers] = useState(users);
+  const { data: topDoctors, loading: topDoctorLoading, error: topDoctorError } = useQuery(GET_DOCTORS)
+
+  const [searchDoctors, { data: filteredDoctors, loading, error }] = useMutation(SEARCH_DOCTORS)
+
+
+
+  console.log(topDoctors)
+
+
 
   // cancel the appointment form
   const cancelAppointmentForm = useAppointmentStore(
@@ -54,29 +64,54 @@ const Consultation = () => {
     setSortOrder(value);
   };
 
-  const handleFilterAndSort = (searchValue = "") => {
+  const handleFilterAndSort = async (searchValue = "") => {
+
+    console.log(searchValue)
     let resultUsers = users;
+    // let resultUsers = data?.SearchDoctors || [];
 
     // Search by name
     if (searchValue) {
-      resultUsers = search(resultUsers, searchValue);
+      // resultUsers = search(resultUsers, searchValue);
+      await searchDoctors({
+        variables: {
+          searchQuery: searchValue,
+          sortingQuery: undefined,
+          sortingOrder: undefined
+
+
+        }
+      })
     }
 
     // Filter by specialization
     if (specializationValue) {
-      resultUsers = filter(
-        resultUsers,
-        (user) => user.specialization === specializationValue
-      );
+      await searchDoctors({
+        variables: {
+          searchQuery: specializationValue,
+          sortingQuery: undefined,
+          sortingOrder: undefined
+        }
+      })
     }
 
+
+    console.log(criteria)
     // Sort users
     if (criteria) {
-      resultUsers = sort(resultUsers, criteria, sortOrder);
-    }
+      // resultUsers = sort(data, criteria, sortOrder);
+      await searchDoctors({
+        variables: {
+          searchQuery: specializationValue || searchValue,
+          sortingQuery: criteria,
+          sortingOrder: sortOrder
+        }
+      })
 
-    setFilteredUsers(resultUsers);
-    setNoValue(resultUsers.length === 0);
+
+    }
+    console.log(filteredDoctors?.SearchDoctors)
+    setNoValue(filteredDoctors?.SearchDoctors?.length === 0 || topDoctors?.GetDoctors?.length === 0);
   };
 
   useEffect(() => {
@@ -93,6 +128,8 @@ const Consultation = () => {
     handleFilterAndSort(values.searchByName);
     setSubmitting(false);
   };
+
+
 
   return (
     <Container>
@@ -113,7 +150,7 @@ const Consultation = () => {
           </div>
           {/* search and filter */}
 
-          <div className="flex justify-center items-center space-x-5 mt-4">
+          <div className="sticky top-40 z-50 flex justify-center items-center space-x-5 mt-4">
             <div>
               <SpecializationPopover
                 specializationValue={specializationValue}
@@ -130,6 +167,9 @@ const Consultation = () => {
                         placeholder="Search by name"
                         name="searchByName"
                         type="text"
+                        onChange={() => {
+
+                        }}
                       />
                     </div>
                     <div>
@@ -152,27 +192,35 @@ const Consultation = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Criterias</SelectLabel>
-                    <SelectItem value="rating"> Rating</SelectItem>
+                    {/* <SelectItem value="rating"> Rating</SelectItem>
                     <SelectItem value="experience">Experience</SelectItem>
                     <SelectItem value="specialty">Specialty</SelectItem>
                     <SelectItem value="availability">Availability</SelectItem>
                     <SelectItem value="location">Location</SelectItem>
                     <SelectItem value="hourlyRate">Hourly Rate</SelectItem>
                     <SelectItem value="followers">Followers</SelectItem>
-                    <SelectItem value="status">Status</SelectItem>
+                    <SelectItem value="status">Status</SelectItem> */}
+                    <SelectItem value="Rating"> Rating</SelectItem>
+                    <SelectItem value="ExperienceYears">Experience</SelectItem>
+                    <SelectItem value="Speciality">Specialty</SelectItem>
+                    <SelectItem value="Schedule">Availability</SelectItem>
+                    {/* <SelectItem vlue="Address">Location</SelectItem> */}
+                    <SelectItem value="ConsultationFee">Hourly Rate</SelectItem>
+                    <SelectItem value="Followers">Followers</SelectItem>
+                    {/* <SelectItem value="Status">Status</SelectItem> */}
                   </SelectGroup>
                   <SelectGroup className="mt-4">
                     <SelectLabel>Type</SelectLabel>
                     <RadioGroup
-                      defaultValue="ascending"
+                      defaultValue="asc"
                       onChange={handleSortOrderChange}
                     >
                       <div className="flex items-center space-x-2 my-2 cursor-pointer">
-                        <RadioGroupItem value="ascending" id="r1" />
+                        <RadioGroupItem value="asc" id="r1" />
                         <Label htmlFor="r1">Ascending</Label>
                       </div>
                       <div className="flex items-center space-x-2 cursor-pointer">
-                        <RadioGroupItem value="descending" id="r2" />
+                        <RadioGroupItem value="desc" id="r2" />
                         <Label htmlFor="r2">Descending</Label>
                       </div>
                     </RadioGroup>
@@ -183,9 +231,13 @@ const Consultation = () => {
           </div>
           {/* list of doctors */}
           {noValue ? (
-            <div>No results found</div>
+            <div className="flex items-center flex-col space-y-2 w-full mt-4">No results found
+              <Frown className="w-10 h-10" />
+            </div>
           ) : (
-            <div>Doctors</div>
+            <div>
+              <TopDoctors items={filteredDoctors?.SearchDoctors || topDoctors?.GetDoctors} />
+            </div>
           )}
         </div>
       ) : (

@@ -15,53 +15,66 @@ import {
 import { useEffect, useState } from "react";
 import { getRoom } from "@/Services/videoCallServices";
 import { toast, useToast } from "../ui/use-toast";
-import ChatBox from "../test/ChatBox";
+import Chat from "../layout/chat/chat";
+import useAuth from "@/hooks/useAuth";
+import useVideoCallInfoStore from "@/store/videoCallInfo";
+import { UserType } from "@/types/types";
 
 const ConsultationPage = ({ role }: any) => {
-  const { user } = useUser() as any;
+  const { user } = useAuth() as any;
   const hmsActions = useHMSActions();
   const [Room, setRoom] = useState<any>();
   const [AuthToken, setAuthToken] = useState<any>();
   const { participants } = useParticipants();
   const notification = useHMSNotifications();
   const { toast } = useToast();
+  const {
+    appointmentId,
+    doctorId,
+    patientId,
+    appointmentDate,
+    appointmentTime,
+    room,
+  } = useVideoCallInfoStore()
 
-  if (user) console.log(user.id);
+  console.log(doctorId)
+
 
   useEffect(() => {
     const fetchRoom = async () => {
       try {
         const response = await getRoom({
-          doctor: "user_2h0T5Y17niLD8kejPXXEPx4j1ME",
-          patient: "user_2gjqwG6Txeg2XAHHZ56zy5kvITA",
-          appointmentDate: "29/05/2024",
-          appointmentTime: "06:40 pm",
+          doctor: doctorId,
+          patient: patientId,
+          appointmentDate: appointmentDate,
+          appointmentTime: appointmentTime,
         });
-        setRoom(response.room);
-        if (role.includes("doctor")) {
-          setAuthToken(response.hostToken);
-        } else if (role.includes("patient")) {
-          setAuthToken(response.memberToken);
+        console.log(response)
+        setRoom(response?.room);
+        if (user?.Role === UserType.DOCTOR) {
+          setAuthToken(response?.hostToken);
+        } else if (user?.Role === UserType.PATIENT) {
+          setAuthToken(response?.memberToken);
         } else
           toast({
             title: "Token not created",
           });
       } catch (error) {
-        console.log(error);
       }
     };
     fetchRoom();
-  }, []);
+  }, [user]);
+  console.log(Room)
+
   useEffect(() => {
     const join = async () => {
       try {
         if (!AuthToken) return;
         const join = await hmsActions.join({
-          userName: user.fullName,
+          userName: user.FullName,
           authToken: AuthToken,
         });
       } catch (error) {
-        console.log(error);
       }
     };
     join();
@@ -77,7 +90,10 @@ const ConsultationPage = ({ role }: any) => {
       {/* Participant List */}
       <div className="w-full md:w-1/4">
         {/* <ParticipantList participants={participants} /> */}
-        <ChatBox />
+        {/* <ChatBox /> */}
+        <div>
+          <Chat includeSider={false} />
+        </div>
       </div>
     </div>
   );

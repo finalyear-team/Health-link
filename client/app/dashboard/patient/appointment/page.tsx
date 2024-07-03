@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,10 +11,35 @@ import useAppointmentStore from "@/store/appointmentStore";
 import { patientAppointments } from "@/public/data/patient-appointment";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AppointmentCard } from "@/components/appointment/appointment-card";
+import useAuth from "@/hooks/useAuth";
+import { useQuery } from "@apollo/client";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import Loading from "@/common/Loader/Loading";
+import { addHours, format, parseISO } from "date-fns";
+import formatScheduleTime from "@/utils/formatDate";
+import { date } from "yup";
+import { UserType } from "@/types/types";
 
 const Appointment = () => {
-  const upcomingAppointments = patientAppointments.upcomingAppointments;
-  const pastAppointments = patientAppointments.pastAppointments;
+  const { user, isLoaded, isSignedIn } = useAuth()
+  const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: {
+      userID: user?.UserID
+    }
+  })
+
+
+  if (loading)
+    return <Loading />
+
+
+  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments;
+  const pastAppointments = data?.UserAppointments?.pastAppointments;
+
+
+
+
+
   return (
     <div className="flex items-start flex-col space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -28,22 +54,28 @@ const Appointment = () => {
               <hr className="mt-2" />
             </CardHeader>
             <CardContent>
-              {upcomingAppointments.map((value) => (
-                <AppointmentCard
-                  key={value.id}
-                  id={value.id}
-                  doctorId={value.doctorId}
-                  appointmentDate={value.appointmentDate}
-                  appointmentTime={value.appointmentTime}
-                  doctorName={value.doctorName}
-                  doctorPhoto={value.doctorPhoto}
-                  purpose={value.purpose}
-                  status={value.status}
-                />
-              ))}
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illo
-              alias sed vero ipsum velit eaque voluptates saepe dolorum maiores
-              tenetur!
+              {upcomingAppointments?.length === 0 ? <div>
+                No upcoming appointments
+              </div> :
+                <>
+                  {upcomingAppointments?.map((value: any) => (
+                    <AppointmentCard
+                      key={value.AppointmentID}
+                      id={value.AppointmentID}
+                      doctorId={value.DoctorID}
+                      appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
+                      appointmentTime={formatScheduleTime(value.AppointmentTime)}
+                      doctorName={value.DoctorName}
+                      doctorPhoto={value.DoctorPhoto || ""}
+                      purpose={value.Note}
+                      status={value.Status}
+                      gender={value.DoctorGender}
+                      role={UserType.DOCTOR}
+                    />
+                  ))}
+                </>
+              }
+
             </CardContent>
           </Card>
         </div>
@@ -57,22 +89,29 @@ const Appointment = () => {
               <hr className="mt-2" />
             </CardHeader>
             <CardContent>
-              {pastAppointments.map((value) => (
-                <AppointmentCard
-                  key={value.id}
-                  id={value.id}
-                  doctorId={value.doctorId}
-                  appointmentDate={value.appointmentDate}
-                  appointmentTime={value.appointmentTime}
-                  doctorName={value.doctorName}
-                  doctorPhoto={value.doctorPhoto}
-                  purpose={value.purpose}
-                  status={value.status}
-                />
-              ))}
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illo
-              alias sed vero ipsum velit eaque voluptates saepe dolorum maiores
-              tenetur!
+              {pastAppointments?.length === 0 ? <div>
+                No past appointments
+              </div> :
+                <>
+                  {pastAppointments?.map((value: any) => (
+                    <AppointmentCard
+                      key={value.AppointmentID}
+                      id={value.AppointmentID}
+                      doctorId={value.DoctorID}
+                      appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
+                      appointmentTime={formatScheduleTime(value.AppointmentTime)}
+                      doctorName={value.DoctorName}
+                      doctorPhoto={value.DoctorPhoto || ""}
+                      purpose={value.Note}
+                      status={value.Status}
+                      gender={value.DoctorGender}
+                      role={UserType.DOCTOR}
+                    />
+                  ))}
+
+                </>
+              }
+
             </CardContent>
           </Card>
         </div>

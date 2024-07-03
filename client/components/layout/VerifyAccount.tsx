@@ -17,6 +17,8 @@ const VerifyAccount = ({ error }: { error: string }) => {
   const { onPressVerify, error: verifyError, completed } = useVerifyOTP();
   const codeInitial = { code: "" };
 
+
+
   return (
     <div className="verify_container ">
       <Image

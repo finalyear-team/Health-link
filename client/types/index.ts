@@ -26,6 +26,8 @@ export interface AppointmentType {
   doctorPhoto: string;
   purpose: string;
   status: string;
+  gender:Gender
+  role:UserType
 }
 
 

@@ -124,7 +124,7 @@ export class PaymentService {
             if (!doctor)
                 throw new HttpException("request faild unexpectedly", HttpStatus.INTERNAL_SERVER_ERROR)
 
-            const fee = doctor.DoctorDetails.ConsultationFee
+            const fee = doctor.ConsultationFee
 
             const amount = parseFloat(fee.toString()) * Duration
 

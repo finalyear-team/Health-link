@@ -155,6 +155,23 @@ enum BlogCategory {
   CancerAwarenessAndSupport
 }
 
+enum notificationStatus {
+  read
+  unread
+}
+
+enum notificationType {
+  newAppointment
+  cancelAppointment
+  acceptAppointment
+  newChat
+  newVideoCall
+  newPost
+  newForumQuestion
+  newForumAnswer
+  newComment
+}
+
 model Users {
   UserID                String              @id @default(uuid())
   Username              String
@@ -406,7 +423,7 @@ model DoctorReviews {
   ReviewID   String   @id @default(uuid())
   DoctorID   String
   ReviewerID String
-  Rating     Int?
+  Rating     Int?     @default(0)
   ReviewText String?  @db.LongText
   CreatedAt  DateTime @default(now())
   UpdatedAt  DateTime @updatedAt
@@ -640,12 +657,15 @@ model Followers {
 }
 
 model Notification {
-  NotificationID String   @id @default(uuid())
-  UserID         String
-  Message        String   @db.Text()
-  CreatedAt      DateTime @default(now())
-  UpdatedAt      DateTime @updatedAt
-  User           Users    @relation(fields: [UserID], references: [UserID])
+  NotificationID   String             @id @default(uuid())
+  UserID           String
+  Message          String             @db.Text()
+  CreatedAt        DateTime           @default(now())
+  ReadAt           DateTime?
+  Status           notificationStatus @default(unread)
+  NotificationType notificationType
+  UpdatedAt        DateTime           @updatedAt
+  User             Users              @relation(fields: [UserID], references: [UserID])
 }
 
 model Report {

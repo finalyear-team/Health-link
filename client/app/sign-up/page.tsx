@@ -16,7 +16,7 @@ const SignUp = () => {
     router.push(`/sign-up/${choice}`);
   };
   return (
-    <div className="bg-container">
+    <div className="bg-login-light dark:bg-login-dark bg-cover bg-center">
       <Header />
       <Container>
         <div className="custom-container font-main">

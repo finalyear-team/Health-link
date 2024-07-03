@@ -4,6 +4,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { DoctorDetailInput, UserDetailsInput } from './dto/create-user.input';
 import { DoctorDetails, Prisma, UserType, Users } from '@prisma/client';
 import { SuspendType } from 'src/utils/types';
+import { boolean, promise } from 'zod';
+import { AllowlistIdentifier } from '@clerk/clerk-sdk-node';
 
 
 @Injectable()
@@ -49,6 +51,24 @@ export class UserService {
     }
   }
 
+  async calculateAverageRating(DoctorID: string) {
+    console.log("aggregation")
+    try {
+      const averageRating = await this.prisma.doctorReviews.aggregate({
+        _avg: {
+          Rating: true
+        },
+        where: {
+          DoctorID
+        }
+      })
+      return averageRating._avg.Rating
+
+    } catch (error) {
+      throw error
+
+    }
+  }
 
   async RegisterUser(RegisterInput: UserDetailsInput) {
     try {
@@ -68,7 +88,6 @@ export class UserService {
 
 
   async DoctorRegister(DoctorRegisterInput: DoctorDetailInput) {
-    console.log(DoctorRegisterInput)
     const { UserDetails, ...others } = DoctorRegisterInput
     try {
       const { DoctorDetails, ...UsersDetail } = await this.prisma.users.create({
@@ -104,7 +123,7 @@ export class UserService {
           DoctorDetails: true
         }
       })
-      return Users
+      return Promise.all(Users.map((user) => ({ ...user, ...user?.DoctorDetails })));
     } catch (error) {
       throw new HttpException("faild to fetch users ", HttpStatus.INTERNAL_SERVER_ERROR)
     }
@@ -113,15 +132,18 @@ export class UserService {
 
   async getUserDetails(Id: string) {
     try {
-      const User = await this.prisma.users.findUnique({
+      const { DoctorDetails, ...userDetails } = await this.prisma.users.findUnique({
         where: {
           UserID: Id
         }, include: {
           DoctorDetails: true
         }
       })
-      return User
+      const followers = await this.countFollowersAndFollowing(userDetails.UserID)
+      const Rating = await this.calculateAverageRating(userDetails.UserID)
+      return { ...DoctorDetails, ...userDetails, ...followers, Rating }
     } catch (error) {
+      console.log(error)
       throw new HttpException("faild to fetch details ", HttpStatus.INTERNAL_SERVER_ERROR)
 
     } finally {
@@ -144,7 +166,7 @@ export class UserService {
 
   async searchUsers(searchQuery: string): Promise<Users[]> {
     try {
-      const Users = await this.prisma.users.findMany({
+      const users = await this.prisma.users.findMany({
         where: {
           OR: [
             { UserID: { contains: searchQuery } },
@@ -160,7 +182,16 @@ export class UserService {
           DoctorDetails: true
         }
       })
-      return Promise.all(Users.map((user) => ({ ...user.DoctorDetails, ...user })))
+      const followersData = await Promise.all(users.map(async (user) => this.countFollowersAndFollowing(user.UserID)));
+      const Ratings = await Promise.all(users.map(async (user) => this.calculateAverageRating(user.UserID)))
+
+      return users.map((user, i) => ({
+        ...user.DoctorDetails,
+        ...user,
+        ...followersData[i],
+        Rating: Ratings[i]
+
+      }));
     } catch (error) {
       throw error
     }
@@ -220,12 +251,27 @@ export class UserService {
         },
         include: {
           DoctorDetails: true,
+          DoctorReviews: true
         },
+        orderBy: [
+          {
+            DoctorDetails: {
+              ExperienceYears: 'desc',
+            },
+          },
+          {
+            DoctorDetails: {
+              ConsultationFee: 'asc',
+            },
+          },
+        ],
 
       })
 
       const Followers = await Promise.all(doctors.map(async (doctor) => this.countFollowersAndFollowing(doctor.UserID)))
-      return Promise.all(doctors.map((doctor, i) => ({ ...doctor.DoctorDetails, ...doctor, ...Followers[i] })))
+      const Ratings = await Promise.all(doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)))
+      console.log(Ratings)
+      return Promise.all(doctors.map((doctor, i) => ({ ...doctor.DoctorDetails, ...doctor, ...Followers[i], Rating: Ratings[i] })))
 
     } catch (error) {
       console.log(error)
@@ -273,36 +319,70 @@ export class UserService {
     }
   }
 
-  async searchDoctors(searchQuery: string): Promise<Users[]> {
+  async searchDoctors(searchQuery: string, sortingQuery: string, sortingOrder: string): Promise<Users[]> {
+
     try {
-      const Users = await this.prisma.users.findMany({
+      const whereClause = {
+        OR: [
+          {
+            OR: [
+              { FirstName: { contains: searchQuery } },
+              { Username: { contains: searchQuery } },
+              { LastName: { contains: searchQuery } },
+              { Address: { contains: searchQuery } },
+            ]
+          },
+          {
+            DoctorDetails: {
+              Speciality: { contains: searchQuery }
+            }
+          }
+        ]
+      }
+
+      const doctors = await this.prisma.users.findMany({
         where: {
           Role: "doctor",
-          OR: [
-            {
-              OR: [
-                { FirstName: { contains: searchQuery } },
-                { Username: { contains: searchQuery } },
-                { LastName: { contains: searchQuery } },
-                { Address: { contains: searchQuery } },
-              ]
-            },
-            {
-              DoctorDetails: {
-                Speciality: { contains: searchQuery }
-              }
-            }
-          ]
+          ...whereClause
         },
         include: {
-          DoctorDetails: true
-        }
+          DoctorDetails: true,
+          DoctorReviews: {
+            select: {
+              Rating: true
+            },
+          },
+        },
+        orderBy: [{
+          DoctorDetails: {
+            ExperienceYears: sortingQuery === 'ExperienceYears' ? sortingOrder as Prisma.SortOrder : undefined,
+            ConsultationFee: sortingQuery === 'ConsultationFee' ? sortingOrder as Prisma.SortOrder : undefined,
+          }
+        }, {
+          FollowersFollowing: {
+            _count: sortingQuery === 'Followers' ? sortingOrder as Prisma.SortOrder : "asc",
+          }
+        },
+        ].filter(Boolean)
       });
-      return Promise.all(Users.map((user) => ({ ...user, ...user?.DoctorDetails })));
+
+      const followersData = await Promise.all(doctors.map(async (user) => this.countFollowersAndFollowing(user.UserID)));
+      const Ratings = await Promise.all(doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)))
+
+      console.log(doctors)
+
+      return doctors.map((user, i) => ({
+        ...user.DoctorDetails,
+        ...user,
+        ...followersData[i],
+        Rating: Ratings[i],
+      }));
     } catch (error) {
+      console.log(error)
       throw new HttpException("faild to fetch doctors", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
+
 
 
 
