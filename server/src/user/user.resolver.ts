@@ -22,8 +22,6 @@ export class UserResolver {
   @Query("GetSignedInUser")
   async getProfile(@Context() context: { req: Request, res: Response, next: NextFunction }) {
     const requestUser = context.req.user as any
-    console.log(requestUser)
-
     const user = await this.userService.getUserDetails(requestUser.UserID)
 
     return user

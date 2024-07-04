@@ -289,15 +289,23 @@ export class AppointmentService {
 
   //
   async getAppointments(UserID: string) {
+    console.log(UserID)
     try {
       const upcomingAppointment = await this.prisma.appointments.findMany({
         where: {
-          OR: [
-            { Status: "pending" },
-            { Status: "booked" },
-            { DoctorID: UserID },
-            { PatientID: UserID }
-          ]
+          AND: [
+            {
+              OR: [
+                { Status: "pending" },
+                { Status: "booked" },
+              ]
+            }, {
+              OR: [
+                { DoctorID: UserID },
+                { PatientID: UserID }
+              ]
+            }
+          ],
         },
         include: {
           Doctor: true,
@@ -311,11 +319,21 @@ export class AppointmentService {
 
       const pastAppointment = await this.prisma.appointments.findMany({
         where: {
-          Status: "completed",
-          OR: [
-            { DoctorID: UserID },
-            { PatientID: UserID }
-          ]
+          AND: [{
+            OR: [{
+
+              Status: "completed",
+            }, {
+              Status: "overDue"
+            }]
+          }, {
+
+            OR: [
+              { DoctorID: UserID },
+              { PatientID: UserID }
+            ]
+
+          }]
         },
         include: {
           Doctor: true,

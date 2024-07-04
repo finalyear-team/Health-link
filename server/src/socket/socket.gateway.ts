@@ -50,18 +50,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (recipient) {
         console.log("recipient")
         console.log(appointment)
-
         const Message = `new appointment request by ${appointment.Patient.FirstName} ${appointment.Patient.LastName} for ${format(appointment.AppointmentDate, 'EEE MMM yyyy')}  at ${format(addHours(appointment.AppointmentTime, 1), "hh:mm a")}`
 
-        console.log(Message)
+        console.log(recipient)
+
 
         const notification = await this.notificationService.create({
           UserID: appointment.DoctorID,
           Message,
           NotificationType: notificationType.newAppointment
         })
-
-        console.log(notification)
 
         recipient.socket.emit('new-appointment', { appointment, Message })
       } else {

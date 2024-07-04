@@ -96,7 +96,6 @@ export class AuthController {
   async signup(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     this.removeAccessToken(res)
     const input = new SignUpDto(req.body)
-    console.log(input)
     const { user, access_token, refresh_token } = await this.authService.Register(input)
     res.json({ user, access_token, refresh_token })
   }
@@ -106,9 +105,6 @@ export class AuthController {
     const input = new DoctorDetailsInputs(req.body)
     console.log(input.EducationalBackground)
     const edu = input.EducationalBackground
-    const json = JSON.stringify(edu)
-    console.log(edu)
-    console.log(json)
     const user = await this.authService.DoctorDetailsRegister(input)
 
     res.status(201).json(user)
@@ -119,7 +115,6 @@ export class AuthController {
 
   @Post('signin')
   async signin(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    console.log(req.body)
     this.removeAccessToken(res);
     const { user, access_token, refresh_token } = await this.authService.Login(
       req.body,
