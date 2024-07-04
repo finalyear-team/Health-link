@@ -7,7 +7,7 @@ const TopDoctorSection = () => {
   const filteredUsers = users.slice(0, 6);
   return (
     <section className="w-full py-6">
-      <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold h-20 text-center px-3 text-primary-600 dark:text-primary-700 sticky top-12 bg-slate-800">
+      <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold h-20 text-center px-3 text-primary-600 dark:text-primary-700 sticky top-12 dark:bg-slate-800 bg-white">
         <Tags className="w-6 h-6 mr-2" /> Our Doctors
       </div>
       <div className="container px-4 md:px-6">
