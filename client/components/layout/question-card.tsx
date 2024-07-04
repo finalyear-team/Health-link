@@ -29,7 +29,7 @@ interface QuestionCardProps {
   description: string;
   tags: string[];
   author: string;
-  date: string;
+  date: Date;
 }
 
 const QuestionCard: FC<QuestionCardProps> = ({
@@ -59,30 +59,16 @@ const QuestionCard: FC<QuestionCardProps> = ({
         isVerified={true}
         username="johndoe"
         userType="Doctor"
+        postTime={date}
       />
-      <Link
-        href={`/dashboard/${Role}/forum/${id}`}
-        className="text-xl font-semibold text-primary-600 dark:text-primary-700"
-      >
+      <Link href={`/dashboard/${Role}/forum/${id}`} className="font-semibold ">
         {title}
       </Link>
       <p className="text-slate-700 dark:text-slate-50 mt-2">{description}</p>
-      <div className="flex flex-wrap mt-3">
-        {tags.map((tag, index) => (
-          <span
-            key={index}
-            className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+
       <div className="flex justify-between items-center mt-4 ">
-        <span className="text-xs text-slate-800 dark:text-slate-200">
-          Asked by {author}
-        </span>
         <span className="text-xs dark:text-slate-200 text-slate-800">
-          {date}
+          {date.toLocaleDateString()}
         </span>
       </div>
 
@@ -102,7 +88,7 @@ const QuestionCard: FC<QuestionCardProps> = ({
                   }`}
                   onClick={handleVoteUp}
                 >
-                  21 <ArrowBigUp className="w-5 h-5 ml-1" />
+                  21 <ArrowBigUp className="w-5 h-5 ml-1" /> UpVote
                 </Button>
               </TooltipTrigger>
               <TooltipContent>

@@ -18,6 +18,7 @@ import {
 import { CreditCard, Settings, User, Keyboard } from "lucide-react";
 
 import { MdOutlineSettings } from "react-icons/md";
+import Link from "next/link";
 
 const Appointment = () => {
   return (
@@ -36,7 +37,7 @@ const Appointment = () => {
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Account</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard className="mr-2 h-4 w-4" />

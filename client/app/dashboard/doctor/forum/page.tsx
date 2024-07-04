@@ -5,7 +5,7 @@ import QuestionCard from "@/components/layout/question-card";
 import PostForm from "@/components/form/feed/page";
 import ProfileHeader from "@/components/layout/profile-header";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, MessageCircleQuestion } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Formik, Form } from "formik";
 import WysiwygForm from "@/components/form/WYSWYG/WysiwygForm";
@@ -16,7 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { parse, format } from 'date-fns';
+
 
 const initialQuestions = [
   {
@@ -26,7 +29,7 @@ const initialQuestions = [
       "I am new to TypeScript and want to integrate it with my React project.",
     tags: ["React", "TypeScript", "JavaScript"],
     author: "John Doe",
-    date: "May 20, 2024",
+    date: new Date("May 20, 2024"),
   },
   {
     id: "2",
@@ -35,7 +38,7 @@ const initialQuestions = [
       "I am new to TypeScript and want to integrate it with my React project.",
     tags: ["React", "TypeScript", "JavaScript"],
     author: "John Doe",
-    date: "May 20, 2024",
+    date: new Date("May 20, 2024"),
   },
   // Add more questions here
 ];
@@ -55,6 +58,12 @@ const HomePage = () => {
   const [questions, setQuestions] = useState(initialQuestions);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].name);
 
+  const [editorContent, setEditorContent] = useState("");
+
+  const handleEditorContentChange = (content: string) => {
+    setEditorContent(content);
+  };
+
   const handlePostSubmit = (title: string, content: string, tags: string[]) => {
     const newQuestion = {
       id: (questions.length + 1).toString(),
@@ -62,7 +71,7 @@ const HomePage = () => {
       description: content,
       tags,
       author: "Current User",
-      date: new Date().toLocaleDateString(),
+      date: new Date(),
     };
     setQuestions([newQuestion, ...questions]);
   };
@@ -97,8 +106,22 @@ const HomePage = () => {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader>Ask a Question.</DialogHeader>
-              <WysiwygForm />
+              <DialogHeader>
+                <span className="flex items-center">
+                  <MessageCircleQuestion className="w-5 h-5 mr-2" /> Ask a
+                  Question.
+                </span>
+              </DialogHeader>
+              <WysiwygForm onContentChange={handleEditorContentChange} />
+              <Button
+                className="z-50"
+                disabled={!editorContent}
+                onClick={() => {
+                  console.log(editorContent);
+                }}
+              >
+                Add a Question
+              </Button>
             </DialogContent>
           </Dialog>
         </div>
