@@ -30,7 +30,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <div>
+      <div
+        className={`${
+          type === "checkbox" ? "flex flex-row items-center space-x-2" : ""
+        }`}
+      >
         {type === "checkbox" ? (
           <Field id={name} name={name} type={type} {...rest} />
         ) : null}

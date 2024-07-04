@@ -9,21 +9,28 @@ import { useQuery } from "@apollo/client";
 import { GET_SIGNEDIN_USER } from "@/graphql/queries/userQueries";
 import { refreshAccessToken } from "@/Services/authService";
 import useAuth from "@/hooks/useAuth";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 
 const Header = () => {
   // const { isSignedIn } = useUser();
-  const { user, isSignedIn } = useAuth()
+  const { user, isSignedIn } = useAuth();
 
-  console.log(user)
-  console.log(isSignedIn)
+  console.log(user);
+  console.log(isSignedIn);
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
-
 
   return (
     <nav className="header__custom">
@@ -59,7 +66,9 @@ const Header = () => {
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link href={""}>Find a Doctor</Link>
+                  <Link href={"/dashboard/patient/consultation"}>
+                    Find a Doctor
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href={""}>Services</Link>
@@ -85,7 +94,7 @@ const Header = () => {
           ) : (
             ""
           )}
-          <Link href={""} className="hover:underline">
+          <Link href={"/dashboard/patient/consultation"} className="hover:underline">
             Find a Doctor
           </Link>
           <Link href={""} className="hover:underline">

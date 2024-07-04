@@ -57,7 +57,7 @@
     "passport-local": "^1.0.0",
     "puppeteer": "^22.10.0",
     "react-hook-form": "^7.51.2",
-    "reflect-metadata": "^0.2.0",
+    "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
     "stream-chat": "^8.31.0",
