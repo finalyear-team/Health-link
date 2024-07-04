@@ -81,6 +81,7 @@ enum ScheduleType {
 
 enum AppointmentStatus {
   pending
+  overDue
   booked
   completed
   cancelled

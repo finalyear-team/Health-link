@@ -25,6 +25,8 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   targetTime,
   expire,
 }) => {
+
+
   // calculate the remaing time
   const calculateTimeLeft = (): TimeLeft => {
     const difference = +new Date(targetTime) - +new Date();

@@ -46,7 +46,6 @@ const Video = () => {
     setVideoCallInfo(appointmentId, doctorId, patientId, appointmentDate, appointmentTime);
     setShowVideoChat(true);
   };
-  console.log(appointmentId, doctorId, patientId)
 
 
   return (
