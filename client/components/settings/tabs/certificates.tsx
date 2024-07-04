@@ -1,102 +1,148 @@
-
-import { Button } from "@/components/ui/button";
-import { Plus, Trash2, FilePenLine } from "lucide-react";
+"use client";
+import { useState } from "react";
+import { Scroll } from "lucide-react";
+import { validateCertificateInputs } from "@/utils/validationSchema";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 import { TabsContent } from "@/components/ui/tabs";
-import Image from "next/image";
+import CertificateDialog from "../ui/CertificateDialog";
+import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@apollo/client";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import CertificateCard from "../ui/CertificateCard";
 
-const dummyData = [
-  {
-    id: 1,
-    title: "Certificate 1",
-    previewUrl: "/image/placeholders/certification-placeholder.png",
-  },
-  {
-    id: 2,
-    title: "Certificate 2",
-    previewUrl: "/image/placeholders/certification-placeholder.png",
-  },
-  {
-    id: 3,
-    title: "Certificate 3",
-    previewUrl: "/image/placeholders/certification-placeholder.png",
-  },
+interface Certificate {
+  id: string;
+  name: string;
+  previewUrl: string;
+  issueDate: Date;
+  description: string;
+}
+
+const dummyData: Certificate[] = [
+  // {
+  //   id: "1",
+  //   name: "Certificate of Achievement",
+  //   previewUrl: "/image/placeholders/certification-placeholder.png",
+  //   issueDate: new Date("2023-05-15"),
+  //   description: "Awarded for outstanding performance in academics.",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Professional Development Certificate",
+  //   previewUrl: "/image/placeholders/certification-placeholder.png",
+  //   issueDate: new Date("2022-09-20"),
+  //   description:
+  //     "Recognition of completion of a professional development course.",
+  // },
+  // {
+  //   id: "3",
+  //   name: "Leadership Excellence Certificate",
+  //   previewUrl: "/image/placeholders/certification-placeholder.png",
+  //   issueDate: new Date("2024-01-10"),
+  //   description:
+  //     "Acknowledgment of exceptional leadership skills demonstrated.",
+  // },
 ];
 
 const Certificates = ({ value }: { value: string }) => {
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const { toast } = useToast();
+  const [updateUser] = useMutation(UPDATE_USER);
+
+  const handleCertificateSubmit = async (values: any) => {
+    console.log(values, certificateFile);
+    // values.name, values.description,values.issueDate,value.imageURL
+    try {
+      const { data } = await updateUser({
+        variables: {
+          updateUserInput: {
+            // e
+          },
+        },
+      });
+      console.log("Updated user:", data);
+      // show toast
+      toast({
+        title: "Certificate Added",
+        variant: "success",
+        description: "Your Certificate has been added successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error updating the Certificate",
+        description: "Error updating the Certificate, Please try again!",
+        variant: "destructive",
+      });
+      console.error("Error updating user:", error);
+    }
+  };
+
+  const certInitialValues = {
+    name: certificateFile?.name.split(".").slice(0, -1).join(".") || "",
+    description: "",
+    issueDate: new Date(""),
+    certificateId: "",
+  };
+
   return (
     <TabsContent value={value}>
       <Card>
-        {/* <div className="p-6 md:p-8 lg:p-10"> */}
         <CardHeader>
           <div className="flex justify-between">
             <span className="text-primary-700 font-medium">Certificates</span>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Certificate
-            </Button>
+
+            <div className="flex items-center justify-between">
+              <CertificateDialog
+                type="create"
+                initialValues={certInitialValues}
+                onSubmit={handleCertificateSubmit}
+                certificateFile={certificateFile}
+                setCertificateFile={setCertificateFile}
+                validateCertificateInputs={validateCertificateInputs}
+              />
+            </div>
           </div>
           <hr />
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dummyData.map((certificate) => (
-              <CertificateCard
-                key={certificate.id}
-                title={certificate.title}
-                previewUrl={certificate.previewUrl}
-              />
-            ))}
-          </div>
+          {dummyData.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {dummyData.map((certificate) => (
+                <CertificateCard
+                  key={certificate.id}
+                  certificateId={certificate.id}
+                  name={certificate.name}
+                  previewUrl={certificate.previewUrl}
+                  issueDate={certificate.issueDate}
+                  description={certificate.description}
+                  validateCertificateInputs={validateCertificateInputs}
+                  onDelete={() => {
+                    toast({
+                      title: "Delete",
+                      description: "Coming Soon.",
+                      variant: "destructive",
+                    });
+                  }}
+                  onEdit={() => {}}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center w-full space-y-2">
+              <Scroll className="w-10 h-10 text-slate-500" />
+              <CardDescription>No Certificate.</CardDescription>
+            </div>
+          )}
         </CardContent>
-        {/* </div> */}
       </Card>
     </TabsContent>
   );
 };
 
 export default Certificates;
-
-function CertificateCard({ title, previewUrl, onDelete, onEdit }: any) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={onEdit}>
-            <FilePenLine className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            color="secondary-600"
-            onClick={onDelete}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4">
-          <Image
-            src={previewUrl}
-            alt="Certificate"
-            width={120}
-            height={160}
-            className="rounded-md"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

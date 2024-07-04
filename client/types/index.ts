@@ -26,10 +26,9 @@ export interface AppointmentType {
   doctorPhoto: string;
   purpose: string;
   status: string;
-  gender:Gender
-  role:UserType
+  gender: Gender
+  role: UserType
 }
-
 
 // updated user interface to be consistent with the backend user Data
 export interface UserRegister {
@@ -53,4 +52,27 @@ export interface UserRegister {
   institution: string;
   additionalInfo?: File | undefined;
   graduationYear: number;
+}
+
+export interface PopoverNotification {
+  NotificationID: string;
+  UserID: string;
+  Message: string;
+  CreatedAt: string;
+  UpdatedAt: string;
+  Link: string;
+  Type: NotificationType;
+  Status: "read" | "unread";
+}
+
+export enum NotificationType {
+  newAppointment,
+  cancelAppointment,
+  acceptAppointment,
+  newPost,
+  newForumQuestion,
+  newForumAnswer,
+  newChat,
+  newVideoCall,
+  newComment
 }

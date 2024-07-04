@@ -53,23 +53,16 @@ const MyPosts = ({ value }: { value: string }) => {
         </CardHeader>
         <CardContent className="flex space-x-2 ">
           {posts.map((post, index) => (
-            <Card
-              key={index}
-              className="max-w-sm my-4"
-            >
-              <CardHeader className="px-6 py-4">
-                <CardTitle className="text-xl font-bold">
-                  {post.title}
-                </CardTitle>
-                <CardDescription className="text-gray-500 text-sm">
-                  {post.author}
-                </CardDescription>
+            <Card key={index} className="max-w-sm my-4">
+              <CardHeader>
+                <CardTitle>{post.title}</CardTitle>
+                <CardDescription>{post.author}</CardDescription>
               </CardHeader>
-              <CardContent className="px-6 py-4">
-                <p className="text-gray-700">{post.description}</p>
+              <CardContent>
+                <p>{post.description}</p>
               </CardContent>
-              <CardFooter className="px-6 py-4">
-                <span className="text-gray-400 text-xs">{post.date}</span>
+              <CardFooter>
+                <span>{post.date}</span>
               </CardFooter>
             </Card>
           ))}

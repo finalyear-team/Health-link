@@ -40,7 +40,7 @@ const Header = () => {
       </div>
       <div className="db-header-right space-x-6 text-white">
         <ModeToggle />
-        <Appointment />
+
         <Notification />
         <Setting />
         <Profile />

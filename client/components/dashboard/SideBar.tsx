@@ -24,8 +24,14 @@ import useAuth from "@/hooks/useAuth";
 import { UserType } from "@/types/types";
 
 export const Sidebar = () => {
-  const [showText, setShowText] = useState(true);
-  const [sideBarOff, setSidebarOff] = useState(false);
+  const [showText, setShowText] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const storedShowText = localStorage.getItem("showText");
+      return storedShowText === "true";
+    }
+    // default usecase for the showText
+    return false;
+  });
 
   const pathname = usePathname();
   const [role, setRole] = useState("");
@@ -51,8 +57,6 @@ export const Sidebar = () => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
         setShowText(false);
-      } else {
-        setShowText(true);
       }
     };
 
@@ -68,9 +72,14 @@ export const Sidebar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Update localStorage whenever 'showText' state changes
+    localStorage.setItem("showText", showText.toString());
+  }, [showText]);
+
   return (
-    <div className="z-50 h-screen w-fit border border-stroke dark:border-slate-600 bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm z-">
-      <div className="p-4 relative">
+    <div className="z-50 h-screen w-fit border border-stroke dark:border-slate-600 bg-white dark:bg-slate-950 dark:text-slate-50 flex flex-col justify-between shadow-sm">
+      <div className="py-4 relative">
         <div className="absolute top-0 -right-9">
           <button
             className="w-10 h-10 text-white flex items-center justify-center"
@@ -89,7 +98,7 @@ export const Sidebar = () => {
             width={81}
             height={72}
             alt="Logo"
-            className="w-8 h-8 auto pb-2 border-b"
+            className="w-8 h-8 auto pb-2 mx-4 border-b"
           />
         </Link>
         <SideBarNavigation

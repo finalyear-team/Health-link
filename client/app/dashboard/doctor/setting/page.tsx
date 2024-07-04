@@ -1,9 +1,9 @@
-
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
+import Head from "next/head";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,7 +30,7 @@ import {
 import Certificates from "@/components/settings/tabs/certificates";
 import { Formik, Form, Field } from "formik";
 import Container from "@/components/container/container";
-import { Loader2 } from "lucide-react";
+import PageLoader from "@/common/Loader/PageLoader";
 import {
   Popover,
   PopoverContent,
@@ -76,6 +76,7 @@ export default function TabsDemo() {
   const lastName = user && user.LastName;
 
   const { toast } = useToast();
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
 
   // handle availabilty
   const handleAvailablity = async (value: any) => {
@@ -103,24 +104,43 @@ export default function TabsDemo() {
       });
   };
 
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth < 750) {
+        setIsSmallScreen(true);
+      } else {
+        setIsSmallScreen(false);
+      }
+    };
+
+    // Initial check
+    checkScreenSize();
+
+    // Add event listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Clean up event listener on component unmount
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   console.log(error?.message)
   if (!isLoaded) {
     return (
       <Container>
-        <Loader2 className="w-10 h-10" />
+        <PageLoader />
       </Container>
     );
   }
   return (
     <div>
-      <head>
+      <Head>
         <title>Setting | HealthLink</title>
-      </head>
+      </Head>
       {/* profile section */}
       <Card>
-        <div className="h-[200px] flex items-center space-x-3 p-3 rounded">
-          <div className="flex items-center ">
-            <div className="flex items-center space-x-4">
+        <div className=" flex items-center space-x-3 p-3 rounded">
+          <div className="flex items-center flex-wrap space-y-2 ">
+            <div className="flex items-center space-x-4 mr-4">
               <Image
                 src="/image/profile-picture.jpg"
                 width={128}
@@ -129,17 +149,22 @@ export default function TabsDemo() {
                 className="rounded-full border-2 border-secondary-700"
               />
               <div>
-                <h2 className="text-xl font-bold">
-                  <span>Dr. </span> {firstName} {lastName}
-                </h2>
-                <p className="text-slate-400">@alexisSan</p>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-200">
-                    Oncologist
+                <div className="relative text-xl font-bold">
+                  <span>
+                    Dr. {firstName} {lastName}
                   </span>
-                  <MdVerified size={20} className="text-secondary-600 ml-2" />
-                  <Badge>Doctor</Badge>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-slate-400">@alexisSan</span>{" "}
+                  <div className="flex items-center">
+                    <MdVerified size={20} className="text-secondary-600" />
+                    <Badge>Doctor</Badge>
+                  </div>
+                </div>
+
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-200">
+                  Oncologist
+                </span>
                 <div className="flex items-center space-x-2">
                   <Rating value={4.5} />
                 </div>
@@ -147,7 +172,7 @@ export default function TabsDemo() {
                   <span className="mr-3">Monday to Friday: 10 AM - 11 PM</span>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost">
+                      <Button variant="ghost" className="mr-3">
                         <Settings2 className="w-4 h-4 cursor-pointer" />
                       </Button>
                     </PopoverTrigger>
@@ -272,9 +297,9 @@ export default function TabsDemo() {
                                   />
                                 </div>
                                 <hr className="border dark:border-slate-500" />
-                                {error ? (
+                                {!isValid ? (
                                   <span className="text-xs text-red-600 dark:text-red-700">
-                                    {error?.message}
+                                    Incorrect format, try again
                                   </span>
                                 ) : null}
                                 <Button
@@ -342,27 +367,31 @@ export default function TabsDemo() {
         </div>
       </Card>
       <Tabs defaultValue="account" className="relative mt-2">
-        <TabsList className="sticky -top-2 bg-white dark:bg-slate-800 grid w-full grid-cols-7">
+        <TabsList className="sticky -top-2 z-10 bg-white dark:bg-slate-800 w-full grid grid-cols-5">
           <TabsTrigger value="account">
-            <User className="w-4 h-4 mr-2" /> Account
-          </TabsTrigger>
-          <TabsTrigger value="certificates">
-            <Award className="w-4 h-4 mr-2" /> Certificates
+            <User className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Account"}
           </TabsTrigger>
           <TabsTrigger value="loginAndSecurity">
-            <KeyRound className="w-4 h-4 mr-2" /> Password
+            <KeyRound className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Password"}
           </TabsTrigger>
+          <TabsTrigger value="certificates">
+            <Award className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Certificates"}
+          </TabsTrigger>
+
           <TabsTrigger value="Network">
-            <Users className="w-4 h-4 mr-2" /> Network
+            <Users className="w-4 h-4 mr-2" />{" "}
+            {isSmallScreen ? null : "Network"}
           </TabsTrigger>
           <TabsTrigger value="myPosts">
-            <Rss className="w-4 h-4 mr-2" /> my Posts
+            <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
           </TabsTrigger>
         </TabsList>
-        <Account value="account" />
-        <Certificates value="certificates" />
+        {/* <Account value="account" isPatient={false} /> */}
         <LoginAndSecurity value="loginAndSecurity" />
-        <Network value="Network" />
+        <Certificates value="certificates" />
+        <Network value="Network" isPatient={false} />
         <MyPosts value="myPosts" />
       </Tabs>
     </div>

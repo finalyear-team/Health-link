@@ -9,8 +9,8 @@
   font-family: "Poppins";
 }
 
-body{
-  @apply bg-white dark:bg-slate-800
+body {
+  @apply bg-white dark:bg-slate-800;
 }
 
 .glow {
@@ -78,7 +78,7 @@ body{
 }
 
 .input__error {
-  @apply text-red-500 font-main text-xs mt-1 flex flex-wrap;
+  @apply text-red-500 font-main text-xs mt-1 flex flex-wrap w-[250px];
 }
 
 .main_container {
@@ -86,7 +86,7 @@ body{
 }
 
 .custom-container {
-  @apply  bg-white border border-solid shadow-sm border-stroke dark:border-gray-700 dark:bg-slate-800 dark:text-slate-50 py-6 px-4 rounded-lg space-y-4 font-main backdrop-blur-sm;
+  @apply bg-white border border-solid shadow-sm border-stroke dark:border-gray-700 dark:bg-slate-800 dark:text-slate-50 py-6 px-4 rounded-lg space-y-4 font-main backdrop-blur-sm;
 }
 
 .header__custom {
@@ -146,7 +146,7 @@ body{
 }
 
 .auto {
-  @apply h-auto w-auto ;
+  @apply h-auto w-auto;
 }
 
 .space_buttons {
@@ -165,7 +165,6 @@ body{
   background-size: cover;
   background-position: center;
 }
-
 
 .db-header-left {
   flex: 1;
@@ -192,10 +191,53 @@ body{
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, and Opera */
+}
+
+.custome-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custome-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #6b7280; /* Change color as needed */
+  border-radius: 10px;
+}
+
+.custome-scrollbar::-webkit-scrollbar-track {
+  background-color: #e5e7eb; /* Change color as needed */
+  border-radius: 10px;
+}
+
+/* Hide scrollbar arrows */
+.custome-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.ql-editor {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ql-toolbar {
+  @apply bg-slate-100 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 dark:text-slate-500 text-slate-900 rounded;
+}
+
+.ql-container {
+  @apply border-slate-400 dark:border-slate-600;
+}
+
+.ql-snow .ql-stroke {
+  @apply stroke-slate-700 dark:stroke-slate-200;
+}
+
+.ql-snow .ql-fill {
+  @apply fill-slate-700 dark:fill-slate-200;
 }

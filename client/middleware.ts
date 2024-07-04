@@ -4,8 +4,8 @@ import { clerkClient } from "@clerk/nextjs/server";
 
 
 
-export default function middleware(req:NextRequest) {
-    
+export default function middleware(req: NextRequest) {
+
 
 
 }

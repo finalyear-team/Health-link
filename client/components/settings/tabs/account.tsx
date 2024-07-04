@@ -1,75 +1,104 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Formik, Form } from "formik";
-import {
-  validatePersEditInfo,
-  validateContEditInfo,
-} from "@/utils/validationSchema";
+import { TabsContent } from "@/components/ui/tabs";
+import { Formik, Form, Field } from "formik";
+
 import { Loader2 } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
-import { useToast } from "@/components/ui/use-toast";
-import SpecializationPopover from "@/components/form/popOver/SpecializationPopover";
-import EducationPopover from "@/components/form/popOver/EducationPopover";
-import useAuth from "@/hooks/useAuth";
+import { EmailAddressResource } from "@clerk/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { codeValidation } from "@/utils/validationSchema";
+import { DialogClose } from "@radix-ui/react-dialog";
+import PersonalInfoUpdate from "../ui/PersonalInfoUpdate";
+import ContactInfoUpdate from "../ui/ContactInfoUpdate";
+import ProffessionalInfoUpdate from "../ui/ProffessionalInfoUpdate";
+import { useUser, useClerk } from "@clerk/nextjs";
 
-const Account = ({ value }: { value: string }) => {
-  // const { user } = useUser();
-  const { user } = useAuth()
-  const { toast } = useToast();
-  const [specializationValue, setSpecializationValue] = useState("");
-  const [educationValue, setEducationValue] = useState("");
+const Account = ({
+  value,
+  isPatient,
+}: {
+  value: string;
+  isPatient: boolean;
+}) => {
+  // ========== for updating email ==========
+  // const [code, setCode] = React.useState("");
+  const [isVerifying, setIsVerifying] = React.useState(false);
+  const [successful, setSuccessful] = React.useState(false);
+  const { user } = useUser();
+  const clerk = useClerk();
+  const [emailObj, setEmailObj] = React.useState<
+    EmailAddressResource | undefined
+  >();
+  const codeInitial = { code: "" };
+  // =======================================
 
-  // const personalInitialValues = {
-  //   firstName: user?.firstName,
-  //   lastName: user?.lastName,
-  //   userName: "alexo",
-  // };
-  const personalInitialValues = {
-    firstName: user?.FirstName,
-    lastName: user?.LastName,
-    userName: user?.Username,
-  };
+  // Handle the submission of the verification form
+  const verifyCode = async (values: any, { setSubmitting }: any) => {
+    const code = values.code;
+    console.log(values.code);
+    console.log(code);
+    // try {
+    //   // Verify that the code entered matches the code sent to the user
+    //   const emailVerifyAttempt = await emailObj?.attemptVerification({ code });
 
-  const ContactInitialValues = {
-    email: user?.Email,
-    phone: user?.PhoneNumber,
-    address: "A.A",
-  };
+    //   if (emailVerifyAttempt?.verification.status === "verified") {
+    //     setSuccessful(true);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-      event.preventDefault();
-    }
-  };
-
-  const handlePersonalSubmit = async (values: any, { setSubmitting }: any) => {
-    await user?.update({
-      firstName: "John",
-      lastName: "Doe",
-    });
-    // show toast
-    toast({
-      title: "Information Updated",
-      variant: "success",
-      description: "Your information has been updated successfully",
-    });
+    //     // remove the fist email linked to the account
+    //     // if (firstEmail) {
+    //     //   firstEmail.destroy();
+    //     // }
+    //     toast({
+    //       title: "Contact Information Updated",
+    //       variant: "success",
+    //       description: "Your Contact information has been updated successfully",
+    //     });
+    //   } else {
+    //     console.error(JSON.stringify(emailVerifyAttempt, null, 2));
+    //   }
+    // } catch (err) {
+    //   console.error(JSON.stringify(err, null, 2));
+    // }
     setSubmitting(false);
   };
-  const handleContactSubmit = (values: any) => { };
+
+  const handleCancelUpdate = async () => {
+    // if (!user) return;
+
+    // // Find the unverified email address
+    // const unverifiedEmail = user.emailAddresses.find(
+    //   (email: EmailAddress) => email.verification.status !== "verified"
+    // );
+
+    // if (unverifiedEmail) {
+    //   try {
+    //     // Remove the unverified email address
+    //     await clerk.deleteEmailAddress(unverifiedEmail.id);
+    //     // Reload user to get updated User object
+    //     await user.reload();
+    //   } catch (err) {
+    //     console.error(JSON.stringify(err, null, 2));
+    //   }
+    // }
+    setIsVerifying(false);
+  };
+
   return (
     <TabsContent value={value}>
       <Card>
@@ -80,203 +109,103 @@ const Account = ({ value }: { value: string }) => {
           </span>
           <hr />
         </CardHeader>
-        <CardContent className="">
-          <Formik
-            initialValues={personalInitialValues}
-            onSubmit={handlePersonalSubmit}
-            validationSchema={validatePersEditInfo}
-          >
-            {({ isValid, isSubmitting }) => (
-              <Form className="space-y-6" action="#" method="POST">
-                <div className="flex items-center space-x-5">
-                  <Input label="First Name" name="firstName" type="text" />
-                  <Input label="Last Name" name="lastName" type="text" />
-                  <Input label="User Name" name="userName" type="text" />
-                </div>
 
-                <div>
-                  <Button disabled={!isValid} type="submit">
-                    {isSubmitting ? (
-                      <div>
-                        <Button disabled={!isValid} type="submit">
-                          {isSubmitting ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            ""
-                          )}{" "}
-                          Save info
-                        </Button>
-                      </div>
-                    ) : (
-                      "Save info"
-                    )}
-                  </Button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </CardContent>
+        <PersonalInfoUpdate />
         <CardHeader>
           <span className="text-primary-700 font-medium">
             Contact Information
           </span>
           <hr />
         </CardHeader>
-        <CardContent className="space-y-2">
-          <Formik
-            initialValues={ContactInitialValues}
-            onSubmit={handleContactSubmit}
-            validationSchema={validateContEditInfo}
-          >
-            {({ isValid, isSubmitting }) => (
-              <Form className="space-y-6" action="#" method="POST">
-                <div className="flex items-center space-x-5">
-                  <Input label="Email" name="email" type="email" />
-                  <Input
-                    label="Phone Number"
-                    name="phoneNumber"
-                    type="number"
-                  />
-                  <Input label="Address" name="phone" type="text" />
-                </div>
-                <div>
-                  <Button disabled={!isValid} type="submit">
-                    {isSubmitting ? (
-                      <div>
-                        <Button disabled={!isValid} type="submit">
-                          {isSubmitting ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            ""
-                          )}{" "}
-                          Save info
-                        </Button>
-                      </div>
-                    ) : (
-                      "Save info"
-                    )}
-                  </Button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </CardContent>
 
-        <CardHeader>
-          <span className="text-primary-700 font-medium">
-            Professional Information
-          </span>
-          <hr />
-        </CardHeader>
-        <CardContent className="space-y-2">
+        <ContactInfoUpdate
+          setIsVerifying={setIsVerifying}
+          setEmailObj={setEmailObj}
+        />
+        {/* for accepting the OTP code sent to the email */}
+        {isVerifying && !successful ? (
           <Formik
-            initialValues={ContactInitialValues}
-            onSubmit={handleContactSubmit}
-            validationSchema={validateContEditInfo}
+            initialValues={codeInitial}
+            onSubmit={verifyCode}
+            validationSchema={codeValidation}
           >
             {({ isValid, isSubmitting }) => (
-              <Form className="space-y-6" action="#" method="POST">
-                <div>
-                  {/* institution */}
-                  <div className="mt-3">
-                    <Input
-                      name="institution"
-                      type="text"
-                      placeholder="Academic Institution"
-                      label="Academic Institution"
-                      className="max-w-xs"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-5">
-                    {/* Educational qualification/Degree */}
-                    <div className="mt-3 flex items-start flex-col">
-                      <label className="text-sm font-medium">
-                        Education Qualification
-                      </label>
-                      <EducationPopover
-                        educationValue={educationValue}
-                        setEducationValue={setEducationValue}
-                      />
-                    </div>
-                    {/* specialization form */}
-                    <div className="mt-3 flex items-start flex-col">
-                      <label className="text-sm font-medium">
-                        Specialization
-                      </label>
-                      <SpecializationPopover
-                        specializationValue={specializationValue}
-                        setSpecializationValue={setSpecializationValue}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-5">
-                    {/*  Graduation Year */}
-                    <div className="mt-3">
-                      <Input
-                        name="graduationYear"
-                        type="number"
-                        onKeyDown={handleKeyDown}
-                        placeholder="Graduation Year"
-                        label="Graduation year"
-                      />
-                    </div>
-                    {/* license */}
-                    <div className="mt-3">
-                      <Input
-                        name="license"
-                        type="number"
-                        onKeyDown={handleKeyDown}
-                        placeholder="License Number"
-                        label="License Number"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-5">
-                    {/* experiance */}
-                    <div className="mt-3">
-                      <Input
-                        name="experiance"
-                        type="number"
-                        onKeyDown={handleKeyDown}
-                        placeholder="Experiance Year"
-                        label="Experiance Year"
-                      />
-                    </div>
-                    {/* consultation fee */}
-                    <div className="mt-3">
-                      <Input
-                        name="consultationFee"
-                        type="number"
-                        onKeyDown={handleKeyDown}
-                        placeholder="Charge(per Hour)"
-                        label="Consultation Charge"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <Button disabled={!isValid} type="submit">
-                    {isSubmitting ? (
-                      <div>
-                        <Button disabled={!isValid} type="submit">
+              <Form action="#" method="POST">
+                <Dialog defaultOpen>
+                  <DialogContent className="sm:max-w-[400px]">
+                    <DialogHeader>
+                      <DialogTitle>Verify Your Email</DialogTitle>
+                      <DialogDescription>
+                        We&apos;ve sent a verification code to your new email
+                        address. Please enter the code below to confirm your
+                        identity.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <Field name="code">
+                        {({ field, form }: any) => (
+                          <InputOTP
+                            {...field}
+                            maxLength={6}
+                            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                            onChange={(value) =>
+                              form.setFieldValue(field.name, value)
+                            }
+                          >
+                            <InputOTPGroup>
+                              {[...Array(6)].map((_, index) => (
+                                <InputOTPSlot key={index} index={index} />
+                              ))}
+                            </InputOTPGroup>
+                          </InputOTP>
+                        )}
+                      </Field>
+                      <div className="flex justify-end gap-2">
+                        {/* <DialogClose asChild> */}
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          // type="button"
+                          onClick={handleCancelUpdate}
+                        >
+                          Cancel
+                        </Button>
+                        {/* </DialogClose> */}
+                        <Button
+                          className="w-full sm:w-auto"
+                          disabled={!isValid}
+                          type="submit"
+                        >
                           {isSubmitting ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                             ""
-                          )}{" "}
-                          Save info
+                          )}
+                          Verify
                         </Button>
                       </div>
-                    ) : (
-                      "Save info"
-                    )}
-                  </Button>
-                </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </Form>
             )}
           </Formik>
-        </CardContent>
-        <CardFooter>{/* <Button>Save changes</Button> */}</CardFooter>
+        ) : (
+          ""
+        )}
+
+        {!isPatient ? (
+          <div>
+            {" "}
+            <CardHeader>
+              <span className="text-primary-700 font-medium">
+                Professional Information
+              </span>
+              <hr />
+            </CardHeader>
+            <ProffessionalInfoUpdate />
+          </div>
+        ) : null}
       </Card>
     </TabsContent>
   );
