@@ -62,7 +62,7 @@ const Certificates = ({ value }: { value: string }) => {
       const { data } = await updateUser({
         variables: {
           updateUserInput: {
-            // e
+            //
           },
         },
       });

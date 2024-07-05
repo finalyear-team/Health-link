@@ -16,13 +16,16 @@ import SpecializationPopover from "../popOver/SpecializationPopover";
 import { Loader2 } from "lucide-react";
 import { formatBytes, validateFiles } from "@/utils/fileinputValidator";
 import CertificateFileList from "@/components/shared/CertificateFileList";
+import CertificateDialog from "@/components/settings/ui/CertificateDialog";
+import { validateCertificateInputs } from "@/utils/validationSchema";
+import { Label } from "@/components/ui/label";
 
 const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
   const [specializationValue, setSpecializationValue] = useState("");
   const [educationValue, setEducationValue] = useState("");
-  const [fileErrors, setFileErrors] = useState<string | null>(null)
-
-
+  const [fileErrors, setFileErrors] = useState<string | null>(null);
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const [isDialogOpen, setDialogOpen] = useState(true);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -30,23 +33,64 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
-  const [selectedFiles, setSelectedFiles] = useState<File[] | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[] | null>(null);
+
+  let certInitialValues = {
+    name: certificateFile?.name.split(".").slice(0, -1).join(".") || "",
+    description: "",
+    issueDate: new Date(""),
+    certificateId: "",
+  };
 
   const handleCertificateRemove = (removedFile: File) => {
-    const remainingFiles = selectedFiles?.filter((file) => removedFile.name != file.name && removedFile.size != file.size)
-    setSelectedFiles(remainingFiles || null)
-  }
+    const remainingFiles = selectedFiles?.filter(
+      (file) => removedFile.name != file.name && removedFile.size != file.size
+    );
+    setSelectedFiles(remainingFiles || null);
+    certInitialValues = {
+      name: "",
+      description: "",
+      issueDate: new Date(""),
+      certificateId: "",
+    };
+    setCertificateFile(null);
+  };
 
-  const handleCertificateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault()
-    console.log("upload certificate")
-    const file = event.target?.files?.[0]
-    const currentFiles = event.target.files && Array.from(event.target.files)
+  const handleCertificateChange = (values: any) => {
+    console.log("upload certificate");
+    console.log("This is the original values: ", certificateFile); //this is the file's original values
+    console.log("This is the values from the input: ", values.type); // this is my custome values from the inputs
+    const file = certificateFile;
+    // const currentFiles = event.target.files && Array.from(event.target.files);
 
-    const validFiles = validateFiles(selectedFiles, file, setSelectedFiles, setFileErrors)
+    // Check if file is not null
+    if (file !== null) {
+      const { name, certificateId, issueDate, description } = values;
+      const type = file.type;
+      const size = file.size;
+      const updatedCertificate = {
+        ...file,
+        name,
+        certificateId,
+        issueDate,
+        description,
+        type,
+        size,
+      };
 
+      console.log("This is updated values :", updatedCertificate);
 
-  }
+      const validFiles = validateFiles(
+        selectedFiles,
+        updatedCertificate,
+        setSelectedFiles,
+        setFileErrors
+      );
+
+      // Close the modal after submitting
+      setDialogOpen(false);
+    }
+  };
 
   const [storedValues, setStoredValues] = useLocalStorage("professionalInfo", {
     consultationFee: "",
@@ -68,7 +112,6 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
     completed,
   } = useSubmit(setStoredValues, "provider", selectedFiles);
 
-
   return (
     <Container>
       {!pendingVerification && (
@@ -82,7 +125,11 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
               Professional Information (3/3)
             </h2>
             <Formik
-              initialValues={{ ...storedValues, specialization: specializationValue, education: educationValue }}
+              initialValues={{
+                ...storedValues,
+                specialization: specializationValue,
+                education: educationValue,
+              }}
               onSubmit={handleSubmit}
               validationSchema={validationSchemaAddInfo}
               enableReinitialize
@@ -130,7 +177,6 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       onKeyDown={handleKeyDown}
                       placeholder="Graduation Year"
                       label="Enter your Graduation year"
-
                     />
                   </div>
                   {/* license */}
@@ -161,11 +207,10 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       onKeyDown={handleKeyDown}
                       placeholder="Enter Charge(per Hour)"
                       label="Consultation Charge"
-
                     />
                   </div>
                   {/* Additional Certification */}
-                  <div className="mt-3 ">
+                  {/* <div className="mt-3 ">
                     <Input
                       name="additionalInfo"
                       type="file"
@@ -174,18 +219,43 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                       label="Drop any Certification"
                       optional={true}
                       onChange={handleCertificateChange}
-
                     />
-                    {fileErrors && <p className="text-red-600 text-sm">
-                      {fileErrors}
+                    {fileErrors && (
+                      <p className="text-red-600 text-sm">{fileErrors}</p>
+                    )}
+                    {selectedFiles && selectedFiles.length > 0 && (
+                      <CertificateFileList
+                        SelectedFiles={selectedFiles}
+                        handleFileRemove={handleCertificateRemove}
+                        formatBytes={formatBytes}
+                      />
+                    )}
+                  </div> */}
 
-                    </p>}
-                    {selectedFiles && selectedFiles.length > 0 && <CertificateFileList SelectedFiles={selectedFiles} handleFileRemove={handleCertificateRemove} formatBytes={formatBytes} />}
-
-
-
-
+                  <div className="flex flex-col">
+                    <Label className="mb-2">Add Certificate (optional)</Label>
+                    <CertificateDialog
+                      type="create"
+                      initialValues={certInitialValues}
+                      onSubmit={handleCertificateChange}
+                      certificateFile={certificateFile}
+                      setCertificateFile={setCertificateFile}
+                      formatBytes={formatBytes}
+                      validateCertificateInputs={validateCertificateInputs}
+                      open={true}
+                    />
+                    {fileErrors && (
+                      <p className="text-red-600 text-sm">{fileErrors}</p>
+                    )}
+                    {selectedFiles && selectedFiles.length > 0 && (
+                      <CertificateFileList
+                        SelectedFiles={selectedFiles}
+                        handleFileRemove={handleCertificateRemove}
+                        formatBytes={formatBytes}
+                      />
+                    )}
                   </div>
+
                   <div className="mt-3">
                     <Input
                       name="agreedToTerms"
@@ -215,7 +285,6 @@ const SpecializationForm = ({ onBack }: { onBack: () => void }) => {
                           !specializationValue ||
                           !educationValue ||
                           completed
-
                         }
                         type="submit"
                       >
