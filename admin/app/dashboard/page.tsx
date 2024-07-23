@@ -44,16 +44,19 @@ import {
   Flag,
   Menu,
   MessageCircle,
+  Router,
   Search,
   Settings,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Component() {
+  const router = useRouter();
   return (
     <div className="flex min-h-screen flex-col bg-muted/40">
       <header className="sticky top-0 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 my-2">
-       <h1 className="text-xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold">Admin Dashboard</h1>
         <div className="relative ml-auto flex-1 md:grow-0">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input2
@@ -130,7 +133,7 @@ export default function Component() {
               </CardTitle>
               <FileText className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-x-scroll">
               <BarchartChart className="w-full aspect-[4/3]" />
             </CardContent>
           </Card>
@@ -167,9 +170,30 @@ export default function Component() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
-                <Button variant="outline">View Users</Button>
-                <Button variant="outline">Approve Registrations</Button>
-                <Button variant="outline">Suspend Accounts</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/users");
+                  }}
+                >
+                  View Users
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/users");
+                  }}
+                >
+                  Approve Registrations
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/users");
+                  }}
+                >
+                  Suspend Accounts
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -182,9 +206,30 @@ export default function Component() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
-                <Button variant="outline">Review Posts</Button>
-                <Button variant="outline">Manage Comments</Button>
-                <Button variant="outline">Resolve Reports</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/reports");
+                  }}
+                >
+                  Review Posts
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/reports");
+                  }}
+                >
+                  Manage Comments
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/reports");
+                  }}
+                >
+                  Resolve Reports
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -197,9 +242,30 @@ export default function Component() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
-                <Button variant="outline">View Appointments</Button>
-                <Button variant="outline">Schedule New</Button>
-                <Button variant="outline">Manage Availability</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/appointments");
+                  }}
+                >
+                  View Appointments
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/appointments");
+                  }}
+                >
+                  Schedule New
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push("/dashboard/appointments");
+                  }}
+                >
+                  Manage Availability
+                </Button>
               </div>
             </CardContent>
           </Card>

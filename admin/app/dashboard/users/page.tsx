@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import UserTable from "@/components/shared/UserTable";
-import { GET_USER } from "@/graphql/queries/userQueries";
+import { GET_USER, GET_USERS } from "@/graphql/queries/userQueries";
 import { User } from "@/types";
 import { DELETE_USER, REGISTER_USER } from "@/graphql/mutations/userMutations";
 import Loading from "@/common/Loader/Loading";
@@ -14,31 +14,6 @@ import { Plus } from "lucide-react";
 import AddUserModal from "@/components/shared/AddUserModal";
 
 const UserTableContainer: React.FC = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(5);
-
-  const { loading, error, data, refetch } = useQuery(GET_USER, {
-    variables: { page },
-  });
-
-  const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: () => refetch(),
-  });
-
-  const handleDeleteUser = (userId: string) => {
-    deleteUser({ variables: { id: userId } });
-  };
-
-  if (loading)
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <PageLoader />
-      </div>
-    );
-  if (error) return <p>Error: {error.message}</p>;
-
-  const users: User[] = data.users.data;
-  const totalPages = Math.ceil(data.users.meta.totalCount / 5);
 
   return (
     <div>
@@ -47,12 +22,12 @@ const UserTableContainer: React.FC = () => {
         <AddUserModal />
       </div>
 
-      <UserTable users={users} />
-      <Pagination
+      <UserTable />
+      {/* <Pagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
-      />
+      /> */}
     </div>
   );
 };

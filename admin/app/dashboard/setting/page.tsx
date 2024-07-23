@@ -16,6 +16,8 @@ import { Camera } from "lucide-react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/lib/firebaseConfig";
 import Loading from "@/common/Loader/Loading";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import { useMutation } from "@apollo/client";
 
 export default function TabsDemo() {
   // const { user, isLoaded } = useUser();
@@ -24,6 +26,7 @@ export default function TabsDemo() {
   const [image, setImage] = useState("https://via.placeholder.com/150");
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [updateUser] = useMutation(UPDATE_USER);
 
   const firstName = "Abebe";
   const lastName = "Kebede";
@@ -55,13 +58,29 @@ export default function TabsDemo() {
             // Handle successful uploads on complete
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setImage(downloadURL);
+
               setUploading(false);
               console.log("File available at", downloadURL);
-              toast({
-                title: "Success",
-                description: "Profile image updated successfully",
-                // variant: "success",
-              });
+              try {
+                updateUser({
+                  variables: {
+                    updateUserInput: {
+                      // UserID: userID,
+                      ProfilePicture: downloadURL,
+                    },
+                  },
+                });
+                toast({
+                  title: "Success",
+                  description: "Profile image updated successfully",
+                });
+              } catch (error) {
+                console.error("Error updating profile picture:", error);
+                toast({
+                  title: "Failed",
+                  description: "Failed to update profile picture, try again!",
+                });
+              }
             });
           }
         );

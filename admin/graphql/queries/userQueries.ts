@@ -25,30 +25,25 @@ export const GET_USER_BY_EMAIL = gql`
   }
 `;
 
-// export const GET_USER = gql`
-//   query GetUser($id: String!) {
-//     GetUser(id: $id) {
-//       UserID
-//       FirstName
-//       LastName
-//     }
-//   }
-// `;
-
 export const GET_USER = gql`
-  query GetUsers($page: Int!) {
-    users(options: { paginate: { page: $page, limit: 5} }) {
-      data {
-        id
-        name
-        email
-        username
-        phone
-        website
-      }
-      meta {
-        totalCount
-      }
+  query GetUser($id: String!) {
+    GetUser(id: $id) {
+      UserID
+      FirstName
+      LastName
+    }
+  }
+`;
+
+export const GET_USERS = gql`
+  query GetAllUsers {
+    GetUsers {
+      UserID
+      FirstName
+      LastName
+      Username
+      Email
+      Role
     }
   }
 `;

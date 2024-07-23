@@ -46,30 +46,43 @@ const AddUserModal = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [department, setDepartment] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    setShowConfirmation(true);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setDateOfBirth("");
-    setGender("");
-    setInsuranceNumber("");
-    setMedicalLicense("");
-    setSpecialty("");
-    setYearsOfExperience("");
-    setEmployeeId("");
-    setDepartment("");
+  const [specializationValue, setSpecializationValue] = useState("");
+  const [educationValue, setEducationValue] = useState("");
+  const handleSubmit = (values: any) => {
+    console.log(values);
+    // setShowConfirmation(true);
+    // setFirstName("");
+    // setLastName("");
+    // setEmail("");
+    // setPassword("");
+    // setConfirmPassword("");
+    // setDateOfBirth("");
+    // setGender("");
+    // setInsuranceNumber("");
+    // setMedicalLicense("");
+    // setSpecialty("");
+    // setYearsOfExperience("");
+    // setEmployeeId("");
+    // setDepartment("");
   };
   const initialValues = {
+    userType,
     firstName: "",
     lastName: "",
-    userName: "",
-    DOB: "",
-    gender: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    dateOfBirth: "",
+    gender,
+    insuranceNumber: "",
+    medicalLicense: "",
+    specialty: specializationValue,
+    educationLevel: educationValue,
+    yearsOfExperience: "",
+    employeeId: "",
+    department: "",
   };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -164,8 +177,8 @@ const AddUserModal = () => {
                       <DropdownMenuRadioItem value="doctor">
                         Doctor
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="moderator">
-                        Moderator
+                      <DropdownMenuRadioItem value="admin">
+                        Admin
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
@@ -228,10 +241,16 @@ const AddUserModal = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <SpecializationPopover />
+                      <SpecializationPopover
+                        specializationValue={specializationValue}
+                        setSpecializationValue={setSpecializationValue}
+                      />
                     </div>
                     <div className="space-y-2">
-                      <EducationPopover />
+                      <EducationPopover
+                        educationValue={educationValue}
+                        setEducationValue={setEducationValue}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Input
@@ -244,7 +263,7 @@ const AddUserModal = () => {
                   </div>
                 </>
               )}
-              {userType === "moderator" && (
+              {userType === "admin" && (
                 <>
                   <div className="space-y-2">
                     <Input
@@ -259,7 +278,9 @@ const AddUserModal = () => {
               <DialogFooter>
                 <Button type="submit">Register</Button>
                 <DialogClose asChild>
-                  <Button type="button" variant={"outline"}>Cancel</Button>
+                  <Button type="button" variant={"outline"}>
+                    Cancel
+                  </Button>
                 </DialogClose>
               </DialogFooter>
             </Form>

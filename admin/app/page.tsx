@@ -44,7 +44,7 @@ const LoginPage = () => {
   ) => {
     try {
       const user = await signIn(values.email, values.password);
-      if (user) router.push("/dashboard");
+      if (user && user.user.Role === 'doctor') router.push("/dashboard");
 
       // const result = await signIn.create({
       //   identifier: values.email,
@@ -57,8 +57,8 @@ const LoginPage = () => {
       // } else {
       //   console.log(result);
       // }
-      console.log(values);
-      router.push("/dashboard");
+      // console.log(values);
+      // router.push("/dashboard");
     } catch (err: any) {
       setError(err.response.data.message);
       // setError(err.errors[0].longMessage);
