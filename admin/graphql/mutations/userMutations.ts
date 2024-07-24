@@ -61,6 +61,7 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
 export const SUSPEND_USER = gql`
   mutation SuspendUser($id: String!, $suspendType: SuspendType!) {
     SuspendUser(id: $id, suspendType: $suspendType) {
@@ -128,6 +129,24 @@ export const DELETE_USER = gql`
   mutation DeleteUser($id: ID!) {
     DeleteUser(id: $id) {
       UserID
+    }
+  }
+`;
+
+export const UPDATE_PASSWORD = gql`
+  mutation UpdatePassword(
+    $UserID: String!
+    $CurrentPassword: String!
+    $NewPassword: String!
+  ) {
+    UpdatePassword(
+      UserID: $UserID
+      CurrentPassword: $CurrentPassword
+      NewPassword: $NewPassword
+    ) {
+      UserID
+      Username
+      Email
     }
   }
 `;

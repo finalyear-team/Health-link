@@ -1,63 +1,62 @@
-import React, { useState } from "react";
+import React from "react";
 import { Formik, Form } from "formik";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { validateContEditInfo } from "@/utils/validationSchema";
-// import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
-// import { EmailAddressResource } from "@clerk/types";
 import { CardContent } from "@/components/ui/card";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import { useMutation } from "@apollo/client";
+import useAuth from "@/hooks/useAuth";
+import Loading from "@/common/Loader/Loading";
 
-const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
-  // const { user } = useUser();
+const ContactInfoUpdate = () => {
+  const { user, isLoaded } = useAuth();
+  const [updateUser] = useMutation(UPDATE_USER);
   const { toast } = useToast();
 
+  if (!isLoaded || !user) {
+    return (
+      <div className="w-full flex items-center justify-center p-6">
+        <Loading />
+      </div>
+    );
+  }
+
   const initialValues = {
-    email: "www.alex@gmail.com",
-    // user?.emailAddresses.filter(
-    //   (email) => email.verification.status === "verified"
-    // )[0]?.emailAddress || "",
-    phone: "0901020304",
-    address: "A.A",
+    email: user?.Email,
+    phone: user?.PhoneNumber,
+    address: user?.Address,
   };
 
   // handle the update of contact information
   const handleContactSubmit = async (values: any, { setSubmitting }: any) => {
-    // const email = values.email;
-    // try {
-    //   // Get all unverified email addresses
-    //   const unverifiedEmails = user?.emailAddresses.filter(
-    //     (email) => !email.verification.status
-    //   );
-    //   // Delete each unverified email address
-    //   if (unverifiedEmails) {
-    //     for (const email of unverifiedEmails) {
-    //       await email.destroy();
-    //     }
-    //     console.log("All unverified emails deleted: ", email);
-    //   }
-    //   // Add an unverified email address to user
-    //   const res = await user?.createEmailAddress({ email });
-    //   // Ensure res is not undefined before proceeding
-    //   if (!res) {
-    //     throw new Error("Failed to create email address");
-    //   }
-    //   // Reload user to get updated User object
-    //   await user?.reload();
-    //   // Find the email address that was just added
-    //   const emailAddress = user?.emailAddresses.find((a) => a.id === res.id);
-    //   // Create a reference to the email address that was just added
-    //   setEmailObj(emailAddress);
-    //   // Send the user an email with the verification code
-    //   emailAddress?.prepareVerification({ strategy: "email_code" });
-    //   // Set to true to display second form
-    //   // and capture the OTP code
-    //   setIsVerifying(true);
-    // } catch (err) {
-    //   console.error(JSON.stringify(err, null, 2));
-    // }
-    // setSubmitting(false);
+    setSubmitting(true);
+    await updateUser({
+      variables: {
+        updateUserInput: {
+          UserID: user?.UserID,
+          Email: values.email,
+          PhoneNumber: values.phone,
+          Address: values.address,
+        },
+      },
+    })
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Your information has been updated successfully",
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating profile picture:", error);
+        toast({
+          title: "Failed",
+          description: "Failed to update Your information, try again!",
+        });
+      });
+    setSubmitting(false);
   };
   return (
     <CardContent className="space-y-2">
@@ -68,9 +67,9 @@ const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
       >
         {({ isValid, isSubmitting, resetForm }) => (
           <Form className="space-y-6">
-            <div className="flex space-x-5 flex-wrap">
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               <Input label="Email" name="email" type="email" />
-              <Input label="Phone Number" name="phoneNumber" type="number" />
+              <Input label="Phone Number" name="phone" type="number" />
               <Input label="Address" name="address" type="text" />
             </div>
             <Button disabled={!isValid} type="submit">

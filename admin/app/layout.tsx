@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import ApolloWrappper from "./providers/ApolloWrappper";
+import ProtectedRoute from "@/components/layout/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Healthlink",
@@ -24,8 +25,7 @@ export default function DashboardLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-
+            <ProtectedRoute>{children}</ProtectedRoute>
             <Toaster />
           </ThemeProvider>
         </ApolloWrappper>

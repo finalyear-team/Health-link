@@ -1,27 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { Formik, Form } from "formik";
 import { validatePassEditInfo } from "@/utils/validationSchema";
 import { useToast } from "@/components/ui/use-toast";
-// import { useUser } from "@clerk/nextjs";
+import { UPDATE_PASSWORD } from "@/graphql/mutations/userMutations";
+import { useMutation } from "@apollo/client";
+import useAuth from "@/hooks/useAuth";
+import Loading from "@/common/Loader/Loading";
 
 const LoginAndSecurity = ({ value }: { value: string }) => {
+  const { user, isLoaded } = useAuth();
+  const [updatePassword] = useMutation(UPDATE_PASSWORD);
   const { toast } = useToast();
-  // const { user } = useUser();
+
+  if (!isLoaded || !user) {
+    return (
+      <div className="w-full flex items-center justify-center p-6">
+        <Loading />
+      </div>
+    );
+  }
 
   const passInititalValues = {
     previousPassword: "",
@@ -33,34 +37,32 @@ const LoginAndSecurity = ({ value }: { value: string }) => {
     values: any,
     { setSubmitting, resetForm }: any
   ) => {
-    console.log(values);
-    // const currentPassword = values.previousPassword;
-    // const newPassword = values.newPassword;
+    setSubmitting(true);
+    try {
+      const { data } = await updatePassword({
+        variables: {
+          UserID: user?.UserID,
+          CurrentPassword: values.previousPassword,
+          NewPassword: values.newPassword,
+        },
+      });
 
-    // if (!user) return;
-
-    // try {
-    //   await user.updatePassword({
-    //     currentPassword,
-    //     newPassword,
-    //   });
-    //   toast({
-    //     title: "Password Updated",
-    //     description: "Your password has been updated successfully.",
-    //     variant: "success",
-    //   });
-    // } catch (err) {
-    //   console.error("Error updating password:", err);
-    //   toast({
-    //     title: "Error updating password",
-    //     description: "Please check your current password and try again.",
-    //     variant: "destructive",
-    //   });
-    // }
-
-    // setSubmitting(false);
-    // resetForm();
+      toast({
+        title: "Success",
+        description: "Password updated successfully!",
+        // variant: "success",
+      });
+      resetForm();
+    } catch (error : any) {
+      toast({
+        title: "Error",
+        description:  error.message || "Failed to update password. Please try again.",
+        // variant: "error",
+      });
+    }
+    setSubmitting(false);
   };
+
   return (
     <TabsContent value={value}>
       <Card>
@@ -76,7 +78,7 @@ const LoginAndSecurity = ({ value }: { value: string }) => {
           >
             {({ isValid, isSubmitting }) => (
               <Form className="space-y-6" action="#" method="POST">
-                <div className="flex flex-wrap space-x-5">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                   <Input
                     label="Current Password"
                     name="previousPassword"

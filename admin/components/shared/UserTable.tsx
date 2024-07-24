@@ -26,14 +26,37 @@ import { Check, FilePen, Filter, ListOrdered, Trash, User } from "lucide-react";
 import PageLoader from "@/common/Loader/PageLoader";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import UserModal from "./AddUserModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import ShowProfile from "./ShowProfile";
+import { useMutation } from "@apollo/client";
+import { UPDATE_USER, DELETE_USER } from "@/graphql/mutations/userMutations";
+import { GET_USER } from "@/graphql/queries/userQueries";
+import { useQuery } from "@apollo/client";
+import { useToast } from "../ui/use-toast";
+import { fetchUserData } from "@/lib/fetchUserData";
 
 const UserTable = () => {
   const { loading, error, users } = useFetchUsers();
+  const [updateUser] = useMutation(UPDATE_USER);
+  const [deleteUser] = useMutation(DELETE_USER);
 
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [filterRole, setFilterRole] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+
+  const { toast } = useToast();
 
   const handleSort = (key: any) => {
     if (sortBy === key) {
@@ -91,6 +114,26 @@ const UserTable = () => {
     ? users.filter((user: any) => user.Role === "admin").length
     : 0;
 
+  const handleDelete = async (values: any) => {
+    console.log(values);
+    // await DeleteUser({
+    //   variables: { id: values.UserID },
+    // })
+    //   .then(() => {
+    //     toast({
+    //       title: "Success",
+    //       description: "The User has been deleted successfully",
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error deleting the user: ", error);
+    //     toast({
+    //       title: "Failed",
+    //       description: "Failed to delete the User, try again!",
+    //     });
+    //   });
+  };
+
   return (
     <div className="w-full mx-auto px-4 md:px-6 py-8">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4 mb-4">
@@ -145,27 +188,14 @@ const UserTable = () => {
                 onValueChange={(value) => handleFilter(value, filterStatus)}
               >
                 <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="Doctor">
+                <DropdownMenuRadioItem value="doctor">
                   Doctors
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="Patient">
+                <DropdownMenuRadioItem value="patient">
                   Patients
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="Admin">
+                <DropdownMenuRadioItem value="admin">
                   Admins
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup
-                value={filterStatus}
-                onValueChange={(value) => handleFilter(filterRole, value)}
-              >
-                <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="Active">
-                  Active
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="Inactive">
-                  Inactive
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
@@ -207,7 +237,7 @@ const UserTable = () => {
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="bg-slate-100 dark:bg-slate-700 cursor-pointer">
             <TableHead onClick={() => handleSort("FirstName")}>
               First Name
               {sortBy === "FirstName" && (
@@ -271,22 +301,89 @@ const UserTable = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <FilePen className="w-4 h-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Trash className="w-4 h-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <User className="w-4 h-4 mr-2" />
-                      View Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Check className="w-4 h-4 mr-2" />
-                      Activate
-                    </DropdownMenuItem>
+                    {/* <DropdownMenuItem> */}
+                    <UserModal
+                      isEditing
+                      initialValues={{
+                        userID: user.UserID,
+                        userType: user.Role.toLowerCase(),
+                        firstName: user.FirstName,
+                        lastName: user.LastName,
+                        email: user.Email,
+                        password: "",
+                        confirmPassword: "",
+                        dateOfBirth: user.DateOfBirth,
+                        phoneNumber: user.PhoneNumber,
+                        address: user.Address,
+                        specialty: user.Specialty,
+                        educationLevel: user.EducationLevel,
+                        consultationFee: user.ExperienceYears,
+                      }}
+                      onSubmit={async (values) => {
+                        await updateUser({
+                          variables: {
+                            updateUserInput: {
+                              UserID: user.UserID,
+                              FirstName: values.firstName,
+                              LastName: values.lastName,
+                              Username: values.userName,
+                              Email: values.email,
+                              PhoneNumber: values.phoneNumber,
+                              Address: values.address,
+                              // Role: values.userType,
+                              // Speciality: values.specialty || "",
+                              // ExperienceYears: values.experience || 0,
+                              // ConsultationFee: values.consultationFee || 0,
+                            },
+                          },
+                        })
+                          .then(() => {
+                            toast({
+                              title: "Success",
+                              description:
+                                "The User has been updated successfully",
+                            });
+                          })
+                          .catch((error) => {
+                            console.error("Error updating the user: ", error);
+                            toast({
+                              title: "Failed",
+                              description: "Failed to update User, try again!",
+                            });
+                          });
+                      }}
+                    />
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full flex items-center justify-start h-8 p-2"
+                        >
+                          <Trash className="w-4 h-4 mr-2" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your account and remove your data from our
+                            servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(user)}>
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <ShowProfile UserID={user.UserID} />
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

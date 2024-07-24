@@ -16,11 +16,11 @@ const badgeVariants = cva(
           "border-transparent bg-red-500 text-slate-50 hover:bg-red-500/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/80",
         outline: "text-slate-950 dark:text-slate-50",
         admin:
-          "border-transparent bg-purple-500 text-white hover:bg-purple-600 dark:bg-purple-400 dark:text-white dark:hover:bg-purple-500",
+          "border-transparent bg-secondary-600 text-secondary-700 hover:bg-opacity-10 bg-opacity-5",
         doctor:
-          "border-transparent bg-green-500 text-white hover:bg-green-600 dark:bg-green-400 dark:text-white dark:hover:bg-green-500",
+          "border-transparent bg-primary-600 text-primary-700 hover:bg-opacity-10 bg-opacity-5",
         patient:
-          "border-transparent bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-400 dark:text-white dark:hover:bg-blue-500",
+          "border-transparent bg-yellow-600 text-yellow-700 hover:bg-opacity-10 bg-opacity-5",
       },
     },
     defaultVariants: {

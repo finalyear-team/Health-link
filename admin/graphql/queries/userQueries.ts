@@ -9,6 +9,11 @@ export const GET_SIGNEDIN_USER = gql`
       Username
       Role
       Verified
+      ProfilePicture
+      # Gender
+      Email
+      PhoneNumber
+      Address
     }
   }
 `;
@@ -39,11 +44,24 @@ export const GET_USERS = gql`
   query GetAllUsers {
     GetUsers {
       UserID
-      FirstName
-      LastName
       Username
       Email
+      FirstName
+      LastName
+      Verified
+      Bio
+      PhoneNumber
+      Address
+      ProfilePicture
       Role
+      Status
+      Speciality
+      ExperienceYears
+      ConsultationFee
+      EducationalBackground
+      Rating
+      Followers
+      Following
     }
   }
 `;

@@ -14,12 +14,15 @@ import { Loader2 } from "lucide-react";
 // import Header from "@/components/layout/Header";
 // import Footer from "@/components/layout/Footer";
 import { signIn } from "@/Services/authService";
+import useAuth from "@/hooks/useAuth";
 
 const LoginPage = () => {
   const [error, setError] = useState(null);
   // const { isLoaded, signIn, setActive } = useSignIn();
   const router = useRouter();
+  const { isSignedIn } = useAuth();
 
+  console.log("This user is SignedIn: ", isSignedIn);
   // validation for the input fields
 
   const validationSchema = Yup.object().shape({
@@ -149,16 +152,6 @@ const LoginPage = () => {
                     )}{" "}
                     Login
                   </Button>
-
-                  <div className="text-sm mt-4 text-center">
-                    Don&apos;t have an account?
-                    <Link
-                      href="/sign-up"
-                      className="font-main font-medium text-primary-600 hover:text-primary-700"
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
                 </div>
               </Form>
             )}

@@ -6,9 +6,8 @@ import Head from "next/head";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Account from "@/components/tabs/account";
 import LoginAndSecurity from "@/components/tabs/login-and-security";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { KeyRound, Rss, User, Users } from "lucide-react";
+import { KeyRound, User } from "lucide-react";
 import PageLoader from "@/common/Loader/PageLoader";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,20 +17,26 @@ import { storage } from "@/lib/firebaseConfig";
 import Loading from "@/common/Loader/Loading";
 import { UPDATE_USER } from "@/graphql/mutations/userMutations";
 import { useMutation } from "@apollo/client";
+import useAuth from "@/hooks/useAuth";
 
 export default function TabsDemo() {
-  // const { user, isLoaded } = useUser();
-  // const Role = user?.unsafeMetadata.role;
   const [hover, setHover] = useState(false);
-  const [image, setImage] = useState("https://via.placeholder.com/150");
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [updateUser] = useMutation(UPDATE_USER);
+  const { user, isLoaded } = useAuth();
+  const [image, setImage] = useState(user?.ProfilePicture);
 
-  const firstName = "Abebe";
-  const lastName = "Kebede";
   const { toast } = useToast();
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
+
+  const firstName = user?.FirstName;
+  const lastName = user?.LastName;
+  const userName = user?.Username;
+  const userID = user?.UserID;
+  // const gender = user?.Gender === "male" ? "Mr." : "Ms.";
+  // console.log(user?.Gender);
+  const combinedName = firstName + " " + lastName;
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -55,32 +60,31 @@ export default function TabsDemo() {
             setUploading(false);
           },
           () => {
-            // Handle successful uploads on complete
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setImage(downloadURL);
-
               setUploading(false);
               console.log("File available at", downloadURL);
-              try {
-                updateUser({
-                  variables: {
-                    updateUserInput: {
-                      // UserID: userID,
-                      ProfilePicture: downloadURL,
-                    },
+              updateUser({
+                variables: {
+                  updateUserInput: {
+                    UserID: user?.UserID,
+                    ProfilePicture: downloadURL,
                   },
+                },
+              })
+                .then(() => {
+                  toast({
+                    title: "Success",
+                    description: "Profile image updated successfully",
+                  });
+                })
+                .catch((error) => {
+                  console.error("Error updating profile picture:", error);
+                  toast({
+                    title: "Failed",
+                    description: "Failed to update profile picture, try again!",
+                  });
                 });
-                toast({
-                  title: "Success",
-                  description: "Profile image updated successfully",
-                });
-              } catch (error) {
-                console.error("Error updating profile picture:", error);
-                toast({
-                  title: "Failed",
-                  description: "Failed to update profile picture, try again!",
-                });
-              }
             });
           }
         );
@@ -102,17 +106,14 @@ export default function TabsDemo() {
       }
     };
 
-    // Initial check
     checkScreenSize();
 
-    // Add event listener
     window.addEventListener("resize", checkScreenSize);
 
-    // Clean up event listener on component unmount
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  if (false) {
+  if (!isLoaded) {
     return (
       <div className="w-full flex items-center justify-center">
         <PageLoader />
@@ -125,18 +126,10 @@ export default function TabsDemo() {
       <Head>
         <title>Setting | HealthLink</title>
       </Head>
-      {/* profile section */}
       <Card>
-        <div className=" flex items-center space-x-3 p-3 rounded">
+        <div className="flex items-center space-x-3 p-3 rounded">
           <div className="flex items-center flex-wrap space-y-2 ">
             <div className="flex items-center space-x-4">
-              {/* <Image
-                src="/image/profile-picture.jpg"
-                width={128}
-                height={128}
-                alt="profile picture"
-                className="rounded-full border-2 border-secondary-700"
-              /> */}
               <div
                 className="relative w-32 h-32"
                 onMouseEnter={() => setHover(true)}
@@ -144,13 +137,13 @@ export default function TabsDemo() {
               >
                 <Avatar className="rounded-full w-32 h-32 border-2 border-secondary-700 overflow-hidden">
                   <AvatarImage
-                    src={image}
+                    src={user?.ProfilePicture}
                     alt="Profile Picture"
                     className="object-cover w-full h-full"
                   />
                   <AvatarFallback className="text-2xl font-medium">
-                    {firstName.charAt(0).toUpperCase()}
-                    {lastName.charAt(0).toUpperCase()}
+                    {firstName?.charAt(0).toUpperCase()}
+                    {lastName?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 {hover && (
@@ -166,13 +159,11 @@ export default function TabsDemo() {
                 )}
               </div>
               <div>
-                <h2 className="text-xl font-bold">
-                  <span>Mr. </span> {firstName} {lastName}
-                </h2>
+                <h2 className="text-xl font-bold">{combinedName}</h2>
                 <div className="flex items-center space-x-2">
-                  <span className="text-slate-400">@alexisSan</span>
+                  <span className="text-slate-400 text-sm">@{userName}</span>
                   <div className="flex items-center space-x-2">
-                    <Badge variant={"secondary"}>Admin</Badge>
+                    <Badge variant={"admin"}>Admin</Badge>
                   </div>
                 </div>
               </div>

@@ -10,6 +10,7 @@ export class UpdateUserInput {
   FirstName?: string
   LastName?: string
   Username?: string
+  // Role?: string
   Gender?: Gender
   Bio?: string
   DateOfBirth?: Date

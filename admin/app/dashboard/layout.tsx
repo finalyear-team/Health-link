@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/dashboard/SideBar";
 import Header from "@/components/dashboard/Header";
+import ProtectedRoute from "@/components/layout/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Healthlink",
