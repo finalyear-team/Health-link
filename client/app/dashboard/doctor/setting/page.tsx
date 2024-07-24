@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Head from "next/head";
@@ -39,8 +38,12 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { validateSetAvailability } from "@/utils/validationSchema";
 import useAuth from "@/hooks/useAuth";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_SCHEDULE } from "@/graphql/mutations/scheduleMutations";
+import { GET_SCHEDULES } from "@/graphql/queries/scheduleQueries";
+import { addHours, format, parse } from "date-fns";
+import { includes } from "lodash";
+import { Span } from "next/dist/trace";
 
 interface StatsCardProps {
   followers: number;
@@ -56,31 +59,120 @@ const stats = {
   answeredQuestion: 10,
 };
 
-const initialAvailability = {
-  startTime: "10:00",
-  endTime: "11:00",
-  weekday: [],
-};
+const weekdaysOrder = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+function getWeekdayRange(weekdays: any[]) {
+  // Sort the input weekdays based on the weekdaysOrder
+  const sortedWeekdays = weekdays?.slice().sort((a, b) => weekdaysOrder.indexOf(a) - weekdaysOrder.indexOf(b));
+
+  // Check if the weekdays are consecutive
+  const ranges = [];
+  let start = sortedWeekdays && sortedWeekdays[0];
+  let end = sortedWeekdays && sortedWeekdays[0];
+
+  for (let i = 1; i < (sortedWeekdays ? sortedWeekdays.length : 0); i++) {
+    if (weekdaysOrder.indexOf(sortedWeekdays[i]) === weekdaysOrder.indexOf(end) + 1) {
+      // If the current weekday is consecutive
+      end = sortedWeekdays[i];
+    } else {
+      // If the current weekday is not consecutive
+      ranges.push(start === end ? start : `${start} - ${end}`);
+      start = sortedWeekdays[i];
+      end = sortedWeekdays[i];
+    }
+  }
+  // Push the last range
+  ranges.push(start === end ? start : `${start} - ${end}`);
+
+  // Combine consecutive ranges
+  const finalRanges = [];
+  let rangeStart = ranges[0];
+  let rangeEnd = ranges[0];
+
+  for (let i = 1; i < ranges.length; i++) {
+    if (ranges[i].startsWith(rangeEnd.split(' - ')[1])) {
+      rangeEnd = ranges[i];
+    } else {
+      finalRanges.push(rangeStart === rangeEnd ? rangeStart : rangeStart + ' - ' + rangeEnd.split(' - ')[1]);
+      rangeStart = ranges[i];
+      rangeEnd = ranges[i];
+    }
+  }
+  finalRanges.push(rangeStart === rangeEnd ? rangeStart : rangeStart + ' - ' + rangeEnd.split(' - ')[1]);
+
+  return finalRanges.join(", ");
+}
+
+
+
+
 
 export default function TabsDemo() {
-  // const { user, isLoaded } = useUser();
   const { user, isLoaded, isSignedIn } = useAuth()
-  const [CreateSchedule, { data, loading, error }] = useMutation(CREATE_SCHEDULE)
+  const [startTime, setStartTime] = useState()
+  const [endTime, setEndTime] = useState()
+  const [weekdays, setWeekdays] = useState()
+  const { data: doctorScheudels, error: DoctorSchedulesError, refetch } = useQuery(GET_SCHEDULES, {
+    variables: {
+      doctorID: user?.UserID
+    }
+  })
 
-  // const Role = user?.unsafeMetadata.role;
-  // const firstName = user?.firstName;
-  // const lastName = user?.lastName;
+  const { toast } = useToast();
+  const [CreateSchedule, { data, loading, error }] = useMutation(CREATE_SCHEDULE, {
+    onCompleted: () => {
+      refetch()
+    },
+    onError: () => {
+      toast({
+        title: "Set: Available Time",
+        description: "You have successfully set Available time",
+        variant: "success",
+      });
+
+    }
+  })
+  useEffect(() => {
+    if (doctorScheudels?.Schedules.length === 0)
+      return
+    setWeekdays(doctorScheudels?.Schedules?.map((schedule: any) => schedule.WeekDay))
+    setStartTime(doctorScheudels?.Schedules?.reduce((acc: any, schedules: any) => {
+      if (!schedules.StartTime)
+        return null
+      acc = format(addHours(schedules.StartTime, 1), 'HH:mm:ss')
+      return acc
+    }, {}))
+
+    setEndTime(doctorScheudels?.Schedules?.reduce((acc: any, schedules: any) => {
+      if (!schedules.EndTime)
+        return null
+      acc = format(addHours(schedules.EndTime, 1), 'HH:mm:ss')
+      return acc
+    }, {}))
+
+
+  }, [doctorScheudels?.Schedules])
+
+
+
+  console.log(weekdays)
+
+  const initialAvailability = {
+    startTime: startTime || "10:00",
+    endTime: endTime || "12:00",
+    weekday: weekdays,
+  };
 
   const Role = user && user?.Role;
   const firstName = user && user.FirstName;
   const lastName = user && user.LastName;
 
-  const { toast } = useToast();
+
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
 
   // handle availabilty
   const handleAvailablity = async (value: any) => {
-    console.log(value)
+    const unselectedDays = weekdaysOrder.filter((days) => !value.weekday.includes(days))
     await CreateSchedule({
       variables: {
         scheduleInput: {
@@ -88,20 +180,13 @@ export default function TabsDemo() {
           WeekDay: value.weekday,
           StartTime: value.startTime,
           EndTime: value.endTime
-        }
+        },
+        unselectedDays
       }
     })
 
-    // console.log("weekdays: ", value.weekday);
-    // console.log("startTime: ", value.startTime);
-    // console.log("endTime: ", value.endTime);
-    console.log(error)
-    if (data)
-      toast({
-        title: "Set: Available Time",
-        description: "You have successfully set Available time",
-        variant: "success",
-      });
+
+
   };
 
   useEffect(() => {
@@ -123,6 +208,8 @@ export default function TabsDemo() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  console.log(startTime)
+  console.log(endTime)
   console.log(error?.message)
   if (!isLoaded) {
     return (
@@ -136,7 +223,6 @@ export default function TabsDemo() {
       <Head>
         <title>Setting | HealthLink</title>
       </Head>
-      {/* profile section */}
       <Card>
         <div className=" flex items-center space-x-3 p-3 rounded">
           <div className="flex items-center flex-wrap space-y-2 ">
@@ -155,7 +241,7 @@ export default function TabsDemo() {
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-slate-400">@alexisSan</span>{" "}
+                  <span className="text-slate-400">@{user?.Username}</span>{" "}
                   <div className="flex items-center">
                     <MdVerified size={20} className="text-secondary-600" />
                     <Badge>Doctor</Badge>
@@ -166,10 +252,19 @@ export default function TabsDemo() {
                   Oncologist
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Rating value={4.5} />
+                  <Rating value={3.3} />
                 </div>
                 <div className="text-sm text-slate-600 dark:text-slate-200 flex items-center">
-                  <span className="mr-3">Monday to Friday: 10 AM - 11 PM</span>
+                  {startTime && endTime && weekdays ?
+                    <p className="mr-3">
+
+                      {`${getWeekdayRange(weekdays)} ${startTime && format(parse(startTime ? startTime : "00:00:00", 'HH:mm:ss', new Date()), "hh:mm a")} - ${format(parse(endTime ? endTime : "00:00:00", 'HH:mm:ss', new Date()), "hh:mm a")}`}
+
+                    </p> :
+                    <p className="mr-3">
+                      no schedules yet
+                    </p>
+                  }
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="ghost" className="mr-3">
@@ -330,13 +425,13 @@ export default function TabsDemo() {
                         <p className="text-slate-600 dark:text-slate-100 text-sm">
                           Followers
                         </p>
-                        <p className="font-bold text-lg">{stats.followers}</p>
+                        <p className="font-bold text-lg">{user?.Followers}</p>
                       </div>
                       <div>
                         <p className="text-slate-600 dark:text-slate-100 text-sm">
                           Following
                         </p>
-                        <p className="font-bold text-lg">{stats.following}</p>
+                        <p className="font-bold text-lg">{user?.Following}</p>
                       </div>
                       <div>
                         <p className="text-slate-600 dark:text-slate-100 text-sm">
@@ -388,7 +483,7 @@ export default function TabsDemo() {
             <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
           </TabsTrigger>
         </TabsList>
-        {/* <Account value="account" isPatient={false} /> */}
+        <Account value="account" isPatient={false} />
         <LoginAndSecurity value="loginAndSecurity" />
         <Certificates value="certificates" />
         <Network value="Network" isPatient={false} />

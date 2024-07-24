@@ -56,6 +56,7 @@ type User{
    Rating:Float
    Followers:Int
    Following:Int
+   LicenseNumber:Int
 }
 
 
@@ -100,6 +101,7 @@ input DoctorRegisterInput {
 }
 
 input DoctorUpdateInput{
+  ConsultationFee:Float
   Speciality: String
   LicenseNumber: String
   ExperienceYears:Int
@@ -119,6 +121,7 @@ input updateUserInput{
   Address: String 
   ProfilePicture: String
   DoctorDetails:DoctorUpdateInput
+
  
 }
 
@@ -139,7 +142,7 @@ type Query {
 type Mutation {
   RegisterUser(RegisterInput: UserDetailsInput!): User!
   DoctorRegister(DoctorDetailInput:DoctorRegisterInput!):User!
-  RemoveUser(UserID: Int!): User!
+  RemoveUser(UserID: String!): User!
   Follow(FollowerID:String!,FollowingID:String!):User
   UnFollow(FollowerID:String!,FollowingID:String!):User
   UpdateUser(updateUserInput:updateUserInput):User!

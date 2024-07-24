@@ -1,6 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { getYear } from 'date-fns';
 import { Token } from 'graphql';
 // import { User } from 'src/user/entities/user.entity';
@@ -35,7 +34,6 @@ export class MailService {
 
 
     async sendResetPasswordEmail(payload: any) {
-        console.log(" event  !!!")
         const { email, FirstName, verificationLink } = payload
         console.log(email)
         try {

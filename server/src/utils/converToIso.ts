@@ -1,5 +1,6 @@
 import { parse, isValid, formatISO, format } from 'date-fns';
 
+
 export function convertToIso(time) {
     // Remove any leading/trailing whitespace
     time = time.trim();
@@ -9,22 +10,35 @@ export function convertToIso(time) {
     const time12HourFormat = /^(1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm])$/i;
     const time24HourFormat = /^([01]?[0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?$/;
 
-    let date;
+    // Get the current date
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // Note: 0-indexed
+    const day = now.getDate();
+
+    let hours, minutes;
 
     // Parse 12-hour format time
     if (time12HourFormat.test(time)) {
-        date = parse(time, 'h:mm a', new Date());
+        const parsedTime = parse(time, 'h:mm a', new Date());
+        hours = parsedTime.getHours();
+        minutes = parsedTime.getMinutes();
     }
     // Parse 24-hour format time
     else if (time24HourFormat.test(time)) {
-        date = parse(time, 'HH:mm', new Date());
+        const parsedTime = parse(time, 'HH:mm', new Date());
+        hours = parsedTime.getHours();
+        minutes = parsedTime.getMinutes();
     }
     // Handle invalid formats
     else {
         throw new Error("Invalid time format");
     }
 
-    // Check if the parsed date is valid
+    // Create a new Date object with the current date and parsed time
+    const date = new Date(year, month, day, hours, minutes);
+
+    // Check if the date is valid
     if (!isValid(date)) {
         throw new Error("Invalid time");
     }
@@ -63,4 +77,22 @@ export const decreaseHourByOne = (date: Date) => {
 
     return newDate
 };
+
+
+import { getHours, getMinutes, getSeconds } from 'date-fns'
+
+const timeToSeconds = (date) => {
+    const hours = getHours(date)
+    const minutes = getMinutes(date)
+    const seconds = getSeconds(date)
+
+    return hours * 3600 + minutes * 60 + seconds
+}
+
+export const compareTimeOnly = (date1, date2) => {
+    const seconds1 = timeToSeconds(date1)
+    const seconds2 = timeToSeconds(date2)
+
+    return seconds1 - seconds2
+}
 

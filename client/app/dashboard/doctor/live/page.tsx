@@ -11,10 +11,11 @@ import { UserType } from "@/types/types";
 import useVideoCallInfoStore from "@/store/videoCallInfo";
 import { addHours, format } from "date-fns";
 import formatScheduleTime from "@/utils/formatDate";
+import useAppointmentStore from "@/store/appointmentStore";
 
 const Video = () => {
-  const [showVideoChat, setShowVideoChat] = useState(false);
   const { user } = useAuth();
+  const { selectedAppointment, selectAppointment, showVideoChat, setShowVideoChat } = useAppointmentStore()
   const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
     variables: {
       userID: user?.UserID,
@@ -33,7 +34,6 @@ const Video = () => {
     (appointment: any) => appointment.Status === "booked"
   );
 
-  console.log(upcomingAppointments);
 
   const handleJoinClick = (
     appointmentId: string,
@@ -42,11 +42,14 @@ const Video = () => {
     appointmentDate: string,
     appointmentTime: string
   ) => {
-    console.log(appointmentId, doctorId, patientId)
     setVideoCallInfo(appointmentId, doctorId, patientId, appointmentDate, appointmentTime);
-    setShowVideoChat(true);
+    setShowVideoChat()
   };
+  const handleEndLeaveCall = () => {
 
+  }
+
+  console.log(showVideoChat)
 
   return (
     <div>
@@ -58,7 +61,10 @@ const Video = () => {
           </div>
           <hr className="my-2" />
           {upcomingAppointments?.length === 0 ? (
-            <div>No upcoming appointments</div>
+            <div className="flex">
+              <CircleArrowOutUpRight className="h-6 w-6 mr-2" /> Upcoming
+              appointments{" "}
+            </div>
           ) : (
             <>
               {upcomingAppointments?.map((value: any) => (
@@ -66,23 +72,29 @@ const Video = () => {
                   key={value.AppointmentID}
                   dummyData={{
                     appointmentId: value.AppointmentID,
+                    patientId: value.PatientID,
+                    userName: value.DoctorName,
                     doctorId: value.DoctorID,
+                    duration: value.Duration,
                     appointmentTime: value.AppointmentTime,
                     appointmentDate: value.AppointmentDate,
-                    doctorName: value.DoctorName,
-                    doctorPhoto: value.DoctorPhoto,
+                    name: value.PatientName,
+                    photo: value.PatientPhoto,
                     purpose: value.Note,
-                    role: UserType.DOCTOR,
+                    gender: value.PatientGender,
+                    role: UserType.PATIENT,
                   }}
                   appointmentTime={value.AppointmentTime}
-                  onJoinClick={() =>
+                  onJoinClick={() => {
+                    selectAppointment(value)
                     handleJoinClick(
                       value.AppointmentID,
                       value.DoctorID,
                       value.PatientID,
                       format(addHours(value.AppointmentDate, 24), "yyyy-MM-dd"),
-                      formatScheduleTime(value.AppointmentDate)
+                      formatScheduleTime(value.AppointmentTime)
                     )
+                  }
                   }
                 />
               ))}
@@ -93,7 +105,7 @@ const Video = () => {
 
       {showVideoChat && (
         <div>
-          <VideoChatInitiation role={UserType.PATIENT} />
+          <VideoChatInitiation role={UserType.DOCTOR} />
         </div>
       )}
     </div>

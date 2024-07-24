@@ -6,33 +6,47 @@ import DoctorProfileCard from "../shared/PopUpProfile";
 import { DoctorProfile } from "@/types";
 import useAppointmentStore from "@/store/appointmentStore";
 import { useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { GET_DOCTORS } from "@/graphql/queries/userQueries";
 import Loading from "@/common/Loader/Loading";
+import useAuth from "@/hooks/useAuth";
+import { FOLLOW_DOCTOR } from "@/graphql/mutations/userMutations";
 
 interface TopDoctorsProps {
   items: DoctorProfile[];
 }
 
 const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
+  const { user } = useAuth()
 
-  console.log(items)
   const selectDoctor = useAppointmentStore((state) => state.selectDoctor);
+  const [Follow, { data, loading, error }] = useMutation(FOLLOW_DOCTOR)
 
   const showAppointmentForm = useAppointmentStore(
     (state) => state.showAppointmentForm
   );
-  const { data, error, loading } = useQuery(GET_DOCTORS);
 
-  const handleFollow = () => {
+  const handleFollow = async (FollowingID: string) => {
+    if (!FollowingID || !user.UserID)
+      return
+
+    await Follow({
+      variables: {
+        FollowerID: user.UserID,
+        FollowingID,
+
+      }
+
+
+    })
     // handle follow logic
   };
 
 
+  console.log(data)
 
 
   const handleMakeAppointment = (profile: any) => {
-    console.log(profile)
     selectDoctor({
       id: profile.UserID,
       profilePicture: profile.ProfilePicture,
@@ -46,7 +60,6 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
       experience: profile.ExperienceYears,
       hourlyRate: profile.ConsultationFee
     });
-    console.log(profile)
     setTimeout(() => {
       showAppointmentForm();
     }, 1000);
@@ -54,10 +67,7 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
   };
 
 
-  if (loading) return <Loading />;
-  if (error) return <div>{error.message}</div>
 
-  console.log(data);
   return (
     <div className="flex flex-wrap justify-center mt-3">
       {/* {data.Getdata.map((profile: any) => ( */}
@@ -75,7 +85,7 @@ const TopDoctors: React.FC<TopDoctorsProps> = ({ items }) => {
           speciality={profile.Speciality}
           experience={profile.ExperienceYears}
           hourlyRate={profile.ConsultationFee}
-          onFollow={handleFollow}
+          onFollow={() => handleFollow(profile.UserID)}
           onMakeAppointment={handleMakeAppointment}
           profile={profile}
         />

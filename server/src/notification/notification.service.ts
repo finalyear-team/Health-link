@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateNotificationInput } from './dto/create-notification.input';
 import { UpdateNotificationInput } from './dto/update-notification.input';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { notificationStatus } from '@prisma/client';
 
 @Injectable()
 export class NotificationService {
@@ -9,11 +10,14 @@ export class NotificationService {
 
   async create(createNotificationInput: CreateNotificationInput) {
     try {
-      console.log(createNotificationInput)
-      const notification = await this.prisma.notification.create({
-        data: createNotificationInput
+      const { User, ...others } = await this.prisma.notification.create({
+        data: createNotificationInput,
+        include: {
+          User: true
+        }
       });
-      return notification;
+
+      return { ...User, ...others };
     } catch (error) {
       console.log(error)
       throw error;
@@ -23,8 +27,15 @@ export class NotificationService {
   async findAllForUser(UserID: string) {
     try {
       const notifications = await this.prisma.notification.findMany({
-        where: { UserID },
+        where: { UserID, Status: notificationStatus.unread },
+        orderBy: {
+          CreatedAt: "desc"
+        },
+        include: {
+          User: true
+        }
       });
+
       return notifications;
     } catch (error) {
       throw error;

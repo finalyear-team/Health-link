@@ -10,19 +10,21 @@ export class NotificationResolver {
 
 
 
-  @Query('notificationsForUser')
-  findAll(@Args('UserID', { type: () => String }) UserID: string) {
+  @Query('UserNotification')
+  findAll(@Args('UserID') UserID: string) {
+
     return this.notificationService.findAllForUser(UserID);
   }
 
-  @Query('notification')
-  findOne(@Args('NotificationID', { type: () => String }) NotificationID: string) {
+  @Query('GetNotification')
+  findOne(@Args('NotificationID') NotificationID: string) {
     return this.notificationService.findOne(NotificationID);
   }
 
   @Mutation("updateNotification")
   updateNotification(@Args('updateNotificationInput') updateNotificationInput: UpdateNotificationInput) {
-    return this.notificationService.update(updateNotificationInput);
+    console.log(updateNotificationInput)
+    // return this.notificationService.update(updateNotificationInput);
   }
 
   @Mutation("removeNotification")

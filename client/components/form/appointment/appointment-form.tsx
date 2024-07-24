@@ -13,6 +13,8 @@ import {
   addMinutes,
   addHours,
   parseISO,
+  differenceInDays,
+  isAfter,
 } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,44 +50,63 @@ import { DoctorProfile } from "@/types";
 import client from "@/graphql/apollo-client";
 import formatScheduleTime from "@/utils/formatDate";
 import { getRoom } from "@/Services/videoCallServices";
-
-// type DayOfWeek = keyof typeof doctorAvailability;
-
-// const doctorAvailability = {
-//   Monday: { start: "03:00 AM", end: "08:00 AM" },
-//   Tuesday: { start: "09:00 AM", end: "12:00 PM" },
-//   Wednesday: { start: "01:00 PM", end: "05:00 PM" },
-//   Thursday: { start: "07:00 AM", end: "11:00 AM" },
-//   Friday: { start: "02:00 PM", end: "06:00 PM" },
-//   Saturday: { start: "10:00 AM", end: "03:00 PM" },
-//   Sunday: { start: "12:00 PM", end: "04:00 PM" },
-// };
+import { UpdateAppointmentType } from "@/types/types";
+import { validateAppointmentBooking } from "@/utils/validationSchema";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
 
 
 
-// const getTimeRangeForDay = (day: DayOfWeek) => doctorAvailability[day];
 
+const createTimeSlots = (start: Date, end: Date, date: string, excludedRanges: Array<{ start: string; end: string }>) => {
+  console.log("from slots")
+  let excludeTimes: any[] = [];
+  console.log(excludedRanges)
+  if (excludedRanges.length > 0) {
+    excludeTimes = excludedRanges?.map((time) => ({
+      start: parse(time.start, "hh:mm a", new Date()),
+      end: parse(time.end, "hh:mm a", new Date())
 
-const createTimeSlots = (start: Date, end: Date) => {
+    }))
+  }
   const times = [];
   let current = start;
+  const currentDate = date && new Date(date)
+  const now = new Date(format(new Date(), "yyyy-MM-dd"))
+
+  if (differenceInDays(currentDate, now) === 0)
+    current = addHours(setMinutes(new Date(), 0), 1)
+
+
+
 
   // Generate times in 1-hour increments
   while (isBefore(current, end) || current.getTime() < end.getTime()) {
-    times.push(format(current, "hh:mm a"));
+    let isInExclusionRange = false;
+    for (const exclusion of excludeTimes) {
+      if (isBefore(current, exclusion.end) && isAfter(current, exclusion.start)) {
+        isInExclusionRange = true;
+        break;
+      }
+    }
+    if (!isInExclusionRange) {
+      times.push(format(current, "hh:mm a"));
+    }
     current = addMinutes(current, 60);
   }
+
+  console.log("from slots")
+  console.log(times)
 
   return times;
 
 }
 
-const selectSchedule = (schedules: any[] | null, appointmentTime: string) => {
+const selectSchedule = (schedules: any[] | null, appointmentTime: string, date: Date | null, excludedRanges: Array<{ start: string; end: string }>) => {
   if (!schedules || schedules.length === 0)
     return
-
-  const slots = schedules.map((schedule) => (createTimeSlots(parse(formatScheduleTime(schedule.StartTime), "hh:mm a", new Date()), parse(formatScheduleTime(schedule.EndTime), "hh:mm a", new Date()))))
-  console.log(slots)
+  console.log("schedules")
+  console.log(schedules)
+  const slots = schedules.map((schedule) => (createTimeSlots(parse(formatScheduleTime(schedule.StartTime), "hh:mm a", new Date()), parse(formatScheduleTime(schedule.EndTime), "hh:mm a", new Date()), format(date || "", "yyyy-MM-dd"), excludedRanges)))
 
   const schedule = slots.map((slot, i) => {
     const time = slot.filter((time) => time.includes(appointmentTime))
@@ -93,43 +114,76 @@ const selectSchedule = (schedules: any[] | null, appointmentTime: string) => {
       return schedules[i]
   })
 
-  console.log(schedule.find((time) => time))
   return schedule.find((time) => time)
-
-
-
-
 }
 
-const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
+
+
+const AppointmentForm = ({ doctorId, patientId, name, existingAppointment }: any) => {
+
+
+  console.log(existingAppointment)
+
   const [date, setDate] = useState<Date | null>(
-    existingAppointment?.date ? new Date(existingAppointment.date) : null
+    existingAppointment?.date ? existingAppointment.date : null
   );
-  const [schedule, setSchedule] = useState(null)
+  const [schedule, setSchedule] = useState<any>(null)
   const [doctorAvailability, setDoctorAvailablity] = useState(null)
   const [appointmentTime, setAppointmentTime] = useState<string>(
     existingAppointment?.time || ""
   );
   const { user } = useAuth();
+  const [bookedTimes, setBookedTimes] = useState<any[]>([])
   const patientID = user?.UserID;
-  const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
 
-  console.log(selectedDoctor?.id)
+  const { refetch } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: { userID: user?.UserID },
+  });
+
+  const selectedDoctor = useAppointmentStore((state) => state.selectedDoctor);
 
 
   const clearSelection = useAppointmentStore((state) => state.clearSelection);
 
-  const [CreateAppointment, { data: createData, error: createError }] = useMutation(CREATE_APPOINTMENT);
-  const [UpdateAppointment, { data: updateData, error: updateError }] = useMutation(UPDATE_APPOINTMENT);
+  const [CreateAppointment, { data: createData, error: createError }] = useMutation(CREATE_APPOINTMENT, {
+    onCompleted(data, clientOptions) {
+      refetch()
+      toast({
+        title: "Appointment Created",
+        description: `Your appointment has been sent successfully, please wait for ${selectedDoctor?.name} to confirm.`,
+        variant: "success",
+      });
+      clearSelection()
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+    }
+
+  });
+  const [UpdateAppointment, { data: updateData, error: updateError }] = useMutation(UPDATE_APPOINTMENT, {
+    onCompleted(data, clientOptions) {
+      refetch()
+      toast({
+        title: "Appointment Updated",
+        description: `Your appointment has been updated successfully, please wait for a confirmation from ${name}`,
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+
+      console.error('Mutation error:', error);
+    }
+
+  });
 
   const { toast } = useToast();
 
 
+
   const handleSubmit = async (values: any) => {
-    console.log(appointmentTime)
 
+    const selectedSchedule = selectSchedule(schedule, appointmentTime, date, bookedTimes)
 
-    const selectedSchedule = selectSchedule(schedule, appointmentTime)
 
     if (!date || !appointmentTime || !values.reason)
       return
@@ -139,37 +193,30 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
     // submission logic
     try {
       const createdRoom = await getRoom({
-        doctor: selectedDoctor?.id,
-        patient: user?.UserID,
+        doctor: selectedDoctor?.id || doctorId,
+        patient: patientId || user?.UserID,
         appointmentDate: format(date, "yyyy-MM-dd"),
         appointmentTime
       })
-
-
-      console.log(createdRoom?.room.id)
 
       if (!createdRoom)
         return
 
       if (existingAppointment) {
-
         await UpdateAppointment({
           variables: {
             updateAppointmentInput: {
               AppointmentID: existingAppointment.id,
-              DoctorID: selectedDoctor?.id,
-              PatientID: patientID,
+              DoctorID: doctorId,
+              PatientID: patientId,
+              ScheduleID: selectedSchedule?.ScheduleID,
               AppointmentDate: format(date, "yyyy-MM-dd"),
               AppointmentTime: appointmentTime,
+              UpdatedBy: user?.UserID,
+              UpdateType: UpdateAppointmentType.RESCHEDULEAPPOINTMENT,
               Note: values.reason,
             }
           },
-        });
-        console.log("appointment updated");
-        toast({
-          title: "Appointment Updated",
-          description: `Your appointment has been updated successfully, please wait for response from ${selectedDoctor?.name} to confirm`,
-          variant: "success",
         });
         clearSelection();
       } else {
@@ -186,40 +233,30 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
             },
           },
         });
-        console.log("appointment created");
-        toast({
-          title: "Appointment Created",
-          description: `Your appointment has been sent successfully, please wait for response from ${selectedDoctor?.name} to confirm.`,
-          variant: "success",
-        });
+
         clearSelection();
       }
     } catch (error: any) {
       console.error(
         `Error ${existingAppointment ? "updating" : "creating"} appointment:`,
         error.message
-      );
-      toast({
-        title: `Error ${existingAppointment ? "updating" : "creating"
-          } appointment.         
-          `,
-        description: "Please try again.",
-        variant: "destructive",
-      });
+      )
     }
   }
 
-  const initialValues = { reason: existingAppointment?.reason || "" };
+  const initialValues = { reason: "" };
 
   const today = startOfDay(new Date());
 
   const isDateDisabled = (day: Date) => isBefore(day, today);
 
+
+
   const getAvailableTimes = (doctorAvailability: any[] | null) => {
 
-    // if (!date) return [];
     if (!doctorAvailability || doctorAvailability?.length === 0)
       return []
+
     const range = doctorAvailability.map((date) => ({
       ...date
     }))
@@ -232,34 +269,12 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
       end: parse(time.end, "hh:mm a", new Date())
 
     }))
-    const slots = times.map((slot) => createTimeSlots(slot.start, slot.end))
+    const slots = times.map((slot) => createTimeSlots(slot.start, slot.end, format(date || "", "yyyy-MM-dd"), bookedTimes))
+
 
     return slots
 
-    // // Get the day of the week
-    // const dayOfWeek = format(date, "EEEE") as DayOfWeek;
-    // console.log(dayOfWeek)
-    // const range = getTimeRangeForDay(dayOfWeek);
 
-    // if (!range) return [];
-
-    // // Parse the start and end times
-    // const start = parse(range.start, "hh:mm a", date);
-    // const end = parse(range.end, "hh:mm a", date);
-    // console.log(formatScheduleTime(start.toISOString()))
-    // console.log(formatScheduleTime(end.toISOString()))
-
-    // const times = [];
-    // let current = start;
-
-    // // Generate times in 1-hour increments
-    // while (isBefore(current, end) || current.getTime() === end.getTime()) {
-    //   times.push(format(current, "hh:mm a"));
-    //   current = addMinutes(current, 60);
-    // }
-    // console.log(times)
-
-    // return times;
   };
 
   // Function to format date and time into a specific combined string format
@@ -287,31 +302,35 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
 
     return "";
   };
-  useEffect(() => {
-    setDate(
-      existingAppointment?.date ? new Date(existingAppointment.date) : null
-    );
-    setAppointmentTime(existingAppointment?.time || "");
-  }, [doctorId, existingAppointment]);
+
+
+
 
   useEffect(() => {
     const availableSlot = async () => {
       try {
         if (date) {
           const selectedDate = format(date, "dd-MM-yyyy")
+          console.log("selectedDate")
+          console.log(selectedDate)
           const { data, loading, error } = await client.query({
             query: GET_SCHEDULE_BY_DATE,
             variables: {
-              doctorID: selectedDoctor?.id,
+              doctorID: selectedDoctor?.id || doctorId,
               date: selectedDate
             }
           })
-          setSchedule(data.GetScheduleByDate)
-          const scheduleDates = data.GetScheduleByDate.map((date: any) => ({
+          console.log("from the schedule")
+          setSchedule(data.GetScheduleByDate.Schedule)
+          const scheduleDates = data.GetScheduleByDate?.Schedule?.map((date: any) => ({
             start: formatScheduleTime(date.StartTime),
             end: formatScheduleTime(date.EndTime)
           }))
           setDoctorAvailablity(scheduleDates)
+          setBookedTimes(data.GetScheduleByDate?.BookedTimes?.map((date: any) => ({
+            start: formatScheduleTime(date.StartTime),
+            end: formatScheduleTime(date.EndTime)
+          })))
         }
 
       } catch (error) {
@@ -325,6 +344,8 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
 
 
 
+  console.log("bookedTimes")
+  console.log(bookedTimes)
 
   return (
     <div className="p-6">
@@ -394,7 +415,7 @@ const AppointmentForm = ({ doctorId, existingAppointment }: any) => {
                     <>
                       {
                         time.map((slot) => (
-                          <SelectItem key={slot} value={slot}>
+                          <SelectItem key={slot} value={slot} >
                             {slot}
                           </SelectItem>
                         ))

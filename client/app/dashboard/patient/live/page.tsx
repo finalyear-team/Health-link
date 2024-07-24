@@ -12,10 +12,12 @@ import { Gender, UserType } from "@/types/types";
 import useVideoCallInfoStore from "@/store/videoCallInfo";
 import { addHours, format } from "date-fns";
 import formatScheduleTime from "@/utils/formatDate";
+import useAppointmentStore from "@/store/appointmentStore";
 
 const Video = () => {
-  const [showVideoChat, setShowVideoChat] = useState(false);
+
   const { user } = useAuth()
+  const { selectedAppointment, selectAppointment, showVideoChat, setShowVideoChat } = useAppointmentStore()
   const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
     variables: {
       userID: user?.UserID
@@ -47,7 +49,7 @@ const Video = () => {
   ) => {
     console.log(doctorId, patientId)
     setVideoCallInfo(appointmentId, doctorId, patientId, appointmentDate, appointmentTime);
-    setShowVideoChat(true);
+    setShowVideoChat();
   };
 
   return (
@@ -68,16 +70,20 @@ const Video = () => {
                   key={value.AppointmentID}
                   dummyData={{
                     appointmentId: value.AppointmentID,
+                    patientId: value.PatientID,
                     doctorId: value.DoctorID,
+                    userName: value.PatientName,
                     appointmentTime: value.AppointmentTime,
+                    duration: value.Duration,
                     appointmentDate: value.AppointmentDate,
-                    doctorName: value.DoctorName,
-                    doctorPhoto: value.DoctorPhoto,
+                    name: value.DoctorName,
+                    photo: value.DoctorPhoto,
                     purpose: value.Note,
                     role: UserType.DOCTOR
                   }}
                   appointmentTime={value.AppointmentTime}
                   onJoinClick={() => {
+                    selectAppointment(value)
                     handleJoinClick(value.AppointmentID, value.DoctorID, value.PatientID, format(addHours(value.AppointmentDate, 24), "yyyy-MM-dd"), formatScheduleTime(value.AppointmentDate))
                   }}
                 />

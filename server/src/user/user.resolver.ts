@@ -12,7 +12,8 @@ import { ClerkMiddleware } from 'src/clerk.middleware';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {
+  }
 
   lowerCase(field: string) {
     return field.toLowerCase()
@@ -23,7 +24,6 @@ export class UserResolver {
   async getProfile(@Context() context: { req: Request, res: Response, next: NextFunction }) {
     const requestUser = context.req.user as any
     const user = await this.userService.getUserDetails(requestUser.UserID)
-
     return user
   }
 
@@ -31,15 +31,12 @@ export class UserResolver {
   @Query("GetUserByEmail")
   async getUserByEmail(@Args("Email") Email: string) {
     const user = await this.userService.getUserByEmail(Email)
-    console.log(user)
     return user
   }
 
 
   @Mutation('RegisterUser')
   async register(@Args('RegisterInput') RegisterInput: UserDetailsInput, @Context("res") res: Response) {
-    console.log(RegisterInput)
-    console.log("register")
     const input = new UserDetailsInput(RegisterInput)
     const user = await this.userService.RegisterUser(input);
     return user
@@ -50,7 +47,6 @@ export class UserResolver {
   @Mutation('DoctorRegister')
   async doctorRegister(@Args('DoctorDetailInput') doctorDetailInput: DoctorDetailInput) {
     const input = new DoctorDetailInput(doctorDetailInput)
-    console.log(input)
     const doctor = await this.userService.DoctorRegister(input)
     return doctor
   }
@@ -97,10 +93,6 @@ export class UserResolver {
 
   @Mutation('SearchDoctors')
   async searchDoctors(@Args('searchQuery') searchQuery: string, @Args('sortingQuery') sortingQuery: string, @Args('sortingOrder') sortingOrder: string) {
-    console.log(searchQuery)
-    console.log(sortingOrder)
-    console.log(sortingQuery)
-
     const users = await this.userService.searchDoctors(searchQuery, sortingQuery, sortingOrder)
     return users
   }
@@ -110,6 +102,7 @@ export class UserResolver {
   @Mutation('UpdateUser')
   //  @UseGuards(ClerkAuthGuard)
   async update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+    console.log(updateUserInput)
     const user = await this.userService.updateUser(updateUserInput)
     const Education = JSON.parse(`${user.EducationalBackground}`)
     return { EducationalBackground: Education, ...user }
@@ -131,6 +124,8 @@ export class UserResolver {
   // @UseGuards(RoleGuard)
   // @UserRoles(UserType.ADMIN)
   async Follow(@Args('FollowerID') FollowerID: string, @Args("FollowingID") FollowingID: string) {
+    console.log(FollowerID)
+    console.log(FollowingID)
     const user = await this.userService.follow(FollowerID, FollowingID)
     return user
 

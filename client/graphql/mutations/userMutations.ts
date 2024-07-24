@@ -117,3 +117,23 @@ export const SEARCH_DOCTORS = gql`
     }
   }
 `;
+export const FOLLOW_DOCTOR = gql`
+   mutation Follow($FollowerID:String!,$FollowingID:String!){
+      Follow(FollowerID:$FollowerID,FollowingID:$FollowingID){
+        UserID,
+        Username,
+        FirstName,
+        LastName     
+     }
+   }
+`
+
+export const UNFOLLOW_DOCTOR = gql`
+   mutation UnFollow($FollowerID:String!,$FollowingID:String!){
+      Follow(FollowerID:$FollowerID,FollowingID:$FollowingID){
+        UserID,
+        Username,
+        FirstName,
+        LastName      }
+   }
+  `

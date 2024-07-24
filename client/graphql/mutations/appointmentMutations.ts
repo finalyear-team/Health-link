@@ -20,8 +20,8 @@ mutation CreateAppointment($createAppointmentInput: CreateAppointmentInput!) {
 }
 `;
 export const UPDATE_APPOINTMENT = gql`
-mutation UpdateAppointment($input: UpdateAppointmentInput!) {
-  UpdateSchedule(updateAppointmentInput: $input) {
+mutation UpdateAppointment($updateAppointmentInput: UpdateAppointmentInput!) {
+  UpdateAppointment(updateAppointmentInput: $updateAppointmentInput) {
   AppointmentID
   DoctorID
   PatientID
@@ -56,27 +56,42 @@ mutation CreateEmergencyAppointment($input: EmergencyAppointmentInput!) {
 }
 `;
 export const ACCEPT_APPOINTMENT = gql`
-mutation AcceptAppointment($AppointmentID:String!,$DoctorID: String!,$Duration:Int!) {
-    AcceptAppointment(DoctorID: $DoctorID,AppointmentID:$AppointmentID,Duration:$Duration) {
+mutation AcceptAppointment($AppointmentID:String!,$DoctorID: String!,$Duration:Int!,$Status:AppointmentStatus!) {
+    AcceptAppointment(DoctorID: $DoctorID,AppointmentID:$AppointmentID,Duration:$Duration,Status:$Status) {
     AppointmentID
     DoctorID
     PatientID
     ScheduleID
     AppointmentDate
     AppointmentTime
-    VideoChatRoomID
     Duration
     Status
     AppointmentType
-    Note  
-
-   
+    Note     
   }
 }
 `;
 
+export const DECLINE_APPOINTMENT = gql`
+  mutation DeclineAppointment($CancelledBy:String!,$AppointmentID:String!,$CancelledReason:String){
+    DeclineAppointment(CancelledBy:$CancelledBy,AppointmentID:$AppointmentID,CancelledReason:$CancelledReason){
+      AppointmentID
+        DoctorID
+        PatientID
+        ScheduleID
+        AppointmentDate
+        AppointmentTime
+        Duration
+        Status
+        AppointmentType
+        Note   
+
+    }
+  }
+`
+
 export const REMOVE_APPOINTMENT = gql`
-mutation RemoveAppointment($Id: Int!) {
+mutation RemoveAppointment($Id: String!) {
   RemoveAppointment(Id: $Id) {
   AppointmentID
   DoctorID

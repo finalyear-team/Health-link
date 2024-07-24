@@ -18,7 +18,7 @@ import { DoctorDetailInput } from 'src/user/dto/create-user.input';
 export class AuthService {
     private salt: string
 
-    constructor(private readonly prisma: PrismaService, private readonly userService: UserService, private readonly jwtService: JwtService, private eventEmitter: EventEmitter2) {
+    constructor(private readonly prisma: PrismaService, private readonly userService: UserService, private readonly jwtService: JwtService) {
         this.salt = process.env.HASH_KEY_SALT
 
 
@@ -76,6 +76,8 @@ export class AuthService {
             })
             if (!user)
                 throw new UnauthorizedException("Invalid credentials.check your username or password!!")
+            if (user && !user.Verified)
+                throw new UnauthorizedException("user not verified")
 
             if (!this.validatePassword(Password, user.Password))
                 throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
@@ -235,11 +237,6 @@ export class AuthService {
             const verificationToken = this.generateJWTToken(process.env.PASSWORD_RESET_SECRET, { sub: user.UserID, username: user.Username, email: user.Email }, "15m")
             const verificationLink = `${process.env.API}/auth/reset-password?token=${verificationToken}`
 
-            this.eventEmitter.emit("Reset-password", {
-                username: user.Username,
-                email: user.Email,
-                verificationLink
-            })
             return { token: verificationToken }
 
 

@@ -90,7 +90,7 @@ export class EmergencyScheduleInput {
     DoctorID: string
     @Field()
     EndTime: Date
-    constructor(input: EmergencyScheduleInput) {
+    constructor(input: any) {
         const validatedData = EmergencyScheduleInputSchema.parse(input);
         this.DoctorID = validatedData.DoctorID;
         this.EndTime = new Date(convertToIso(validatedData.EndTime)); // Convert and parse EndTime

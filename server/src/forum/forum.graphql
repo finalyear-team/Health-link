@@ -3,27 +3,52 @@ scalar Date
 type PostMedia{
    MediaType:MediaType
    URL:String
-  }  
+  } 
+
+
+enum UserType {
+    doctor,
+    patient,
+    admin,
+    moderator,
+    organization
+  }
+
+type Author{
+  UserID:String
+  FirstName:String
+  LastName:String
+  Username: String
+  ProfilePicture: String
+  Role:UserType
+  Verified:Boolean
+
+} 
 
 type ForumAnswer{
   ForumPostID:String
+  ForumAnswerID:String
   Answer:String
   UserID:String
   Medias:[PostMedia]
+  CreatedAt:Date
   Comments:[Comment]
   CommentsCount:Int
+  Author:Author!
   Likes:Int
 }
 type Forum {
   ForumPostID:String
-  UserID:String
+  Title:String
   Question:String!
   CreatedAt:Date
   UpdatedAt:Date
   ForumAnswer:[ForumAnswer]
+  Author:Author!
 }
 
 input CreateForumInput {
+   Title:String!
    Question:String!
    UserID:String!   
 }
@@ -49,7 +74,7 @@ input UpdateForumAnswerInput {
 }
 
 type Query {
-  GetForumPosts: [Forum]
+  GetForumPosts(Query:String): [Forum]
   GetForumPost(ForumPostID: String!): Forum
   GetForumAnswers(ForumPostID:String!):[ForumAnswer]
   GetForumAnswer(ForumAnswerID:String!):[ForumAnswer]

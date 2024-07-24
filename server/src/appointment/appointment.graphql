@@ -5,13 +5,20 @@ enum AppointmentType {
 }
 enum AppointmentStatus {
   pending
+  reschedulePending
   booked
   completed
   cancelled
+  overdue
 }
 enum Gender {
   male
   female
+}
+
+enum UpdateAppointmentType{
+  cancelAppointment,
+  rescheduleAppointment
 }
 
 
@@ -22,13 +29,15 @@ type Appointment {
   AppointmentID:String!
   DoctorID:String!
   PatientID:String!
-  ScheduleID:String!
+  ScheduleID:String
   AppointmentDate:Date!
   AppointmentTime:Date!
   Duration:Int
   PatientName:String
   PatientPhoto:String
   PatientGender:Gender
+  PatientDOB:Date
+  CreatedAt:Date
   DoctorGender:Gender
   DoctorName:String
   DoctorPhoto:String
@@ -69,7 +78,9 @@ input UpdateAppointmentInput {
   AppointmentType:AppointmentType
   Note:String   
   CancelledBy:String
-  CancelledReson:String    
+  CancelledReason:String 
+  UpdatedBy:String
+  UpdateType:UpdateAppointmentType
 }
 
 input EmergencyAppointmentInput{
@@ -88,7 +99,8 @@ type Query {
   FilterUserAppointment(UserID:String!,Query:String!):[Appointment]
   
   FilterDoctorAppointment(DoctorID:String!,Query:String!):[Appointment]
-
+  checkIfOverDue:[Appointment]
+  
   FilterAppointments(Query:String): [Appointment]
   GetAppointmentByID(Id:String!):Appointment
 }
@@ -100,7 +112,9 @@ type Mutation {
 
   CreateEmergencyAppointment(emergencyAppointmentInput:EmergencyAppointmentInput):Appointment  
 
-  AcceptAppointment(DoctorID:String!,AppointmentID:String!,Duration:Int!):Appointment
+  AcceptAppointment(DoctorID:String!,AppointmentID:String!,Duration:Int!,Status:AppointmentStatus!):Appointment
+
+  DeclineAppointment(CancelledBy:String!,AppointmentID:String!,CancelledReason:String):Appointment
 
   RemoveAppointment(Id: String!): Appointment
 }

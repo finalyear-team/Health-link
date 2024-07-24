@@ -1,4 +1,4 @@
-import { Gender, UserType } from "./types";
+import { AppointmentStatus, Gender, NotificationType, UserType } from "./types";
 
 export interface DoctorProfile {
   id: number;
@@ -22,8 +22,10 @@ export interface AppointmentType {
   appointmentDate: string;
   appointmentTime: string;
   doctorId: string;
-  doctorName: string;
-  doctorPhoto: string;
+  patientId: string;
+  duration?: number;
+  name: string;
+  photo: string;
   purpose: string;
   status: string;
   gender: Gender
@@ -65,14 +67,26 @@ export interface PopoverNotification {
   Status: "read" | "unread";
 }
 
-export enum NotificationType {
-  newAppointment,
-  cancelAppointment,
-  acceptAppointment,
-  newPost,
-  newForumQuestion,
-  newForumAnswer,
-  newChat,
-  newVideoCall,
-  newComment
+export interface NotificationCardProps {
+  patientName: string;
+  date: Date;
+  time: string;
+  reason: string;
+  details: string;
+}
+export interface AppointmentNotification {
+  patientName: string;
+  date: string;
+  age: string,
+  appointmentId: string,
+  doctorName: string,
+  doctorId: string
+  role: UserType,
+  gender: Gender
+  time: string;
+  status: AppointmentStatus
+  reason: string;
+  details: string;
+  appointmentDate: string;
+  appointmentTime: string;
 }

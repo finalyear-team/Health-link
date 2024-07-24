@@ -2,8 +2,8 @@ import { UserStatus, UserType } from '@/types/types';
 import { gql } from '@apollo/client';
 
 export const CREATE_SCHEDULE = gql`
-mutation CreateSchedule($scheduleInput: CreateScheduleInput!) {
-  CreateSchedule(createScheduleInput: $scheduleInput) {
+mutation CreateSchedule($scheduleInput: CreateScheduleInput!,$unselectedDays:[WeekDay]) {
+  CreateSchedule(createScheduleInput: $scheduleInput,unselectedDays:$unselectedDays) {
     ScheduleID
     WeekDay
     Date

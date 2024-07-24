@@ -1,24 +1,64 @@
-type Stream {
-  # Example field (placeholder)
-  exampleField: Int
+# Define the ChatChannel type
+type ChatChannel {
+  ChannelID: String! 
+  ChannelName: String
+  Image: String
+  Description: String
+  Disease: String
+  ChannelType: String 
+  CreatedAt: String 
+  UpdatedAt: String
+  Members: [ChannelMember!]! 
+  }
+
+
+enum ChatMessageType{
+  myChat,
+  other
+}
+type ChatMessage {
+  ChannelID: String 
+  ChatID: String!
+  Content: String
+  SenderID: String
+  MediaUrl: String
+  SentAt: String 
+  IsSeen: Boolean
+  sender:ChannelMember
 }
 
-input CreateStreamInput {
-  # Example field (placeholder)
-  exampleField: Int
+type ChannelMember {
+  UserID: String! 
+  Role:String
+  Username:String
+  FirstName:String
+  LastName:String
+  ProfilePicture: String
 }
 
-input UpdateStreamInput {
-  id: Int!
+
+input CreateChatChannelInput {
+  ChannelName: String
+  Image: String
+  Description: String
+  Disease: String
+  ChannelType: String
 }
 
+input UpdateChatChannelInput {
+  id: String! # Assuming ChannelID is a string
+}
+
+#
 type Query {
-  streams: [Stream]!
-  stream(id: Int!): Stream
+  userChannel(UserID:String!): [ChatChannel]! 
+  getChannel(ChannelID: String!): ChatChannel 
+  getChats(UserID: String!,ChannelID:String): [ChatMessage]
 }
+
 
 type Mutation {
-  createStream(createStreamInput: CreateStreamInput!): Stream!
-  updateStream(updateStreamInput: UpdateStreamInput!): Stream!
-  removeStream(id: Int!): Stream
+  createChatChannel(input: CreateChatChannelInput!): ChatChannel!
+  updateChatChannel(input: UpdateChatChannelInput!): ChatChannel!
+  deleteChat(ChatID: String!): ChatMessage!
 }

@@ -7,6 +7,7 @@ import { elementAt } from 'rxjs';
 import { ConfirmPaymentInput } from './dto/confirm-payment.input';
 import { UserService } from 'src/user/user.service';
 import { string } from 'zod';
+import { AppointmentService } from 'src/appointment/appointment.service';
 
 @Injectable()
 export class PaymentService {
@@ -23,7 +24,7 @@ export class PaymentService {
             "last_name": user.LastName,
             "phone_number": user.phone_number,
             "tx_ref": tx_ref,
-            "callback_url": " https://b7e5-213-55-102-49.ngrok-free.app/payment/webhook",
+            "callback_url": " https://1ff7-197-156-97-73.ngrok-free.app/payment/webhook",
             "return_url": "https://localhost:3000/dashboard",
             "customization[title]": "Payment for my favourite merchant",
             "customization[description]": "I love online payments"
@@ -44,6 +45,8 @@ export class PaymentService {
             const data = await response.json()
             console.log(data.data)
             const checkout = await this.chapaCheckoutConfrim(data.data.checkout_url)
+            console.log("from checkout")
+            console.log(checkout)
         } catch (error) {
             throw error
 
@@ -84,17 +87,45 @@ export class PaymentService {
         }
     }
 
+
+
     async pendingPayment(paymentInput: CreatePaymentInput) {
+        const { AppointmentID, DoctorID, PatientID } = paymentInput
         try {
-            const payment = await this.prisma.payment.create({
-                data: { ...paymentInput }
+            const appointment = await this.prisma.appointments.findUnique({
+                where: {
+                    AppointmentID,
+                    PatientID,
+                    DoctorID
+                },
+                include: {
+                    Doctor: {
+                        select: {
+                            DoctorDetails: {
+                                select: {
+                                    ConsultationFee: true
+                                }
+                            }
+                        }
+                    }
+
+                }
             })
-            console.log(payment)
-            return payment
+
+
+
+
+            console.log(appointment)
+
+
+
+
         } catch (error) {
-            throw new HttpException("faild to process payment", HttpStatus.INTERNAL_SERVER_ERROR)
+            console.log(error)
 
         }
+
+
 
 
     }
@@ -138,11 +169,10 @@ export class PaymentService {
                 }
             })
 
-            this.chapaTransactionIntialize(patient, amount)
+            const checkout = await this.chapaTransactionIntialize(patient, amount)
+            console.log(checkout)
 
-            const updatedPayment = this.updatePayment(payment.PaymentID, amount)
 
-            return updatedPayment
 
         } catch (error) {
             console.log(error)

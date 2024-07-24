@@ -31,6 +31,26 @@ type Schedule {
   ScheduleType:ScheduleType
 }
 
+type Appointment {
+  AppointmentID:String!
+  DoctorID:String!
+  PatientID:String!
+  ScheduleID:String
+  AppointmentDate:Date!
+  AppointmentTime:Date!
+  Duration:Int
+  PatientName:String
+  PatientPhoto:String
+  PatientGender:Gender
+  PatientDOB:Date
+  CreatedAt:Date
+  DoctorGender:Gender
+  DoctorName:String
+  DoctorPhoto:String
+  Status:AppointmentStatus
+  AppointmentType:AppointmentType
+  Note:String
+}
 
 input CreateScheduleInput{
   DoctorID:String!
@@ -62,16 +82,25 @@ input SearchScheduleInput{
   DoctorID:String!
 }
 
+type BookedTimes{
+  StartTime:Date
+  EndTime:Date
+}
+
+type AvailableSchedules{
+  Schedule:[Schedule]
+  BookedTimes:[BookedTimes]
+}
 
 type Query {  
   Schedules(DoctorID:String!): [Schedule]
   EmergencySchedules:[Schedule]
-  GetScheduleByDate(DoctorID:String!,Date:String!):[Schedule]
+  GetScheduleByDate(DoctorID:String!,Date:String!):AvailableSchedules
 }
 
 
 type Mutation {
-  CreateSchedule(createScheduleInput: CreateScheduleInput!): [Schedule]
+  CreateSchedule(createScheduleInput: CreateScheduleInput!,unselectedDays:[WeekDay]): [Schedule]
   UpdateSchedule(updateScheduleInput: UpdateScheduleInput!): Schedule!
   CreateEmergencySchedule(emergencyScheduleInput: EmergencyScheduleInput!): Schedule!
   RemoveSchedule(id: Int!): Schedule

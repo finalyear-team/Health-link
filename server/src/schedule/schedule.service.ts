@@ -8,6 +8,7 @@ import { DoctorSchedule, ScheduleType, Weekday } from '@prisma/client';
 import { format } from 'date-fns';
 import { parseDate } from 'src/utils/parseDate';
 import { ScheduleStatus } from 'src/utils/types';
+import { removed } from 'dompurify';
 
 @Injectable()
 export class ScheduleService {
@@ -16,8 +17,6 @@ export class ScheduleService {
   // 
   async checkIfTheSlotIsAlreadyRegistered(DoctorID: string, StartTime: any, EndTime: any, ScheduleType: ScheduleType, WeekDay?: Weekday[], date?: Date) {
     try {
-      console.log(WeekDay)
-      console.log(date)
       const conditions = [];
       const TimeCondition = {
         OR: [
@@ -50,7 +49,6 @@ export class ScheduleService {
 
 
       if (WeekDay && WeekDay.length > 0) {
-        console.log(" weekday condition")
         WeekDay.forEach(day => conditions.push({
           AND: [
             { WeekDay: day },
@@ -62,7 +60,6 @@ export class ScheduleService {
       }
 
       if (date) {
-        console.log("date condition")
         const dayOfWeek = format(date.toISOString(), 'EEEE').toLowerCase(); // Get the full name of the day of the week
         conditions.push({
           AND: [
@@ -79,7 +76,6 @@ export class ScheduleService {
         });
       }
 
-      console.log(conditions.forEach(condition => console.log(condition)))
 
       const slot = await this.prisma.doctorSchedule.findFirst({
         where: {
@@ -89,10 +85,101 @@ export class ScheduleService {
           OR: conditions
         }
       });
-      console.log(slot)
       return slot;
     } catch (error) {
       throw error;
+    }
+  }
+
+
+
+  async createOrUpdateSchedule(createScheduleInput: CreateScheduleInput, unselectedDays: Weekday[]) {
+    const { Date, StartTime, EndTime, WeekDay, Note, DoctorID, Status, ScheduleType } = createScheduleInput;
+
+
+    // Step 1: Check for existing schedules
+    const scheduelsToDelete = await this.prisma.doctorSchedule.findMany({
+      where: {
+        DoctorID,
+        WeekDay: {
+          in: unselectedDays
+        }
+      }
+    })
+
+    const existingSchedules = WeekDay ? await this.prisma.doctorSchedule.findMany({
+      where: {
+        DoctorID,
+        WeekDay: { in: WeekDay },
+        ScheduleType: ScheduleType || "normal"
+      }
+    }) : [];
+
+    const existingDays = existingSchedules.map(schedule => schedule.WeekDay);
+
+    console.log("days to delete")
+
+    // Step 2: Determine which days need to be updated and which need to be created
+    const daysToUpdate = WeekDay ? WeekDay.filter(day => existingDays.includes(day)) : [];
+    const daysToCreate = WeekDay ? WeekDay.filter(day => !existingDays.includes(day)) : [];
+
+
+    // delete unselectedSchedules
+    const deletedSchedules = scheduelsToDelete.map((schedule) =>
+      this.prisma.doctorSchedule.delete({
+        where: {
+          ScheduleID: schedule.ScheduleID
+        }
+      }))
+    // Step 3: Update existing schedules
+    const updatePromises = existingSchedules.map(schedule =>
+      this.prisma.doctorSchedule.update({
+        where: {
+          ScheduleID: schedule.ScheduleID,
+          WeekDay: schedule.WeekDay,
+          ScheduleType: ScheduleType || "normal"
+        },
+        data: {
+          StartTime,
+          EndTime,
+          Status,
+          Note
+        }
+      })
+    );
+
+    // Step 4: Create new schedules
+    const createPromises = daysToCreate.map(day =>
+      this.prisma.doctorSchedule.create({
+        data: {
+          DoctorID,
+          WeekDay: day,
+          StartTime,
+          EndTime,
+          Status,
+          Note,
+          ScheduleType: ScheduleType || "normal"
+        }
+      })
+    );
+
+    // Step 5: Execute updates and creations in parallel
+    try {
+      await Promise.all([...deletedSchedules, ...updatePromises, ...createPromises]);
+
+      // Return the updated and created schedules
+      const updatedSchedules = await this.prisma.doctorSchedule.findMany({
+        where: {
+          DoctorID,
+          WeekDay: { in: WeekDay },
+          ScheduleType: ScheduleType || "normal"
+        }
+      });
+
+      return updatedSchedules;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException("Error while creating or updating schedules", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -102,6 +189,7 @@ export class ScheduleService {
   //
   async createSchedule(createScheduleInput: CreateScheduleInput) {
     const { Date, StartTime, EndTime, WeekDay, Note, DoctorID, Status } = createScheduleInput
+
 
     if (await this.checkIfTheSlotIsAlreadyRegistered(DoctorID, StartTime, EndTime, "normal", WeekDay, Date))
       throw new HttpException("availablity already occupied", HttpStatus.BAD_REQUEST)
@@ -115,9 +203,10 @@ export class ScheduleService {
         Status
       }))
       let schedule: any
+      let WeekdaySchedules: any[]
 
       if (WeekDay && WeekDay.length > 0) {
-        schedule = await this.prisma.$transaction(async (prisma) => {
+        WeekdaySchedules = await this.prisma.$transaction(async (prisma) => {
           // Create many files
           await prisma.doctorSchedule.createMany({
             data: scheduleInput,
@@ -136,31 +225,20 @@ export class ScheduleService {
       }
 
       if (Date) {
-        schedule = await this.prisma.$transaction(async (prisma) => {
-          // Create many files
-          await prisma.doctorSchedule.createMany({
-            data: {
-              DoctorID,
-              Date,
-              StartTime,
-              EndTime,
-              Note,
-            },
-            skipDuplicates: true
-          });
-
-          // Retrieve the created files
-          const createdFiles = await prisma.doctorSchedule.findMany({
-            where: {
-              DoctorID
-            }
-          });
-
-          return createdFiles;
+        schedule = await this.prisma.doctorSchedule.create({
+          data: {
+            DoctorID,
+            Date,
+            StartTime,
+            EndTime,
+            Note,
+            Status
+          }
         });
+
       }
 
-      return schedule
+      return WeekdaySchedules && WeekdaySchedules.length > 0 ? WeekdaySchedules : schedule
     } catch (error) {
       console.log(error)
       throw error
@@ -213,17 +291,19 @@ export class ScheduleService {
   //
   async updateSchedule(updateScheduleInput: UpdateScheduleInput) {
     const { ScheduleID, DoctorID, ...others } = updateScheduleInput
+    console.log(others)
+    return null
     try {
-      const schedule = await this.prisma.doctorSchedule.update({
-        where: {
-          ScheduleID,
-          AND: [{
-            DoctorID
-          }]
-        },
-        data: { ...others }
-      })
-      return schedule
+      // const schedule = await this.prisma.doctorSchedule.update({
+      //   where: {
+      //     ScheduleID,
+      //     AND: [{
+      //       DoctorID
+      //     }]
+      //   },
+      //   data: { ...others }
+      // })
+      // return schedule
     } catch (error) {
       console.log(error)
       throw error.message
@@ -249,7 +329,6 @@ export class ScheduleService {
           Status: "unavailable",
         },
       })
-      console.log(schedules)
       return schedules
     } catch (error) {
       console.log(error)
@@ -260,7 +339,6 @@ export class ScheduleService {
 
   //
   async schedules(DoctorID: string) {
-    console.log("schedulessss")
     try {
       const schedules = await this.prisma.doctorSchedule.findMany({
         where: {
@@ -273,7 +351,6 @@ export class ScheduleService {
       return schedules
     } catch (error) {
       console.log(error)
-
     }
   }
 
@@ -319,6 +396,7 @@ export class ScheduleService {
       const schedules = await this.prisma.doctorSchedule.findMany({
         where: {
           DoctorID,
+          Status: "available",
           OR: [
             {
               Date: {
@@ -331,15 +409,37 @@ export class ScheduleService {
         }
       })
 
+      console.log(schedules)
 
       return schedules
     } catch (error) {
       throw error
     }
   }
-
   //
 
 
+  async removeSchedule(ScheduleID: string) {
+    try {
+      const schedules = await this.prisma.doctorSchedule.delete({
+        where: {
+          ScheduleID
+        }
+      })
 
+      console.log("removed schedule")
+      console.log(schedules)
+
+      return schedules
+    } catch (error) {
+      throw error
+    }
+  }
+  //
 }
+
+
+
+
+
+

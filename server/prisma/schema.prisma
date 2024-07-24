@@ -81,7 +81,8 @@ enum ScheduleType {
 
 enum AppointmentStatus {
   pending
-  overDue
+  reschedulePending
+  overdue
   booked
   completed
   cancelled
@@ -116,6 +117,7 @@ enum FeedbackType {
   generalFeedback
   question
   review
+  enquiry
 }
 
 enum Weekday {
@@ -165,6 +167,7 @@ enum notificationType {
   newAppointment
   cancelAppointment
   acceptAppointment
+  rescheduleAppointment
   newChat
   newVideoCall
   newPost
@@ -196,6 +199,7 @@ model Users {
   DoctorDetails         DoctorDetails?
   Reviews               DoctorReviews[]     @relation("patient_review")
   Appointments          Appointments[]      @relation("patient_appointment")
+  UpdateAppointment     Appointments[]      @relation("update_appointment")
   AppointmentsCancelled Appointments[]      @relation("appointmentCancelledby")
   // Consultancy           Consultancy[]
   // PatientBooking        Booking[]           @relation("patientBooking")
@@ -226,6 +230,7 @@ model Users {
   Notification          Notification[]
   Bookmarks             Bookmark[]
   Report                Report[]
+  Wallet                Wallet[]
 
   @@index([Email], name: "email_index")
 }
@@ -243,13 +248,13 @@ model MedicalRecord {
 }
 
 model DoctorDetails {
-  DoctorID              String   @id
+  DoctorID              String  @id
   Speciality            String?
-  ConsultationFee       Decimal?
+  ConsultationFee       Float?
   EducationalBackground Json?
   LicenseNumber         String?
   ExperienceYears       Int?
-  User                  Users    @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
+  User                  Users   @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
 
   @@index([Speciality], name: "Speciality_index")
 }
@@ -276,7 +281,7 @@ model Appointments {
   AppointmentID   String            @id @default(uuid())
   DoctorID        String
   PatientID       String
-  ScheduleID      String
+  ScheduleID      String?
   AppointmentDate DateTime          @db.Date
   AppointmentTime DateTime          @db.Time
   Duration        Int?
@@ -285,17 +290,20 @@ model Appointments {
   Note            String?           @db.Text
   CreatedAt       DateTime          @default(now())
   UpdatedAt       DateTime          @updatedAt
-  CancelledBy     String?           @unique
+  UpdatedBy       String?
+  CancelledBy     String?
+
   CancelledReason String?
   VideoChatRoomID String
-  Doctor          Users             @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
-  Patient         Users             @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
-  Cancelled       Users?            @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
+  Doctor          Users   @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
+  Patient         Users   @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
+  Updated         Users?  @relation(onDelete: Cascade, "update_appointment", fields: [UpdatedBy], references: [UserID])
+  Cancelled       Users?  @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
 
-  Schedule      DoctorSchedule @relation(onDelete: Cascade, fields: [ScheduleID], references: [ScheduleID])
+  Schedule      DoctorSchedule? @relation(onDelete: SetNull, fields: [ScheduleID], references: [ScheduleID])
   // Booking         Booking[]
   Payment       Payment?
-  VideoChatRoom VideoChatRoom  @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
+  VideoChatRoom VideoChatRoom   @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
 
   @@index([Status], name: "status_index")
   @@index([DoctorID, PatientID], name: "doctor_patient_index")
@@ -358,7 +366,8 @@ model VideoChatRoom {
 }
 
 model MemberInVideoChat {
-  MemberID        String        @id @unique
+  ID              String        @id @default(uuid())
+  MemberID        String
   VideoChatRoomID String
   MemberAuthToken String        @db.LongText
   User            Users         @relation(onDelete: Cascade, fields: [MemberID], references: [UserID])
@@ -367,7 +376,7 @@ model MemberInVideoChat {
 
 // model that stores both dms and group chats it also stores PeerSupport group informations as channel
 model ChatChannel {
-  ChannelID   String          @id
+  ChannelID   String          @id @default(uuid())
   ChannelName String
   Image       String?
   Description String?         @db.Text
@@ -380,7 +389,7 @@ model ChatChannel {
 }
 
 model ChatMessage {
-  ChatID    String      @id
+  ChatID    String      @id @default(uuid())
   Content   String
   SenderID  String
   MediaUrl  String?
@@ -392,9 +401,10 @@ model ChatMessage {
 }
 
 model ChannelMember {
-  UserID           String      @id
+  ID               String      @id @default(uuid())
+  UserID           String
   ChannelID        String
-  AuthToken        String      @db.LongText
+  AuthToken        String?     @db.LongText
   Role             Role?       @default(member)
   JoinedAt         DateTime?   @default(now())
   CreatedAt        DateTime?   @default(now())
@@ -453,6 +463,7 @@ model BlogPost {
 
 model ForumPost {
   ForumPostID String        @id @default(uuid())
+  Title       String        @db.LongText()
   Question    String        @db.LongText
   CreatedAt   DateTime      @default(now())
   UpdatedAt   DateTime      @updatedAt
@@ -544,19 +555,6 @@ model Likes {
   @@index([ItemID])
   @@index([CreatedAt])
 }
-
-// model Views {
-//   ViewID      String       @id @default(uuid())
-//   UserID      String?
-//   ItemID      String
-//   ItemType    ContentType
-//   CreatedAt   DateTime     @default(now())
-//   User        Users?       @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
-//   Comment     Comments?    @relation(onDelete: Cascade, fields: [ItemID], references: [CommentID], map: "comment_view_fkey")
-//   BlogPost    BlogPost?    @relation(onDelete: Cascade, fields: [ItemID], references: [BlogID])
-//   ForumAnswer ForumAnswer? @relation(onDelete: Cascade, fields: [ItemID], references: [ForumAnswerID], map: "forum_answer_view_fkey")
-//   Post        Post?        @relation(onDelete: Cascade, fields: [ItemID], references: [PostID], map: "post_view_fkey")
-// }
 
 model Share {
   ShareID  String   @id @default(uuid())
@@ -682,4 +680,32 @@ model Report {
   PostID    Post?       @relation(fields: [ItemID], references: [PostID], map: "report_post_fkey")
   BlogPost  BlogPost?   @relation(fields: [ItemID], references: [BlogID], map: "report_blog_fkey")
   Comment   Comments?   @relation(fields: [ItemID], references: [CommentID], map: "report_comment_fkey")
+}
+
+model Wallet {
+  WalletID     String        @id @default(uuid())
+  UserID       String
+  Balance      Float         @default(0)
+  Transactions Transaction[]
+  User         Users         @relation(fields: [UserID], references: [UserID])
+
+  @@index([UserID], name: "wallet_user_index")
+}
+
+model Transaction {
+  TransactionID String          @id @default(uuid())
+  WalletID      String
+  Amount        Float
+  Type          TransactionType
+  Description   String?
+  CreatedAt     DateTime        @default(now())
+  UpdatedAt     DateTime        @updatedAt
+  Wallet        Wallet          @relation(fields: [WalletID], references: [WalletID])
+
+  @@index([WalletID], name: "transaction_wallet_index")
+}
+
+enum TransactionType {
+  debit
+  credit
 }

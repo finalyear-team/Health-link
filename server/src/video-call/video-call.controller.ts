@@ -16,7 +16,6 @@ export class VideoCallController {
   // @Roles(UserRoles.DOCTOR)
   async getRoom(@Req() req: Request, @Res() res: Response, @Query("Doctor") host: string, @Query("Patient") member: string, @Next() next: NextFunction) {
     const room = await this.videoCallService.getRoom(host, member)
-    console.log(room)
     res.json(room)
 
   }
@@ -32,7 +31,6 @@ export class VideoCallController {
   async getManagementToken(@Res() res: Response) {
     return await this.videoCallService.getManagmentToken()
   }
-
 
 }
 

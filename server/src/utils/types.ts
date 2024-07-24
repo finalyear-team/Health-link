@@ -99,7 +99,7 @@ export enum Role {
 export enum ContentType {
   FORUM_ANSWER = 'forumAnswer',
   POST = 'post',
-  COMMENT="comment"
+  COMMENT = "comment"
 }
 
 export enum FeedbackType {
@@ -122,12 +122,19 @@ export enum PaymentStatus {
   COMPLETED = 'completed',
 
 }
-export enum MediaType{
-  VIDEO="video",
- IMAGE= "image"
+export enum MediaType {
+  VIDEO = "video",
+  IMAGE = "image"
 }
 
-export enum LikeType{
-  LIKE="like",
- DISLIKE= "dislike"
+export enum LikeType {
+  LIKE = "like",
+  DISLIKE = "dislike"
 }
+
+
+export enum UpdateAppointmentType {
+  CANCELAPPOINTMENT = "cancelAppointment",
+  RESCHEDULEAPPOINTMENT = "rescheduleAppointment"
+}
+

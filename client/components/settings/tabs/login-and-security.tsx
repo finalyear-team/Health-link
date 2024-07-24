@@ -18,10 +18,11 @@ import { Formik, Form } from "formik";
 import { validatePassEditInfo } from "@/utils/validationSchema";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@clerk/nextjs";
+import useAuth from "@/hooks/useAuth";
 
 const LoginAndSecurity = ({ value }: { value: string }) => {
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user } = useAuth();
 
   const passInititalValues = {
     previousPassword: "",

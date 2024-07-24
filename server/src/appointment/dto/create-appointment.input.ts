@@ -1,9 +1,9 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { AppointmentStatus, AppointmentType } from "@prisma/client";
-import { format, parse, isBefore, startOfDay, formatDate } from "date-fns";
+import { format, parse, isBefore, startOfDay, formatDate, differenceInDays } from "date-fns";
 import { ScheduleStatus, WeekDay } from "src/utils/types";
 import { z } from "zod";
-import { convertToIso } from "src/utils/converToIso";
+import { compareTimeOnly, convertToIso } from "src/utils/converToIso";
 import { parseDate } from "src/utils/parseDate";
 
 
@@ -15,35 +15,28 @@ export const createAppointmentSchema = z.object({
     DoctorID: z.string(),
     PatientID: z.string(),
     ScheduleID: z.string().min(1, "scheduleID is required"),
-    AppointmentDate: z.string().refine(date => {
-        const today = new Date();
-        const parsedDate = parseDate(date)
-        today.setHours(0, 0, 0, 0); // Set to the start of the current day
-        if (date) {
-            const appointmentDate = new Date(parsedDate);
-            appointmentDate.setHours(0, 0, 0, 0); // Set to the start of the scheduleDate
-            if (appointmentDate.getTime() < today.getTime()) {
-                throw new Error('Scheduled date cannot be in the past');
-            }
-            else return true;
-        }
-    }),
-    AppointmentTime: z.string().refine(time => {
-        try {
-            convertToIso(time);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }, {
-        message: "Invalid AppointmentTime format"
-    }),
+    AppointmentDate: z.string(),
+    AppointmentTime: z.string(),
     Duration: z.number().optional(),
     VideoChatRoomID: z.string().optional(),
     Status: z.enum(StatusValue).optional(),
     AppointmentType: z.enum(TypeValue).optional(),
     Note: z.string().optional(),
-});
+}).refine(({ AppointmentDate, AppointmentTime }) => {
+    try {
+        const now = new Date()
+        const currenttime = convertToIso(AppointmentTime);
+        if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) < 0)
+            return false
+
+        if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) === 0 && compareTimeOnly(currenttime, new Date()) < 0)
+            return false
+        return true;
+    } catch (e) {
+        return false;
+    }
+
+}, "Appointment can't be in the past");
 
 
 @InputType()
@@ -83,7 +76,6 @@ export class CreateAppointmentInput {
         Object.assign(this, validatedAppointment)
         this.AppointmentDate = new Date(validatedAppointment.AppointmentDate)
         this.AppointmentTime = new Date(convertToIso(validatedAppointment.AppointmentTime))
-        console.log(this.AppointmentTime)
     }
 }
 

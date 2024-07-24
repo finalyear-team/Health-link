@@ -9,21 +9,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { CardContent } from "@/components/ui/card";
+import useAuth from "@/hooks/useAuth";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import { useMutation } from "@apollo/client";
 
 const ProffessionalInfoUpdate = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
+  const EducationalBackground = JSON.parse(user?.EducationalBackground || "{}")
   const { toast } = useToast();
-  const [specializationValue, setSpecializationValue] = useState("");
-  const [educationValue, setEducationValue] = useState("");
+  const [specializationValue, setSpecializationValue] = useState(EducationalBackground.Specialization || "");
+  const [educationValue, setEducationValue] = useState(EducationalBackground.Degree || "");
+
+  const [updateUser, { data, loading, error }] = useMutation(UPDATE_USER)
 
   const ProfessionalInitialValues = {
-    institution: "",
+    institution: EducationalBackground.Institution,
     educationValue,
-    specializationValue,
-    graduationYear: "",
-    license: "1231122133",
-    experiance: "",
-    consultationFee: "",
+    specializationValue: EducationalBackground?.Specialization,
+    graduationYear: EducationalBackground.GraduationYear,
+    license: user?.LicenseNumber.toString(),
+    experiance: user?.ExperienceYears,
+    consultationFee: user?.ConsultationFee,
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -32,8 +38,42 @@ const ProffessionalInfoUpdate = () => {
     }
   };
 
-  const handleProffestionalInfo = (values: any, { setSubmitting }: any) => {
-    console.log(values, specializationValue, educationValue);
+  const handleProffestionalInfo = async (values: any, { setSubmitting }: any) => {
+    try {
+      await updateUser({
+        variables: {
+          updateUserInput: {
+            UserID: user?.UserID,
+            DoctorDetails: {
+              Speciality: specializationValue,
+              LicenseNumber: values.license,
+              ExperienceYears: values.experiance,
+              ConsultationFee: parseFloat(values.consultationFee),
+              EducationalBackground: {
+                Institution: values.institution,
+                Degree: educationValue,
+                Specialization: specializationValue,
+                GraduationYear: values.graduationYear
+              }
+            }
+          }
+        }
+      })
+      toast({
+        title: "Information Updated",
+        variant: "success",
+        description: "Your information has been updated successfully",
+      });
+      setSubmitting(false);
+    } catch (error) {
+      toast({
+        title: "Information Updated",
+        variant: "error",
+        description: "Failed to update",
+      });
+      setSubmitting(false);
+
+    }
     // values.consultationFee
     // values.educationValue = educationValue
     // values.specializationValue = specializationValue

@@ -1,5 +1,6 @@
 import { storage } from "@/firebase/firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { Dispatch, SetStateAction } from "react";
 
 // Helper function to create an input for file selection
 export const filePicker = (callback: any, value: any, meta: any) => {
@@ -44,7 +45,8 @@ const getStoragePath = (type: string, fileName: string): string => {
 // Generalized image upload handler function
 export const uploadFile = async (
   file: File,
-  uploadType: string
+  uploadType: string,
+  setProgress?: Dispatch<SetStateAction<number | null>>
 ): Promise<string> => {
   return await new Promise((resolve, reject) => {
     const storagePath = getStoragePath(uploadType, file.name);
@@ -55,6 +57,8 @@ export const uploadFile = async (
       (snapshot) => {
         const uploadProgress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
         console.log(uploadProgress)
+        if (setProgress)
+          setProgress(uploadProgress)
       },
       (error) => {
         console.error('Upload error:', error);

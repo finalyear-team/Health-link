@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.7",
+    "lodash": "^4.17.21"
+  }
+}

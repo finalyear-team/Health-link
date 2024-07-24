@@ -35,6 +35,7 @@ query GetEmergencySchedules {
 export const GET_SCHEDULE_BY_DATE = gql`
 query GetScheduleByDate($doctorID: String!, $date: String!) {
   GetScheduleByDate(DoctorID: $doctorID, Date: $date) {
+    Schedule{
     ScheduleID
     WeekDay
     Date
@@ -42,7 +43,11 @@ query GetScheduleByDate($doctorID: String!, $date: String!) {
     EndTime
     Note
     Status
-    ScheduleType
+    ScheduleType},
+    BookedTimes{
+      StartTime,
+      EndTime
+    }
   }
 }
 `;

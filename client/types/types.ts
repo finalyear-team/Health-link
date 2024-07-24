@@ -80,9 +80,13 @@ export enum ScheduleStatus {
 }
 
 export enum AppointmentStatus {
-  SCHEDULED = 'Scheduled',
-  COMPLETED = 'Completed',
-  CANCELLED = 'Cancelled',
+  BOOKED = 'booked',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  OVERDUE = "overdue",
+  PENDING = 'pending',
+  RESCHEDULEPENDING = "reschedulePending"
+
 }
 
 export enum Role {
@@ -97,7 +101,7 @@ export enum Role {
 export enum ContentType {
   FORUM_ANSWER = 'forumAnswer',
   POST = 'post',
-  COMMENT="comment"
+  COMMENT = "comment"
 }
 
 export enum FeedbackType {
@@ -120,12 +124,35 @@ export enum PaymentStatus {
   COMPLETED = 'completed',
 
 }
-export enum MediaType{
-  VIDEO="video",
- IMAGE= "image"
+export enum MediaType {
+  VIDEO = "video",
+  IMAGE = "image"
 }
 
-export enum LikeType{
-  LIKE="like",
- DISLIKE= "dislike"
+export enum LikeType {
+  LIKE = "like",
+  DISLIKE = "dislike"
+}
+export enum NotificationType {
+  NEW_APPOINTMENT = "newAppointment",
+  CANCEL_APPOINTMENT = "cancelAppointment",
+  ACCEPT_APPOINTMENT = "acceptAppointment",
+  RESCHEDULEAPPOINTMENT = "rescheduleAppointment",
+  NEW_POST = "newPost",
+  NEW_FORUMQUESTION = "newForumQuestion",
+  NEW_FORUM_ANSWER = "newForumAnswer",
+  NEW_CHAT = "newChat",
+  NEW_VIDEOCALL = "newVideoCall",
+  NEW_COMMENT = "newComment"
+}
+
+export enum NotificationStatus {
+  Read = "read",
+  UNREAD = "unread",
+
+}
+
+export enum UpdateAppointmentType {
+  CANCELAPPOINTMENT = "cancelAppointment",
+  RESCHEDULEAPPOINTMENT = "rescheduleAppointment"
 }

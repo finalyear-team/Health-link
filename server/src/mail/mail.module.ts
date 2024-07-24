@@ -3,7 +3,6 @@ import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 console.log(process.env.EMAIL_USER)
 
 @Module({
@@ -31,6 +30,6 @@ console.log(process.env.EMAIL_USER)
         }),
 
     ],
-    providers: [MailService, EventEmitter2]
+    providers: [MailService]
 })
 export class MailModule { }

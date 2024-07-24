@@ -8,8 +8,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma/prisma.service';
-import { EventEmitterModule } from "@nestjs/event-emitter"
-// import { MailModule } from './mail/mail.module';
+
 import { SocketGateway } from './socket/socket.gateway';
 import { AccessControlService } from './access-control/access-control.service';
 import { VideoCallModule } from './video-call/video-call.module';
@@ -35,6 +34,8 @@ import { JwtStrategy } from './auth/jwt.strategy ';
 import { PassportModule } from '@nestjs/passport';
 import { NotificationModule } from './notification/notification.module';
 import { NotificationService } from './notification/notification.service';
+import { PaymentService } from './payment/payment.service';
+import { SharedModule } from './shared/shared.module';
 
 
 @Module({
@@ -46,8 +47,6 @@ import { NotificationService } from './notification/notification.service';
   }),
 
   nestSchedule.ScheduleModule.forRoot(),
-  EventEmitterModule.forRoot()
-    ,
     PassportModule,
 
   JwtModule.register({
@@ -56,8 +55,9 @@ import { NotificationService } from './notification/notification.service';
     signOptions: { expiresIn: '15m' },
 
   }),
-    UserModule, AuthModule, VideoCallModule, StreamChatModule, AppointmentModule, ScheduleModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule, MailModule, NotificationModule,],
-  providers: [AppService, SocketGateway, AuthService, UserService, UserResolver, PrismaService, AccessControlService, SocketService, MailService, JwtStrategy, JwtService, NotificationService],
+    ScheduleModule,
+    UserModule, AuthModule, VideoCallModule, StreamChatModule, AppointmentModule, SymptomCheckerModule, SocketModule, ForumModule, RedisModule, BlogModule, CommentModule, FeedbackModule, DoctorReviewModule, PaymentModule, MailModule, NotificationModule, SharedModule,],
+  providers: [AppService, AuthService, UserService, UserResolver, PrismaService, AccessControlService, MailService, JwtStrategy, JwtService, NotificationService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

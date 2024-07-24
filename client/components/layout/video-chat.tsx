@@ -12,18 +12,26 @@ import {
   useParticipants,
   useVideo,
 } from "@100mslive/react-sdk";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { getRoom } from "@/Services/videoCallServices";
 import { toast, useToast } from "../ui/use-toast";
 import Chat from "../layout/chat/chat";
 import useAuth from "@/hooks/useAuth";
 import useVideoCallInfoStore from "@/store/videoCallInfo";
-import { UserType } from "@/types/types";
+import { NotificationType, UserType } from "@/types/types";
+import useAppointmentStore from "@/store/appointmentStore";
+import { io } from "socket.io-client"
+import formatScheduleTime from "@/utils/formatDate";
 
-const ConsultationPage = ({ role }: any) => {
+
+const ConsultationPage = ({ role }: { role: any }) => {
   const { user } = useAuth() as any;
   const hmsActions = useHMSActions();
   const [Room, setRoom] = useState<any>();
+  const { selectedAppointment } = useAppointmentStore()
+  const userID = selectedAppointment && role === UserType.DOCTOR ? selectedAppointment.PatientID : selectedAppointment.DoctorID
+  const userName = selectedAppointment && role === UserType.DOCTOR ? selectedAppointment.DoctorName : selectedAppointment.PatientName
+
   const [AuthToken, setAuthToken] = useState<any>();
   const { participants } = useParticipants();
   const notification = useHMSNotifications();
@@ -37,7 +45,6 @@ const ConsultationPage = ({ role }: any) => {
     room,
   } = useVideoCallInfoStore()
 
-  console.log(doctorId)
 
 
   useEffect(() => {
@@ -64,9 +71,25 @@ const ConsultationPage = ({ role }: any) => {
     };
     fetchRoom();
   }, [user]);
-  console.log(Room)
 
   useEffect(() => {
+    const socket = io("http://localhost:4000", {
+      query: {
+        userId: user?.UserID,
+      }
+    })
+    socket.on("connect", () => {
+      console.log("connected")
+    });
+
+    const sendJoinMessage = () => {
+      socket.emit("notification", {
+        UserID: userID,
+        message: `${userName} has started Video call session  scheduled for ${formatScheduleTime(selectedAppointment.AppointmentTime)}`,
+        notificationType: NotificationType.NEW_VIDEOCALL
+      })
+
+    }
     const join = async () => {
       try {
         if (!AuthToken) return;
@@ -74,17 +97,21 @@ const ConsultationPage = ({ role }: any) => {
           userName: user.FullName,
           authToken: AuthToken,
         });
+        sendJoinMessage()
       } catch (error) {
       }
     };
     join();
+    return () => {
+      socket.disconnect();
+    };
   }, [AuthToken, Room]);
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap relative w-full ">
       {/* Video Call Area */}
-      <div className="flex-grow w-full md:w-3/4 mb-2">
-        <VideoCall />
+      <div className="flex-grow w-full md:w-3/4 mb-2 ">
+        <VideoCall role={role} />
       </div>
 
       {/* Participant List */}

@@ -22,27 +22,38 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ProfileHeader from "@/components/layout/profile-header";
+import useAuth from "@/hooks/useAuth";
+import { UserType } from "@/types/types";
+import { useQuery } from "@apollo/client";
+import DOMPurify from "dompurify";
 
 interface QuestionCardProps {
-  id: string;
-  title: string;
-  description: string;
-  tags: string[];
-  author: string;
-  date: Date;
+  UserID: string;
+  Title: string;
+  Question: string;
+  ForumPostID: string;
+  // tags: string[];
+  Author: any;
+  CreatedAt: Date;
 }
 
 const QuestionCard: FC<QuestionCardProps> = ({
-  id,
-  title,
-  description,
-  tags,
-  author,
-  date,
+  UserID,
+  Title,
+  Question,
+  ForumPostID,
+  // tags,
+  Author,
+  CreatedAt,
 }) => {
+  let sanitizeHtml;
+  if (Question) {
+    sanitizeHtml = DOMPurify.sanitize(Question);
+  }
   const [activeVote, setActiveVote] = useState<"up" | "down" | null>(null);
-  const { user } = useUser();
-  const Role = user?.unsafeMetadata.role === "provider" ? "doctor" : "patient";
+  const { user } = useAuth();
+
+  const Role = user?.Role === UserType.DOCTOR ? "doctor" : "patient";
 
   const handleVoteUp = () => {
     setActiveVote((prev) => (prev === "up" ? null : "up"));
@@ -55,20 +66,24 @@ const QuestionCard: FC<QuestionCardProps> = ({
     <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-600 shadow-sm rounded-lg p-4 mb-4">
       <ProfileHeader
         profilePicture="https://via.placeholder.com/150"
-        name="Dr. John Doe"
+        name={`${Author?.Role === UserType.DOCTOR && "Dr"}  ${Author?.FirstName} ${Author?.LastName}`}
         isVerified={true}
-        username="johndoe"
-        userType="Doctor"
-        postTime={date}
+        username={`${Author?.Username}`}
+        userType={Author?.Role}
+        postTime={CreatedAt}
       />
-      <Link href={`/dashboard/${Role}/forum/${id}`} className="font-semibold ">
-        {title}
+      <Link href={`/dashboard/${Role}/forum/${ForumPostID}`} className="md:font-bold ">
+        {Title}
       </Link>
-      <p className="text-slate-700 dark:text-slate-50 mt-2">{description}</p>
+      {/* content  */}
+      <div
+        className="text-sm "
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml ? sanitizeHtml?.substring(0, 30) + "...." : "" }}
+      ></div>
 
       <div className="flex justify-between items-center mt-4 ">
         <span className="text-xs dark:text-slate-200 text-slate-800">
-          {date.toLocaleDateString()}
+          {/* {CreatedAt.toISOString()} */}
         </span>
       </div>
 
@@ -81,11 +96,10 @@ const QuestionCard: FC<QuestionCardProps> = ({
               <TooltipTrigger asChild>
                 <Button
                   variant={"empty"}
-                  className={`p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                    activeVote === "up"
-                      ? "text-primary-600 dark:text-primary-700 bg-slate-100 dark:bg-slate-800"
-                      : ""
-                  }`}
+                  className={`p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 ${activeVote === "up"
+                    ? "text-primary-600 dark:text-primary-700 bg-slate-100 dark:bg-slate-800"
+                    : ""
+                    }`}
                   onClick={handleVoteUp}
                 >
                   21 <ArrowBigUp className="w-5 h-5 ml-1" /> UpVote
@@ -99,11 +113,10 @@ const QuestionCard: FC<QuestionCardProps> = ({
               <TooltipTrigger asChild>
                 <Button
                   variant={"empty"}
-                  className={`p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                    activeVote === "down"
-                      ? "text-primary-600 dark:text-primary-700 bg-slate-100 dark:bg-slate-800"
-                      : ""
-                  }`}
+                  className={`p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 ${activeVote === "down"
+                    ? "text-primary-600 dark:text-primary-700 bg-slate-100 dark:bg-slate-800"
+                    : ""
+                    }`}
                   onClick={handleVoteDown}
                 >
                   <ArrowBigDown className="w-5 h-5 mr-1" /> 14

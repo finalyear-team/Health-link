@@ -12,11 +12,13 @@ enum notificationType {
   newForumQuestion
   newForumAnswer
   newComment
+  acceptAppointment
+  rescheduleAppointment
 }
 
 # Define the Notification type
 type Notification {
-  NotificationID: ID!
+  NotificationID: String!
   UserID: String!
   Message: String!
   CreatedAt: String!
@@ -45,8 +47,8 @@ input UpdateNotificationInput {
 
 # Define the Query type
 type Query {
-  notificationsForUser(UserID: String!): [Notification!]!
-  notification(NotificationID: ID!): Notification
+  UserNotification(UserID: String!): [Notification!]!
+  GetNotification(NotificationID: ID!): Notification
 }
 
 # Define the Mutation type

@@ -11,7 +11,6 @@ export class ForumService {
   private async addCounts(answer: any) {
     return {
       ...answer,
-      Views: answer.View.length,
       Comments: answer.Comment.length,
       Likes: answer.Like.length,
     };
@@ -46,23 +45,71 @@ export class ForumService {
     }
   }
 
-  async getForumPosts() {
+  async getForumPosts(query: string) {
+    let orderByCondition = {}
+    switch (query) {
+      case "Latest":
+        orderByCondition = {
+          CreatedAt: "desc",
+
+        }
+        break;
+
+      case "Recent":
+        orderByCondition = {
+          CreatedAt: "desc",
+        }
+        break;
+
+      case "Popular":
+        orderByCondition = {
+          Like: {
+            _count: "desc"
+          }
+        }
+        break;
+
+      case "Trending":
+        orderByCondition = {
+          Like: {
+            _count: "desc",
+            CreatedAt: "desc"
+          }
+        }
+
+    }
+
+
     try {
       const forums = await this.prisma.forumPost.findMany({
         include: {
+          User: {
+            select: {
+              UserID: true,
+              Username: true,
+              FirstName: true,
+              LastName: true,
+              ProfilePicture: true,
+              Role: true,
+              Verified: true
+            }
+          },
           Answers: {
             include: {
               Like: true,
+
             },
             orderBy: {
-              Like: {
-                _count: 'desc',
-              },
+              ...orderByCondition
             },
           },
         },
+        orderBy: {
+          CreatedAt: "desc",
+
+        }
       });
-      return forums;
+      return forums.map(({ UserID, User, Answers, ...others }) => ({ Author: { ...User }, ForumAnswer: { ...Answers }, ...others }));
     } catch (error) {
       console.error(error);
       throw new HttpException('Failed to get forum posts', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -71,17 +118,25 @@ export class ForumService {
 
   async getForumPost(ForumPostID: string) {
     try {
-      const forumPost = await this.prisma.forumPost.findUnique({
+      const { User, Answers, UserID, ...others } = await this.prisma.forumPost.findUnique({
         where: { ForumPostID },
         include: {
           Answers: true,
-
+          User: {
+            select: {
+              UserID: true,
+              Username: true,
+              FirstName: true,
+              LastName: true,
+              ProfilePicture: true,
+              Role: true,
+              Verified: true
+            }
+          }
         },
       });
-      if (!forumPost) {
-        throw new HttpException('Forum post not found', HttpStatus.NOT_FOUND);
-      }
-      return forumPost;
+
+      return { Author: User, ForumAnswer: Answers, ...others };
     } catch (error) {
       console.error(error);
       throw new HttpException('Failed to get forum post', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,6 +150,17 @@ export class ForumService {
           ForumPostID,
         },
         include: {
+          User: {
+            select: {
+              UserID: true,
+              Username: true,
+              FirstName: true,
+              LastName: true,
+              ProfilePicture: true,
+              Role: true,
+              Verified: true
+            }
+          },
           Like: true,
           Comment: true
 
@@ -103,6 +169,8 @@ export class ForumService {
           CreatedAt: 'desc',
         },
       });
+
+      console.log(forums)
       return Promise.all(forums.map(async (post) => await this.addCounts(post)));
     } catch (error) {
       console.error(error);

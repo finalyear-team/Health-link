@@ -33,41 +33,102 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useMutation } from "@apollo/client";
-import { REMOVE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
+import { useMutation, useQuery } from "@apollo/client";
+import { DECLINE_APPOINTMENT, REMOVE_APPOINTMENT, UPDATE_APPOINTMENT } from "@/graphql/mutations/appointmentMutations";
 import { useToast } from "../ui/use-toast";
 import Loading from "@/common/Loader/Loading";
-import { addHours, format, parse, setHours, setMinutes, setSeconds } from 'date-fns';
+import { addDays, addHours, format, isValid, parse, setHours, setMinutes, setSeconds } from 'date-fns';
 import formatScheduleTime from "@/utils/formatDate";
+import { add } from "lodash";
+import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import useAuth from "@/hooks/useAuth";
+import { Field, Form, Formik } from "formik";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "../ui/input";
+import { formatInTimeZone } from "date-fns-tz";
+import { getFormatedDate, getFormatedTime } from "@/utils/TimeZoneConverter";
+import { AppointmentStatus } from "@/types/types";
 
 const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
-
-
   const [ISOFormattedtime, setISOFormattedTime] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [expire, setExpire] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [RemoveAppointment, { data, loading, error }] =
-    useMutation(REMOVE_APPOINTMENT);
+  const [open, setOpen] = useState(false)
+  const { user } = useAuth()
+
+
+  const { refetch } = useQuery(GET_USER_APPOINTMENTS, {
+    variables: { userID: user?.UserID },
+  });
+
+  const [declineAppointment, { data: declineAppointmentData, loading, error }] = useMutation(DECLINE_APPOINTMENT, {
+    onCompleted(data, clientOptions) {
+      refetch()
+      console.error("Error removing appointment: ", error);
+      toast({
+        title: "Appointment Declined appointment",
+        description: "Please try again.",
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      console.error("Error removing appointment: ", error);
+      toast({
+        title: "Error cancelling appointment",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+
+  })
+  const [updateAppointmentStatus, { data: updatedAppointment }] = useMutation(UPDATE_APPOINTMENT, {
+    onCompleted(data, clientOptions) {
+      refetch()
+
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      console.error("Error tment: ", error);
+
+    }
+
+  })
+
   const { toast } = useToast();
 
-  // convert string format date and time into combined ISO format
-  // const convertToISO = (date: string, time: string): string => {
-  //   const dateTime = new Date(`${date}T${time}`);
-  //   return dateTime.toISOString();
-  // };
-  const combineDateAndTime = (date: any, time: any) => {
-    console.log("come on now")
-    return new Date(format(addHours(date, 24), "yyyy-MM-dd") + "T" + format(addHours(time, 1), "HH:mm:ss.SSS'Z'")).toISOString()
 
 
-  }
 
-  // change the format of the appointment time from HH:mm:ss to hh:mm a to display
+  const combineDateAndTime = (firstDateStr: string, secondDateStr: string): string => {
+
+    const year = addDays(new Date(firstDateStr), 1).getFullYear();
+    const month = addDays(new Date(firstDateStr), 1).getMonth();
+    const day = addDays(new Date(firstDateStr), 1).getDate()
+    const hours = addHours(new Date(secondDateStr), 1).getHours();
+    const minutes = addHours(new Date(secondDateStr), 1).getMinutes();
+
+    const combinedDate = new Date(year, month, day, hours, minutes, 0, 0);
+
+    return combinedDate.toISOString()
+
+  };
+
+
+
+
+
+
+
+
+
   const parsedTime = parse(dummyData.appointmentTime, 'HH:mm:ss', new Date());
 
-  // Format the parsed time to 'hh:mm a'
-  // const formattedTime = format(dummyData.appointmentTime, 'hh:mm a');
+
+
+
+
   const formattedTime = formatScheduleTime(dummyData.appointmentTime)
 
 
@@ -77,16 +138,13 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
       dummyData.appointmentDate,
       dummyData.appointmentTime)
 
-    console.log(formattedDateTime)
+
     setISOFormattedTime(formattedDateTime)
 
     const intervalId = setInterval(() => {
       const currentTime = new Date();
       const appointmentTime = new Date(formattedDateTime);
-      const oneHourLater = addHours(appointmentTime, 0.5);
-      console.log(currentTime)
-      console.log(oneHourLater)
-      console.log(oneHourLater)
+      const oneHourLater = addHours(appointmentTime, dummyData.duration);
 
       if (currentTime >= appointmentTime && currentTime <= oneHourLater) {
         setIsActive(true);
@@ -101,30 +159,47 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     }, 1000);
 
     return () => clearInterval(intervalId); // Clean up on unmount
-  }, [dummyData.appointmentDate, dummyData.appointmentTime]);
+  }, [dummyData.appointmentDate, dummyData.appointmentTime, dummyData.duration,]);
 
-  const RemoveAppointmentHandler = async () => {
+
+
+
+  const cancelAppointmentHandler = async (value: any) => {
     try {
-      await RemoveAppointment({
-        variables: { Id: dummyData.appointmentId },
-      });
-      console.log("appointment Removed");
-      toast({
-        title: "Appointment Removed",
-        description: "Your appointment has been removed successfully.",
-        variant: "success",
-      });
+      await declineAppointment(
+        {
+          variables: {
+            CancelledBy: user?.UserID
+            , AppointmentID: dummyData.appointmentId
+            , CancelledReason: value?.cancelReason
+          }
+        }
+      )
     } catch (error) {
-      console.error("Error removing appointment: ", error);
-      toast({
-        title: "Error removing appointment",
-        description: "Please try again.",
-        variant: "destructive",
-      });
+
     }
   };
 
-  console.log(ISOFormattedtime)
+
+  useEffect(() => {
+
+    if (expire)
+      updateAppointmentStatus({
+        variables: {
+          updateAppointmentInput: {
+            AppointmentID: dummyData.appointmentId,
+            DoctorID: dummyData.doctorId,
+            PatientID: dummyData.patientId,
+            Status: AppointmentStatus.OVERDUE
+          }
+
+
+        }
+      }
+      )
+
+
+  }, [expire])
 
   if (loading)
     return (
@@ -141,9 +216,8 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
     >
       <div className="flex items-center justify-between flex-wrap">
         <AppointmentDetails
-
-          doctorName={dummyData.doctorName}
-          doctorPhoto={dummyData.doctorPhoto}
+          doctorName={dummyData.name}
+          doctorPhoto={dummyData.photo}
           appointmentId={dummyData.appointmentId}
           appointmentTime={`${format(addHours(dummyData.appointmentDate, 24), "EEE, d MMM yyyy")} | ${formattedTime}`}
           purpose={dummyData.purpose}
@@ -151,14 +225,17 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
           gender={dummyData.gender}
         />
         <CountdownTimer targetTime={ISOFormattedtime} expire={expire} />
-        {/* <JoinButton isActive={true} onClick={onJoinClick} /> */}
-        <Button
-          onClick={onJoinClick}
-          className={`${isActive ? "" : "bg-slate-300 cursor-not-allowed"}`}
-          disabled={false}
-        >
-          <Video className="w-4 h-4 mr-2" /> Join Live Consultation
-        </Button>
+
+        <div className="">
+          {isActive && <Button
+            onClick={onJoinClick}
+            className={`${isActive ? "opacity-100" : "bg-slate-300 cursor-not-allowed"}`}
+            disabled={!isActive}
+          >
+            <Video className="w-4 h-4 mr-2" /> Join Live Consultation
+          </Button>}
+        </div>
+
 
       </div>
 
@@ -193,9 +270,11 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
                   </DialogDescription>
                 </DialogHeader>
                 <AppointmentForm
+                  patientId={dummyData.patientId}
                   doctorId={dummyData.doctorId}
                   existingAppointment={{
-                    date: dummyData.appointmentDate,
+                    id: dummyData.appointmentId,
+                    date: addDays(dummyData.appointmentDate, 1),
                     time: dummyData.appointmentTime,
                     reason: dummyData.purpose,
                   }}
@@ -203,7 +282,7 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
               </DialogContent>
             </Dialog>
           )}
-          <AlertDialog>
+          <AlertDialog open={open} onOpenChange={setOpen}>
             <Tooltip>
               <TooltipTrigger>
                 <AlertDialogTrigger asChild>
@@ -221,19 +300,45 @@ const VideoAppointmentCard = ({ dummyData, onJoinClick }: any) => {
             </Tooltip>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>Are you sure you want to cancel this appointment?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. It will permanently delete your
-                  current appointment and remove all its related data from our
-                  servers.
+                  Please provide a reason for cancellation:
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={RemoveAppointmentHandler}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
+              <Formik initialValues={{ cancelReason: "" }} onSubmit={cancelAppointmentHandler}>
+                {({ isValid, isSubmitting }) => (
+                  <Form className="space-y-6" action="#" method="POST">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="reason">Reason</Label>
+                      <Field
+                        id="cancelReason"
+                        name="cancelReason"
+                        as={Input}
+                        type="text"
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel asChild>
+                        <button
+                          type="button"
+                          onClick={() => setOpen(false)}
+                          className="btn-cancel "
+                        >
+                          Cancel
+                        </button>
+                      </AlertDialogCancel>
+                      <button
+                        type="submit"
+                        className={`px-2 text-sm rounded-md text-black bg-slate-50 font-medium ${isSubmitting ? "opacity-50 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
+                        disabled={isSubmitting}
+                      >
+                        Continue
+                      </button>
+                    </AlertDialogFooter>
+                  </Form>
+                )}
+              </Formik>
+
             </AlertDialogContent>
           </AlertDialog>
         </TooltipProvider>

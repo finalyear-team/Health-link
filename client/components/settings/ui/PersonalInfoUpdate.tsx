@@ -4,31 +4,59 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { validatePersEditInfo } from "@/utils/validationSchema";
-import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
 import { CardContent } from "@/components/ui/card";
+import useAuth from "@/hooks/useAuth";
+import { useMutation } from "@apollo/client";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
 
 const PersonalInfoUpdate = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [updateUser, { data, loading, error }] = useMutation(UPDATE_USER)
+  console.log(user)
 
   const initialValues = {
-    firstName: user?.firstName,
-    lastName: user?.lastName,
-    userName: "",
+    firstName: user?.FirstName,
+    lastName: user?.LastName,
+    userName: user?.Username,
   };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    await user?.update({
-      firstName: values.firstName,
-      lastName: values.lastName,
-    });
-    toast({
-      title: "Information Updated",
-      variant: "success",
-      description: "Your information has been updated successfully",
-    });
-    setSubmitting(false);
+    try {
+      await updateUser({
+        variables: {
+          updateUserInput: {
+            UserID: user?.UserID,
+            FirstName: values.firstName,
+            LastName: values.lastName,
+            Username: values.userName
+          }
+        }
+      })
+
+      toast({
+        title: "Information Updated",
+        variant: "success",
+        description: "Your information has been updated successfully",
+      });
+      setSubmitting(false);
+    } catch (error) {
+      toast({
+        title: "Information Updated",
+        variant: "error",
+        description: "Failed to update",
+      });
+      setSubmitting(false);
+
+
+    }
+
+    // await user?.update({
+    //   firstName: values.firstName,
+    //   lastName: values.lastName,
+    // });
+
   };
 
   return (
@@ -47,7 +75,7 @@ const PersonalInfoUpdate = () => {
             </div>
 
             <Button disabled={!isValid} type="submit">
-              {isSubmitting ? (
+              {isSubmitting || loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 ""

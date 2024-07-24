@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -17,12 +17,12 @@ import useAppointmentStore from "@/store/appointmentStore";
 import { patientAppointments } from "@/public/data/patient-appointment";
 import { AppointmentCard } from "@/components/appointment/appointment-card";
 import Loading from "@/common/Loader/Loading";
-import { GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
+import { CHECK_OVERDUE_APPOINTMENTS, GET_USER_APPOINTMENTS } from "@/graphql/queries/appointmentQueries";
 import { useQuery } from "@apollo/client";
 import useAuth from "@/hooks/useAuth";
-import { UserType } from "@/types/types";
+import { AppointmentStatus, Gender, NotificationType, UserType } from "@/types/types";
 import formatScheduleTime from "@/utils/formatDate";
-import { addHours, format, parseISO } from "date-fns";
+import { addHours, compareDesc, differenceInYears, format, parse, parseISO } from "date-fns";
 import { io } from "socket.io-client";
 
 import {
@@ -33,6 +33,9 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import NotificationCard from "@/components/form/appointment/notificationCard";
+import { GET_USER_NOTIFICATION } from "@/graphql/queries/notificationQueries";
+import { getVideoSesssion } from "@/Services/paymentService";
+import { AppointmentNotification } from "@/types";
 
 interface NotificationCardProps {
   patientName: string;
@@ -42,59 +45,17 @@ interface NotificationCardProps {
   details: string;
 }
 
-const notification: NotificationCardProps[] = [
-  {
-    patientName: "John Doe",
-    date: new Date("2024-07-02"),
-    time: "10:30 AM",
-    reason: "Requesting a follow-up appointment to discuss test results.",
-    details:
-      "John Doe is requesting a follow-up appointment to discuss the results of his recent medical tests. He would like to meet with you as soon as possible to go over the findings and determine the next steps in his treatment plan.",
-  },
-  {
-    patientName: "Jane Smith",
-    date: new Date("2024-07-01"),
-    time: "2:00 PM",
-    reason: "Seeking a consultation for a new medical concern.",
-    details:
-      "Jane Smith is requesting a consultation with you to discuss a new medical concern she has been experiencing. She would like to schedule an appointment to have you examine her and provide your professional opinion on the best course of action.",
-  },
-  {
-    patientName: "Michael Johnson",
-    date: new Date("2024-06-30"),
-    time: "9:00 AM",
-    reason: "Requesting a prescription refill.",
-    details:
-      "Michael Johnson is requesting a refill of his prescription medication. He has been a patient of yours for several years and would like to schedule a quick appointment to have the refill authorized.",
-  },
-  {
-    patientName: "Emily Davis",
-    date: new Date("2024-06-29"),
-    time: "4:30 PM",
-    reason: "Seeking a referral to a specialist.",
-    details:
-      "Emily Davis is requesting a referral to a specialist in your network. She has been experiencing a specific medical issue and would like your recommendation on the best specialist to see for further evaluation and treatment.",
-  },
-];
 
 const Appointment = () => {
-  const { user, isLoaded, isSignedIn } = useAuth()
-  useEffect(() => {
-    console.log(user)
-    const socket = io("http://localhost:4000", {
-      query: {
-        userId: user?.UserID,
-      }
-    })
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-    socket.on("new-appointment", (appointment, Message) => {
-      console.log("new appointment")
-      console.log(appointment)
 
-    })
-  }, [user])
+  const { user } = useAuth()
+  const checkOverdue = useQuery(CHECK_OVERDUE_APPOINTMENTS)
+  const [appointmentNotifications, setappointmentNotifications] = useState<AppointmentNotification[] | null | undefined>(null)
+  const { data: userNotification } = useQuery(GET_USER_NOTIFICATION, {
+    variables: {
+      UserID: user?.UserID
+    }
+  })
 
   const { data, loading, error } = useQuery(GET_USER_APPOINTMENTS, {
     variables: {
@@ -102,39 +63,124 @@ const Appointment = () => {
     }
   })
 
+
+  useEffect(() => {
+    if (!user)
+      return
+    const socket = io("http://localhost:4000", {
+      query: {
+        userId: user?.UserID,
+      }
+    })
+    socket.on("connect", () => {
+      console.log("connected")
+    });
+    socket.on("new-appointment", ({ message }) => {
+      console.log(message)
+      if (message)
+        setappointmentNotifications((prevState) => {
+          const exists = prevState?.some(state => state.appointmentId === message.appointmentId);
+
+          if (!exists && prevState) {
+            return [message, ...prevState];
+          }
+          return prevState;
+        });
+
+    })
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user])
+
+
+  const removePendingAppointment = (appointmentId: string) => {
+    setappointmentNotifications(appointmentNotifications?.filter(appointment => appointment.appointmentId !== appointmentId))
+  }
+
+  useEffect(() => {
+    if (!data?.UserAppointments?.upcomingAppointments)
+      return
+    const pendingAppointments = data?.UserAppointments?.upcomingAppointments.filter((appointment: any) => appointment.Status === AppointmentStatus.PENDING)
+
+    const notifications = pendingAppointments?.map((appointment: any, i: number) => {
+      return {
+        patientName: appointment.PatientName,
+        date: format(new Date(appointment.CreatedAt), "yyyy/MM/dd"),
+        age: differenceInYears(new Date(), appointment.PatientDOB),
+        appointmentId: appointment.AppointmentID,
+        doctorName: appointment.DoctorName,
+        doctorId: appointment.DoctorID,
+        time: format(new Date(appointment.CreatedAt), "hh:mm a"),
+        reason: appointment.Note,
+        gender: appointment.PatientGender,
+        status: appointment.Status,
+        appointmentDate: format(addHours(parseISO(appointment.AppointmentDate), 24), "yyyy-MM-dd"),
+        appointmentTime: formatScheduleTime(appointment.AppointmentTime
+        )
+      }
+    })
+
+
+    notifications.sort((a: any, b: any) => {
+      const dateComparison = compareDesc(parse(a.date, "yyyy/MM/dd", new Date()), parse(b.date, "yyyy/MM/dd", new Date()));
+      if (dateComparison === 0) {
+        return compareDesc(parse(a.time, "hh:mm a", new Date()), parse(b.time, "hh:mm a", new Date()));
+      }
+      return dateComparison;
+    });
+    setappointmentNotifications(notifications)
+
+  }, [data])
+
+
+
+
+
+
+
   if (loading)
     return <Loading />
 
+  console.log(data)
 
 
-  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments.filter((appointment: any) => appointment.Status === "booked");
+  const upcomingAppointments = data?.UserAppointments?.upcomingAppointments.filter((appointment: any) => appointment.Status === "booked" || appointment.Status === "reschedulePending");
 
   const pastAppointments = data?.UserAppointments?.pastAppointments;
+
+  console.log(pastAppointments)
+  console.log(upcomingAppointments)
+
+
 
   return (
     <div className="flex flex-col space-y-5">
       {/* Notifications  */}
 
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <div className="flex text-lg font-bold">
-              <Bell className="h-6 w-6 mr-2" /> Notifications
-            </div>
-            <hr className="mt-2" />
-          </CardHeader>
-          <CardContent className="overflow-y-scroll max-h-96 custome-scrollbar">
-            {notification.length > 0 ? (
-              notification.map((item, index) => (
-                <NotificationCard key={index} {...item} />
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center text-slate-500 h-full space-y-2">
-                <BellOff className="w-10 h-10 " /> No Notifications
+        {appointmentNotifications && appointmentNotifications.length > 0 &&
+          <Card>
+            <CardHeader>
+              <div className="flex text-lg font-bold">
+                <Bell className="h-6 w-6 mr-2" /> Pending appointments
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <hr className="mt-2" />
+            </CardHeader>
+            <CardContent className="overflow-y-scroll max-h-96 custome-scrollbar">
+              {appointmentNotifications && appointmentNotifications?.length > 0 ? (
+                appointmentNotifications.map((item, index) => (
+                  <NotificationCard key={index} {...item} removePendingAppointment={removePendingAppointment} />
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center text-slate-500 h-full space-y-2">
+                  <BellOff className="w-10 h-10 " /> No Notifications
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        }
 
         <div className="">
           {/* upcoming appointments */}
@@ -156,13 +202,14 @@ const Appointment = () => {
                     <AppointmentCard
                       key={value.AppointmentID}
                       id={value.AppointmentID}
-                      doctorId={value.PatientID}
+                      doctorId={value.DoctorID}
+                      patientId={value.PatientID}
                       appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
                       appointmentTime={formatScheduleTime(value.AppointmentTime)}
-                      doctorName={value.PatientName}
-                      doctorPhoto={value.PatientPhoto || ""}
+                      name={value.PatientName}
+                      photo={value.PatientPhoto || ""}
                       purpose={value.Note}
-                      status={value.Status}
+                      status={value.Status === "reschedulePending" ? "Pending" : value.Status}
                       gender={value.PatientGender}
                       role={UserType.PATIENT}
                     />
@@ -191,15 +238,16 @@ const Appointment = () => {
                     <AppointmentCard
                       key={value.AppointmentID}
                       id={value.AppointmentID}
-                      doctorId={value.PatientID}
+                      doctorId={value.DoctorID}
+                      patientId={value.PatientID}
                       appointmentDate={format(addHours(parseISO(value.AppointmentDate), 24), "yyyy-MM-dd")}
                       appointmentTime={formatScheduleTime(value.AppointmentTime)}
-                      doctorName={value.PatientName}
-                      doctorPhoto={value.PatientPhoto || ""}
+                      name={value.PatientName}
+                      photo={value.PatientPhoto || ""}
                       purpose={value.Note}
                       status={value.Status}
                       gender={value.PatientGender}
-                      role={UserType.DOCTOR}
+                      role={UserType.PATIENT}
                     />
                   ))}
 

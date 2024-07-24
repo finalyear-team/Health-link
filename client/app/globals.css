@@ -21,9 +21,11 @@ body {
   0% {
     box-shadow: 0 0 10px #fff;
   }
+
   50% {
     box-shadow: 0 0 20px #00a8a5;
   }
+
   100% {
     box-shadow: 0 0 10px #fff;
   }
@@ -82,7 +84,7 @@ body {
 }
 
 .main_container {
-  @apply min-h-screen flex flex-col items-center justify-center  sm:px-6 lg:px-8  overflow-y-hidden bg-cover;
+  @apply min-h-screen flex flex-col items-center justify-center sm:px-6 lg:px-8 overflow-y-hidden bg-cover;
 }
 
 .custom-container {
@@ -94,7 +96,7 @@ body {
 }
 
 .footer {
-  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100  dark:text-gray-100 dark:bg-slate-900 backdrop-blur-sm;
+  @apply flex justify-evenly flex-wrap min-w-full font-main px-4 py-2 bg-primary-100 dark:text-gray-100 dark:bg-slate-900 backdrop-blur-sm;
 }
 
 .footer__custom {
@@ -191,12 +193,15 @@ body {
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, and Opera */
+  display: none;
+  /* Chrome, Safari, and Opera */
 }
 
 .custome-scrollbar::-webkit-scrollbar {
@@ -205,12 +210,14 @@ body {
 }
 
 .custome-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #6b7280; /* Change color as needed */
+  background-color: #6b7280;
+  /* Change color as needed */
   border-radius: 10px;
 }
 
 .custome-scrollbar::-webkit-scrollbar-track {
-  background-color: #e5e7eb; /* Change color as needed */
+  background-color: #e5e7eb;
+  /* Change color as needed */
   border-radius: 10px;
 }
 

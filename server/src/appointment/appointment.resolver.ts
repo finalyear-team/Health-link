@@ -5,6 +5,8 @@ import { UpdateAppointmentInput } from './dto/update-appointment.input';
 import { Appointment } from './entities/appointment.entity';
 import { User } from '@clerk/clerk-sdk-node';
 import { query } from 'express';
+import { UserService } from 'src/user/user.service';
+import { AppointmentStatus } from '@prisma/client';
 
 @Resolver('Appointment')
 export class AppointmentResolver {
@@ -22,11 +24,10 @@ export class AppointmentResolver {
   //
   @Query('UserAppointments')
   async findUserAppointments(@Args("UserID") UserID: string) {
+    console.log(UserID)
     const appointments = await this.appointmentService.getAppointments(UserID)
-    console.log(appointments)
     return appointments
   }
-
   //
   @Query('FilterAppointments')
   async filterAppointments(@Args("Query") Query: string) {
@@ -58,18 +59,35 @@ export class AppointmentResolver {
   }
 
   //
+  @Query('checkIfOverDue')
+  async checkOverDueAppointment() {
+    return await this.appointmentService.updateAppointmentStatus()
+
+  }
+
+  //
   @Mutation('UpdateAppointment')
   async update(@Args('updateAppointmentInput') updateAppointmentInput: UpdateAppointmentInput) {
     const input = new UpdateAppointmentInput(updateAppointmentInput)
+    console.log(input)
     return await this.appointmentService.updateAppointment(input)
   }
 
   //
   //
   @Mutation('AcceptAppointment')
-  async AcceptAppointment(@Args('DoctorID') DoctorID: string, @Args("AppointmentID") AppointmentID: string, @Args("Duration") Duration: number) {
+  async AcceptAppointment(@Args('DoctorID') DoctorID: string, @Args("AppointmentID") AppointmentID: string, @Args("Duration") Duration: number, @Args("Status") Status: AppointmentStatus) {
 
-    return await this.appointmentService.AcceptAppointment(DoctorID, AppointmentID, Duration);
+    console.log(AppointmentID)
+    return await this.appointmentService.AcceptAppointment(DoctorID, AppointmentID, Duration, Status);
+  }
+
+  //
+
+  @Mutation('DeclineAppointment')
+  async DeclineAppointment(@Args('CancelledBy') CancelledBy: string, @Args("AppointmentID") AppointmentID: string, @Args("CancelledReason") Reason: string) {
+    const appointment = await this.appointmentService.declineAppointment(CancelledBy, AppointmentID, Reason)
+    return appointment
   }
 
 

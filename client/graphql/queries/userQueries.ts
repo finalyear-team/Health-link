@@ -7,8 +7,19 @@ export const GET_SIGNEDIN_USER = gql`
           FirstName,
           LastName
           Username,
+          Rating,
+          Email,
+          PhoneNumber,
+          Address,
+          Followers,
+          Following,
+          ConsultationFee,
           Role,
-          Verified,          
+          Verified, 
+          Speciality,
+          ExperienceYears,
+          LicenseNumber,
+          EducationalBackground         
        }
     }
   `

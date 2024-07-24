@@ -1,30 +1,37 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { StreamChatService } from './stream-chat.service';
-import { CreateStreamInput } from './dto/create-stream.input';
-import { UpdateStreamInput } from './dto/update-stream.input';
+// import { CreateStreamInput } from './dto/create-stream.input';
+// import { UpdateStreamInput } from './dto/update-stream.input';
 
 @Resolver('Stream')
 export class StreamResolver {
-  constructor(private readonly streamService: StreamChatService) {}
+  constructor(private readonly streamService: StreamChatService) { }
 
-  @Mutation('createStream')
-  create(@Args('createStreamInput') createStreamInput: CreateStreamInput) {
-    console.log("first")
+
+  @Query('userChannel')
+  async getChannels(@Args("UserID") UserID: string) {
+    const userChannel = await this.streamService.getChannelByUserID(UserID)
+    console.log(userChannel.forEach(channel => console.log(channel.Members)))
+    return userChannel
   }
 
-  @Query('streams')
-  findAll() {
+  @Query('getChannel')
+  getChannel(@Args('ChannelID') ChannelID: string) {
+    return this.streamService.getChannelByID(ChannelID)
   }
 
-  @Query('stream')
-  findOne(@Args('id') id: number) {
+
+  @Query("getChats")
+  getChats(@Args("UserID") UserID: string, @Args("ChannelID") ChannelID: string) {
+
+    return this.streamService.getChannelChats(UserID, ChannelID)
   }
 
-  @Mutation('updateStream')
-  update(@Args('updateStreamInput') updateStreamInput: UpdateStreamInput) {
+  @Mutation("deleteChat")
+  deleteChat(@Args("ChatID") ChatID: string) {
+    return this.streamService.deleteChat(ChatID)
+
   }
 
-  @Mutation('removeStream')
-  remove(@Args('id') id: number) {
-  }
+
 }

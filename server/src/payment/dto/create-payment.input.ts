@@ -13,6 +13,8 @@ export class CreatePaymentInput {
     AppointmentID: string
     @Field()
     Amount: number
+    @Field()
+    Duration: number
 }
 
 

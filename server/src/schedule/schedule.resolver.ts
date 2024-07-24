@@ -4,20 +4,25 @@ import { CreateScheduleInput, EmergencyScheduleInput } from './dto/create-schedu
 import { UpdateScheduleInput } from './dto/update-schedule.input';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Schedule } from './entities/schedule.entity';
+import { date } from 'zod';
+import { Weekday } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { parseDate } from 'src/utils/parseDate';
+import { addHours, format } from 'date-fns';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Resolver('Schedule')
 export class ScheduleResolver {
-  constructor(private readonly scheduleService: ScheduleService) { }
+  constructor(private readonly scheduleService: ScheduleService, private readonly prisma: PrismaService
+  ) { }
 
 
   // @UseGuards(RoleGuard)
   // @UserRoles(UserType.ADMIN)
   @Mutation('CreateSchedule')
-  async createSchedule(@Args('createScheduleInput') createScheduleInput: CreateScheduleInput) {
-    console.log(createScheduleInput)
+  async createSchedule(@Args('createScheduleInput') createScheduleInput: CreateScheduleInput, @Args("unselectedDays") unselectedDays: Weekday[]) {
     const input = new CreateScheduleInput(createScheduleInput)
-    console.log(input)
-    const schedule = await this.scheduleService.createSchedule(input)
+    const schedule = await this.scheduleService.createOrUpdateSchedule(input, unselectedDays)
     return schedule
   }
 
@@ -25,9 +30,7 @@ export class ScheduleResolver {
   // @UserRoles(UserType.ADMIN)
   @Mutation('UpdateSchedule')
   async updateSchedule(@Args('updateScheduleInput') updateScheduleInput: UpdateScheduleInput) {
-    console.log(updateScheduleInput)
     const input = new UpdateScheduleInput(updateScheduleInput)
-    console.log(input)
     const schedule = await this.scheduleService.updateSchedule(input)
     return schedule
   }
@@ -46,14 +49,13 @@ export class ScheduleResolver {
   // updates the emergency schedule status to unavailable when the current day ended
   @Cron("59 23 * * *")
   async handleCron() {
-    console.log("come on man")
     await this.scheduleService.autoEmergencyScheduleUpdate();
   }
 
 
   @Query('Schedules')
   async findAll(@Args("DoctorID") DoctorID: string) {
-    console.log('doctors schedules')
+    console.log(DoctorID)
     const scheduels = await this.scheduleService.schedules(DoctorID)
     return scheduels
   }
@@ -61,15 +63,32 @@ export class ScheduleResolver {
 
   @Query('EmergencySchedules')
   async findEmergencySchedules() {
-    console.log("emergency schedules")
     const emergencySchedules = await this.scheduleService.emergencySchedules()
     return emergencySchedules
   }
 
   @Query('GetScheduleByDate')
-  async GetScheduleByDate(@Args("DoctorID") DoctorID: string, @Args("Date") Date: string) {
-    const schedule = await this.scheduleService.getScheduleByDate(DoctorID, Date)
-    return schedule
+  async GetScheduleByDate(@Args("DoctorID") DoctorID: string, @Args("Date") date: string) {
+    const schedule = await this.scheduleService.getScheduleByDate(DoctorID, date)
+    console.log()
+    const bookedAppointments = await this.prisma.appointments.findMany({
+      where: {
+        DoctorID,
+        AppointmentDate: {
+          equals: new Date(format(parseDate(date), "yyyy-MM-dd"))
+        },
+        Status: "booked"
+      }
+
+    })
+
+
+    console.log(bookedAppointments.map((appoint) => ({ startTime: appoint.AppointmentTime, endTime: addHours(appoint.AppointmentTime, appoint.Duration) })))
+
+    return {
+      Schedule: schedule,
+      BookedTimes: bookedAppointments.map((appoint) => ({ StartTime: appoint.AppointmentTime, EndTime: addHours(appoint.AppointmentTime, appoint.Duration) }))
+    }
   }
 
 

@@ -10,7 +10,7 @@ import { UpdateVideoCallInput } from './dto/update-video_call.input';
 @Injectable()
 export class VideoCallService {
     private hms: any
-    constructor(private readonly webSocket: SocketGateway, private readonly prisma: PrismaService) {
+    constructor(private readonly prisma: PrismaService) {
         this.hms = new HMS.SDK()
     }
 
@@ -28,21 +28,23 @@ export class VideoCallService {
     async generateToken(roomId: string, host: string, member: string, notValidBefore?: number, Duration?: number) {
 
         try {
+            const tokenValid = notValidBefore && Duration ? {
+                issuedAt: Math.floor(Date.now() / 1000),
+                notValidBefore,
+                Duration
+            } : null
             const hostTokenConfig: HMS.AuthTokenConfig = {
                 roomId,
                 role: "host",
                 userId: host,
-                // issuedAt: Date.now() / 1000,
-                // notValidBefore,
-                // validForSeconds: Duration && Duration
+                ...tokenValid
+
             }
             const memberTokenConfig: HMS.AuthTokenConfig = {
                 roomId,
                 role: "guest",
                 userId: member,
-                // issuedAt: Date.now() / 1000,
-                // notValidBefore,
-                // validForSeconds: Duration && Duration
+                ...tokenValid
             }
             const HostAuthToken: any = await this.hms.auth.getAuthToken(hostTokenConfig)
             const MemberAuthToken: any = await this.hms.auth.getAuthToken(memberTokenConfig)
@@ -62,10 +64,15 @@ export class VideoCallService {
     // 
     async createRoom(createRoomInput: CreateVideoCallRoomInput) {
         const { RoomID, RoomName, HostID, MemberID, AppointmentDate, AppointmentTime } = createRoomInput
+
         const appointmentTimeInMilliseconds = getTimeMilliSeconds(AppointmentTime)
-        const tokenNotValidBefore = (AppointmentDate.getTime() + appointmentTimeInMilliseconds) / 1000
+
+        const tokenNotValidBefore = Math.floor((AppointmentDate.getTime() + appointmentTimeInMilliseconds) / 1000)
+
         const { HostAuthToken } = await this.generateToken(RoomID, HostID, MemberID, tokenNotValidBefore)
+
         const { MemberAuthToken } = await this.generateToken(RoomID, HostID, MemberID, tokenNotValidBefore)
+
         try {
             const Room = await this.prisma.videoChatRoom.create({
                 data: {
@@ -74,9 +81,12 @@ export class VideoCallService {
                     HostID,
                     HostAuthToken,
                     Members: {
-                        create: {
-                            MemberID,
-                            MemberAuthToken
+                        createMany: {
+                            data: [{
+                                MemberID,
+                                MemberAuthToken
+                            }]
+
                         }
                     },
                 }
@@ -92,8 +102,6 @@ export class VideoCallService {
             throw error
         }
     }
-
-
 
     //
     async getRoom(HostID: string, MemberID: string) {
@@ -142,7 +150,7 @@ export class VideoCallService {
                 data: {
                     HostAuthToken,
                     Members: {
-                        update: {
+                        updateMany: {
                             where: {
                                 MemberID
                             },

@@ -18,7 +18,7 @@ const buttonVariants = cva(
           "bg-dark-600 text-slate-50 hover:bg-dark-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
         ghost: "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         link: "text-slate-900 underline-offset-4 hover:underline dark:text-slate-50",
-        empty:"",
+        empty: "",
         video: "border border-dark-200 bg-primary-100 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         follow: "bg-primary-600 text-slate-50 hover:bg-primary-700 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 rounded-full",
       },
@@ -38,7 +38,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 

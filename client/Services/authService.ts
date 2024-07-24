@@ -29,7 +29,7 @@ export const sendEmail = async (email: string, firstName: string) => {
             "http://localhost:4000/auth/send-email",
             { email, firstName },
             {
-                withCredentials: true, // Send cookies with the request
+                withCredentials: true,
                 headers: {
                     "Content-Type": "application/json",
                 },

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,8 +40,10 @@ import {
 } from "@/components/ui/select";
 import { selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare } from "@100mslive/react-sdk";
 import useAuth from "@/hooks/useAuth";
+import { UserType } from "@/types/types";
+import useAppointmentStore from "@/store/appointmentStore";
 
-const Controls = () => {
+const Controls = ({ role, onEndCall, setOpenAlert }: { role: string, onEndCall: () => void, setOpenAlert: Dispatch<SetStateAction<boolean>> }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const { screenShareAudioTrackId, screenShareVideoTrackId, toggleScreenShare } = useScreenShare()
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -51,8 +53,7 @@ const Controls = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
-
-  const role = user?.Role;
+  const { cancelVideoChat } = useAppointmentStore()
 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [inputAudioSetting, setInputAudioSetting] = useState("");
@@ -60,23 +61,12 @@ const Controls = () => {
   const [speakerSetting, setspeakerSetting] = useState("");
 
 
-  const endCall = () => {
+  const leaveCall = () => {
     hmsActions.leave()
-    toast({
-      title: "Call ended",
-      description: "Thank u .",
-    });
-  };
+    cancelVideoChat()
+  }
 
-  const toggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
-    toast({
-      title: "This is a test Toast",
-      description: isFullScreen
-        ? "Exited Full Screen."
-        : "Entered Full Screen.",
-    });
-  };
+  console.log(role)
 
   return (
     <TooltipProvider>
@@ -113,11 +103,11 @@ const Controls = () => {
           </TooltipContent>
         </Tooltip>
 
-        {role === "provider" ? (
+        {role === UserType.DOCTOR ? (
           // end call control
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={endCall} variant={"destructive"}>
+              <Button onClick={() => setOpenAlert(true)} variant={"destructive"}>
                 <MdOutlineCallEnd size={20} />
               </Button>
             </TooltipTrigger>
@@ -125,11 +115,11 @@ const Controls = () => {
               <p>End Call</p>
             </TooltipContent>
           </Tooltip>
-        ) : role === "patient" ? (
+        ) : role === UserType.PATIENT ? (
           // Leave call control
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={endCall} variant={"destructive"}>
+              <Button onClick={leaveCall} variant={"destructive"}>
                 <MdLogout size={20} />
               </Button>
             </TooltipTrigger>
@@ -217,7 +207,7 @@ const Controls = () => {
         </Tooltip>
 
         {/* Full screen control */}
-        <Tooltip>
+        {/* <Tooltip>
           <TooltipTrigger asChild>
             <Button onClick={toggleFullScreen} variant={"video"}>
               {isFullScreen ? (
@@ -230,7 +220,7 @@ const Controls = () => {
           <TooltipContent>
             <p>screen share</p>
           </TooltipContent>
-        </Tooltip>
+        </Tooltip> */}
       </div>
     </TooltipProvider>
   );

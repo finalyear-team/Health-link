@@ -1,9 +1,13 @@
+"use client"
 import React from "react";
 import { Tags } from "lucide-react";
 import users from "@/public/data/users";
 import TopDoctors from "../TopDoctors";
+import { useQuery } from "@apollo/client";
+import { GET_DOCTORS } from "@/graphql/queries/userQueries";
 
 const TopDoctorSection = () => {
+  const { data: topDoctors, loading, error } = useQuery(GET_DOCTORS)
   const filteredUsers = users.slice(0, 6);
   return (
     <section className="w-full py-6">
@@ -20,7 +24,7 @@ const TopDoctorSection = () => {
             providing you with the best possible care.
           </p>
         </div>
-        <TopDoctors items={filteredUsers} />
+        <TopDoctors items={topDoctors?.GetDoctors} />
       </div>
     </section>
   );

@@ -17,31 +17,34 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { RecentChat } from "./chat-list";
+import { UserType } from "@/types/types";
 
-const ChatHeader = () => {
+const ChatHeader = ({ selectedChat }: any) => {
+
   return (
     <div className="flex items-center justify-between border-b border-slate-300 dark:border-slate-600 p-3 mb-2">
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8 border-2 border-[#00b894]">
           <AvatarImage src="/placeholder-user.jpg" />
-          <AvatarFallback>JD</AvatarFallback>
+          <AvatarFallback>{`${selectedChat?.Member?.FirstName?.charAt(0).toUpperCase()}${selectedChat?.Member?.LastName?.charAt(0).toUpperCase()}`}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
           <span className="text-sm font-medium text-gray-900 dark:text-gray-50">
-            Dr. Jane Doe
+            {`${selectedChat?.Member?.Role === UserType.DOCTOR ? "Dr." : ""}${selectedChat?.Member?.FirstName} ${selectedChat?.Member?.LastName}`}
           </span>
-          <span className="text-xs text-slate-500 dark:text-gray-400">
+          {/* <span className="text-xs text-slate-500 dark:text-gray-400">
             Online
-          </span>
+          </span> */}
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="icon">
+        {/* <Button variant="outline" size="icon" >
           <Video className="h-5 w-5 text-[#00b894]" />
           <span className="sr-only">Video Call</span>
-        </Button>
+        </Button> */}
 
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
               <Ellipsis className="h-5 w-5 text-[#00b894]" />
@@ -67,7 +70,7 @@ const ChatHeader = () => {
               Delete Chat
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
     </div>
   );

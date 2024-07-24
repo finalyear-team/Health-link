@@ -15,14 +15,43 @@ query GetUserAppointments($userID: String!) {
       PatientPhoto
       PatientGender
       DoctorGender
+      PatientDOB
       DoctorName
       DoctorPhoto
       Duration
+      CreatedAt
       Status
       AppointmentType
       Note
     },
     pastAppointments{
+      AppointmentID
+      DoctorID
+      PatientID
+      ScheduleID
+      AppointmentDate
+      AppointmentTime
+      PatientName
+      PatientPhoto
+      PatientGender
+      DoctorGender
+      PatientDOB
+      DoctorName
+      DoctorPhoto
+      Duration
+      CreatedAt
+      Status
+      AppointmentType
+      Note
+    }
+    
+  }
+}
+`;
+
+export const CHECK_OVERDUE_APPOINTMENTS = gql`
+   query checkIfOverDue{
+    checkIfOverDue{
       AppointmentID
       DoctorID
       PatientID
@@ -35,11 +64,10 @@ query GetUserAppointments($userID: String!) {
       Status
       AppointmentType
       Note
+      
     }
-    
-  }
-}
-`;
+   }
+`
 
 // export const GET_DOCTOR_APPOINTMENTS = gql`
 //    query  GetDoctorAppointments($DoctorID:String!){
@@ -116,15 +144,22 @@ export const GET_APPOINTMENT_BY_ID = gql`
 query GetAppointmentByID($id: String!) {
   GetAppointmentByID(Id: $id) {
     AppointmentID
-    DoctorID
-    PatientID
-    ScheduleID
-    AppointmentDate
-    AppointmentTime
-    Duration
-    Status
-    AppointmentType
-    Note
+  DoctorID
+  PatientID
+  ScheduleID
+  AppointmentDate
+  AppointmentTime
+  Duration
+  PatientName
+  PatientPhoto
+  PatientGender
+  CreatedAt
+  DoctorGender
+  DoctorName
+  DoctorPhoto
+  Status
+  AppointmentType
+  Note
   }
 }
 `;

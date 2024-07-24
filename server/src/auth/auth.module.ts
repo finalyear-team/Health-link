@@ -14,7 +14,7 @@ import { NotificationService } from 'src/notification/notification.service';
 
 
 @Module({
-  providers: [AuthService, PrismaService, UserService, JwtService, SocketGateway, SocketService, MailService, UserService, NotificationService],
+  providers: [AuthService, PrismaService, UserService, JwtService, MailService, UserService, NotificationService],
   controllers: [AuthController]
 })
 export class AuthModule { }

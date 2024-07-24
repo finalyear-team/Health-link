@@ -15,6 +15,7 @@ import { KeyRound, Rss, User, Users } from "lucide-react";
 import Container from "@/components/container/container";
 import PageLoader from "@/common/Loader/PageLoader";
 import { useToast } from "@/components/ui/use-toast";
+import useAuth from "@/hooks/useAuth";
 
 interface StatsCardProps {
   followers: number;
@@ -37,10 +38,10 @@ const initialAvailability = {
 };
 
 export default function TabsDemo() {
-  const { user, isLoaded } = useUser();
-  const Role = user?.unsafeMetadata.role;
-  const firstName = user?.firstName;
-  const lastName = user?.lastName;
+  const { user, isLoaded } = useAuth();
+  const Role = user?.Role;
+  const firstName = user?.FirstName;
+  const lastName = user?.LastName;
   const { toast } = useToast();
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
 
@@ -105,7 +106,7 @@ export default function TabsDemo() {
                   <span>Mr. </span> {firstName} {lastName}
                 </h2>
                 <div className="flex items-center space-x-2">
-                  <span className="text-slate-400">@alexisSan</span>
+                  <span className="text-slate-400">@{user?.Username}</span>
                   <div className="flex items-center space-x-2">
                     <Badge variant={"secondary"}>Patient</Badge>
                   </div>

@@ -108,9 +108,11 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
 
         if (createdRoom) {
             room = await checkRoom(createdRoom.RoomID, authToken.token)
+            console.log(room)
             return { room, hostToken: createdRoom.HostAuthToken, memberToken: createdRoom.Members[0].MemberAuthToken }
         }
         else {
+            console.log("from created room")
             room = await newRoom(authToken.token)
             const createdRoom = await addNewRoom(room, doctor, patient, appointmentDate, appointmentTime)
             return { room, hostToken: createdRoom.HostAuthToken, memberToken: createdRoom.Members[0].MemberAuthToken }

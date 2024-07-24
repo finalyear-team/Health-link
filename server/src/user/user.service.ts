@@ -199,6 +199,7 @@ export class UserService {
 
 
   async follow(FollowerID: string, FollowingID: string) {
+    console.log("doctor following")
     try {
       if (await this.existingFollow(FollowerID, FollowingID))
         throw new HttpException("You're Already following ", HttpStatus.BAD_REQUEST)

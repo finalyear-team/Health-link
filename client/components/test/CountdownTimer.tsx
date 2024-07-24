@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Info, Timer } from "lucide-react";
 import { motion } from "framer-motion";
+import { differenceInDays, differenceInHours, differenceInMilliseconds, differenceInMinutes, differenceInSeconds, format, formatDistance } from "date-fns";
 
 interface CountdownTimerProps {
   targetTime: string;
@@ -16,6 +17,7 @@ interface CountdownTimerProps {
 }
 
 interface TimeLeft {
+  days?: number;
   hours?: number;
   minutes?: number;
   seconds?: number;
@@ -29,19 +31,23 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
   // calculate the remaing time
   const calculateTimeLeft = (): TimeLeft => {
-    const difference = +new Date(targetTime) - +new Date();
+    const difference = differenceInMilliseconds(targetTime, new Date())
+    const dayDifference = differenceInDays(targetTime, new Date())
+
+    // const difference = +new Date(targetTime) - +new Date();
     let timeLeft: TimeLeft = {};
 
-    if (difference > 0) {
-      timeLeft = {
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
+
+    timeLeft = {
+      days: dayDifference,
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
 
     return timeLeft;
   };
+
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
 
@@ -62,9 +68,11 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     if (!value) {
       return;
     }
-
+    if (value < 0)
+      return;
 
     if (
+      interval === "days" ||
       interval === "hours" ||
       interval === "minutes" ||
       interval === "seconds"
@@ -78,15 +86,16 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
           transition={{ duration: 1 }}
           className="flex items-center space-x-1"
         >
-          {value} {index < 2 && ":"}
+          {value} {index < 3 && ":"}
         </motion.span>
       );
     }
   });
 
+
   return (
     <div className="text-center text-lg font-semibold text-slate-600 dark:text-slate-300">
-      {timerComponents.length ? (
+      {timerComponents.length > 0 ? (
         <div className="flex items-center space-x-3 text-sm">
           <Timer className="h-5 w-5" />
           Your consultation will begin in {timerComponents}

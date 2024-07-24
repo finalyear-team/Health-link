@@ -1,4 +1,4 @@
-import { format, addHours, parseISO } from "date-fns";
+import { format, addHours, parseISO, isWithinInterval } from "date-fns";
 
 const formatScheduleTime = (time: string) => {
   let date;
@@ -14,9 +14,19 @@ const formatScheduleTime = (time: string) => {
 
   // Add 1 hour to the date
   const newDate = addHours(date, 1);
+  console.log(newDate)
 
   // Format the date to the desired format
+  // return "null"
   return format(newDate, "hh:mm a");
 };
 
 export default formatScheduleTime;
+
+
+export const isDateIn24Hours = (date: Date) => {
+  const now = new Date();
+  const in24Hours = addHours(now, 24);
+
+  return isWithinInterval(date, { start: now, end: in24Hours })
+};

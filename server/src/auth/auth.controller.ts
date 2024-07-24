@@ -35,7 +35,6 @@ export class AuthController {
   private otpStore = new Map<string, string>();
   constructor(
     private readonly authService: AuthService,
-    private readonly socketGateway: SocketGateway,
     private readonly mailService: MailService,
     private readonly userService: UserService
   ) { }
@@ -240,10 +239,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log(req)
-    console.log("refreshToken ")
     if (!req.cookies['refresh_token']) {
-      console.log("not valid refresh token")
       throw new UnauthorizedException('User not authorized...')
     }
     try {
@@ -256,7 +252,6 @@ export class AuthController {
 
       const userId = decodedToken.sub;
       const user = await this.userService.getUserDetails(userId)
-      console.log(user)
       if (!user) throw new UnauthorizedException('User not authorized...');
       const payload = { sub: user.UserID, username: user.Username, role: user.Role, status: user.Status };
       const AccessToken = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "30d");

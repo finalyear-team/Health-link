@@ -4,6 +4,6 @@ import { ScheduleResolver } from './schedule.resolver';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  providers: [ScheduleResolver, ScheduleService,PrismaService],
+  providers: [ScheduleResolver, ScheduleService, PrismaService],
 })
-export class ScheduleModule {}
+export class ScheduleModule { }
