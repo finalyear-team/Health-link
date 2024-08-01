@@ -77,7 +77,7 @@ const LoginAndSecurity = ({ value }: { value: string }) => {
           >
             {({ isValid, isSubmitting }) => (
               <Form className="space-y-6" action="#" method="POST">
-                <div className="flex flex-wrap space-x-5">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                   <Input
                     label="Current Password"
                     name="previousPassword"

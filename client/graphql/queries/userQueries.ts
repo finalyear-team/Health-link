@@ -10,6 +10,7 @@ export const GET_SIGNEDIN_USER = gql`
           Rating,
           Email,
           PhoneNumber,
+          ProfilePicture,
           Address,
           Followers,
           Following,
@@ -38,11 +39,26 @@ export const GET_USER_BY_EMAIL = gql`
 `
 
 export const GET_USER = gql`
-  query GetUser($id: String!) {
-    GetUser(id: $id) {
-      UserID
-      FirstName
-      LastName
+  query GetUser($UserID: String!) {
+    GetUser(UserID: $UserID) {
+      UserID,
+          FirstName,
+          LastName
+          Username,
+          Rating,
+          Email,
+          Bio,
+          PhoneNumber,
+          Address,
+          Followers,
+          Following,
+          ConsultationFee,
+          Role,
+          Verified, 
+          Speciality,
+          ExperienceYears,
+          LicenseNumber,
+          EducationalBackground         
     }
   }
 `;
@@ -71,4 +87,51 @@ export const GET_DOCTORS = gql`
   }
 `;
 
+export const GET_FOLLOWERS = gql`
+query GetFollowers($userID: String) {
+  GetFollowers(UserID: $userID) {
+    UserID
+      Username
+      Email
+      FirstName
+      LastName
+      Bio
+      PhoneNumber
+      Address
+      ProfilePicture
+      Role
+      Status
+      Speciality
+      ExperienceYears
+      ConsultationFee
+      Followers
+      Following
+      Rating
+  }
+}
+`;
+
+export const GET_FOLLOWING = gql`
+  query GetFollowing($userID: String) {
+    GetFollowing(UserID: $userID) {
+      UserID
+      Username
+      Email
+      FirstName
+      LastName
+      Bio
+      PhoneNumber
+      Address
+      ProfilePicture
+      Role
+      Status
+      Speciality
+      ExperienceYears
+      ConsultationFee
+      Followers
+      Following
+      Rating
+    }
+  }
+`;
 

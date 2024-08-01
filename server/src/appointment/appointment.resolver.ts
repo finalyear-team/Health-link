@@ -16,6 +16,8 @@ export class AppointmentResolver {
   @Mutation('CreateAppointment')
   async createAppointment(@Args('createAppointmentInput') createAppointmentInput: CreateAppointmentInput) {
     const input = new CreateAppointmentInput(createAppointmentInput)
+    console.log(createAppointmentInput)
+
     const appointment = await this.appointmentService.createAppointment(input)
     return appointment
   }
@@ -61,6 +63,7 @@ export class AppointmentResolver {
   //
   @Query('checkIfOverDue')
   async checkOverDueAppointment() {
+    console.log("overDue checked")
     return await this.appointmentService.updateAppointmentStatus()
 
   }

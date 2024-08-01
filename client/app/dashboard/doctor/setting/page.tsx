@@ -25,6 +25,7 @@ import {
   User,
   Users,
   AlarmClockCheck,
+  Camera,
 } from "lucide-react";
 import Certificates from "@/components/settings/tabs/certificates";
 import { Formik, Form, Field } from "formik";
@@ -44,6 +45,11 @@ import { GET_SCHEDULES } from "@/graphql/queries/scheduleQueries";
 import { addHours, format, parse } from "date-fns";
 import { includes } from "lodash";
 import { Span } from "next/dist/trace";
+import useUserStore from "@/store/userStore";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@radix-ui/react-avatar";
+import { uploadFile } from "@/utils/fileUpload";
 
 interface StatsCardProps {
   followers: number;
@@ -108,7 +114,27 @@ function getWeekdayRange(weekdays: any[]) {
 
 
 export default function TabsDemo() {
-  const { user, isLoaded, isSignedIn } = useAuth()
+
+  const [hover, setHover] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<number | null | any>(0);
+
+  const { user, isLoaded } = useAuth();
+  const [image, setImage] = useState(user?.ProfilePicture);
+
+
+  const [updateUser] = useMutation(UPDATE_USER, {
+    onCompleted: (data) => {
+      toast({
+        title: "Success ",
+        description: "Profile update success",
+      });
+
+
+
+    }
+  });
+
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
   const [weekdays, setWeekdays] = useState()
@@ -117,17 +143,24 @@ export default function TabsDemo() {
       doctorID: user?.UserID
     }
   })
+  const { setEducationalBackGround } = useUserStore()
 
   const { toast } = useToast();
   const [CreateSchedule, { data, loading, error }] = useMutation(CREATE_SCHEDULE, {
     onCompleted: () => {
       refetch()
+      toast({
+        title: "Create Success",
+        description: "You have successfully set Available time",
+        variant: "success",
+      });
+
     },
     onError: () => {
       toast({
-        title: "Set: Available Time",
-        description: "You have successfully set Available time",
-        variant: "success",
+        title: "Schedule Error",
+        description: "Faild to create schedule",
+        variant: "error",
       });
 
     }
@@ -155,7 +188,6 @@ export default function TabsDemo() {
 
 
 
-  console.log(weekdays)
 
   const initialAvailability = {
     startTime: startTime || "10:00",
@@ -164,8 +196,6 @@ export default function TabsDemo() {
   };
 
   const Role = user && user?.Role;
-  const firstName = user && user.FirstName;
-  const lastName = user && user.LastName;
 
 
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
@@ -184,10 +214,46 @@ export default function TabsDemo() {
         unselectedDays
       }
     })
-
-
-
   };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        if (!file)
+          return
+
+        const imageUrl = await uploadFile(file, "profilePicture", setProgress)
+        if (!imageUrl)
+          return
+        updateUser({
+          variables: {
+            updateUserInput: {
+              UserID: user?.UserID,
+              ProfilePicture: imageUrl,
+            },
+          },
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Failed",
+        description: "Failed to update your profile picture, try again!",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!user)
+      return
+
+    if (!user.EducationalBackground)
+      return
+
+    setEducationalBackGround(JSON.parse(user.EducationalBackground))
+
+  }, [user])
+
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -218,22 +284,111 @@ export default function TabsDemo() {
       </Container>
     );
   }
+  const firstName = user?.FirstName;
+  const lastName = user?.LastName;
+  const userName = user?.Username;
+  const userID = user?.UserID;
+  // const gender = user?.Gender === "male" ? "Mr." : "Ms.";
+  // console.log(user?.Gender);
+  const combinedName = firstName + " " + lastName;
   return (
     <div>
       <Head>
         <title>Setting | HealthLink</title>
       </Head>
+      {/* <Card className="h-fit">
+        <div className="flex items-center space-x-3 p-3 rounded ">
+          <div className="flex items-center flex-wrap space-y-">
+            <div className="flex items-center space-x-4 ">
+              <div
+                className="relative w-28 h-28 overflow-hidden  " // Add overflow-hidden here
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+              >
+                <Avatar className="absolute inset-0  rounded-full cursor-pointer    w-28 h-28 ">
+                  <AvatarImage
+                    src={user?.ProfilePicture}
+                    alt="Profile Picture"
+                    className="object-cover w-full h-full rounded-full"
+                  />
+                  <AvatarFallback className="text-2xl font-medium">
+                    {firstName?.charAt(0).toUpperCase()}
+                    {lastName?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {hover && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full cursor-pointer">
+                    <Camera className="text-white text-2xl" />
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                )}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">{combinedName}</h2>
+                <div className="flex items-center space-x-2">
+                  <span className="text-slate-400 text-sm">@{userName}</span>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant={user?.Role}>{user?.Role}</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </Card> */}
       <Card>
         <div className=" flex items-center space-x-3 p-3 rounded">
           <div className="flex items-center flex-wrap space-y-2 ">
             <div className="flex items-center space-x-4 mr-4">
-              <Image
-                src="/image/profile-picture.jpg"
-                width={128}
-                height={128}
-                alt="profile picture"
-                className="rounded-full border-2 border-secondary-700"
-              />
+              <div className="flex items-center space-x-3 p-3 rounded ">
+                <div className="flex items-center flex-wrap space-y-">
+                  <div className="flex items-center space-x-4 ">
+                    <div
+                      className="relative w-28 h-28 overflow-hidden  " // Add overflow-hidden here
+                      onMouseEnter={() => setHover(true)}
+                      onMouseLeave={() => setHover(false)}
+                    >
+                      <Avatar className="absolute inset-0  rounded-full cursor-pointer    w-28 h-28 ">
+                        <AvatarImage
+                          src={user?.ProfilePicture}
+                          alt="Profile Picture"
+                          className="object-cover w-full h-full rounded-full"
+                        />
+                        <AvatarFallback className="text-2xl font-medium">
+                          {firstName?.charAt(0).toUpperCase()}
+                          {lastName?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {hover && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full cursor-pointer">
+                          <Camera className="text-white text-2xl" />
+                          <input
+                            type="file"
+                            accept="image/png, image/jpeg, image/jpg"
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                            onChange={handleImageChange}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {/* <div>
+                      <h2 className="text-xl font-bold">{combinedName}</h2>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-slate-400 text-sm">@{userName}</span>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={user?.Role}>{user?.Role}</Badge>
+                        </div>
+                      </div>
+                    </div> */}
+                  </div>
+                </div>
+              </div>
               <div>
                 <div className="relative text-xl font-bold">
                   <span>
@@ -252,7 +407,7 @@ export default function TabsDemo() {
                   Oncologist
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Rating value={3.3} />
+                  {/* <Rating value={3.3} /> */}
                 </div>
                 <div className="text-sm text-slate-600 dark:text-slate-200 flex items-center">
                   {startTime && endTime && weekdays ?
@@ -433,26 +588,26 @@ export default function TabsDemo() {
                         </p>
                         <p className="font-bold text-lg">{user?.Following}</p>
                       </div>
-                      <div>
+                      {/* <div>
                         <p className="text-slate-600 dark:text-slate-100 text-sm">
                           Posts
                         </p>
                         <p className="font-bold text-lg">{stats.posts}</p>
-                      </div>
+                      </div> */}
                       <div>
-                        <p className="text-slate-600 dark:text-slate-100 text-sm">
+                        {/* <p className="text-slate-600 dark:text-slate-100 text-sm">
                           Question Answered
                         </p>
                         <p className="font-bold text-lg">
                           {stats.answeredQuestion}
-                        </p>
+                        </p> */}
                       </div>
-                      <div>
+                      {/* <div>
                         <p className="text-slate-600 dark:text-slate-100 text-sm">
                           Blog
                         </p>
                         <p className="font-bold text-lg">{stats.blogs}</p>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
@@ -466,28 +621,28 @@ export default function TabsDemo() {
           <TabsTrigger value="account">
             <User className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Account"}
           </TabsTrigger>
-          <TabsTrigger value="loginAndSecurity">
+          {/* <TabsTrigger value="loginAndSecurity">
             <KeyRound className="w-4 h-4 mr-2" />{" "}
             {isSmallScreen ? null : "Password"}
-          </TabsTrigger>
-          <TabsTrigger value="certificates">
+          </TabsTrigger> */}
+          {/* <TabsTrigger value="certificates">
             <Award className="w-4 h-4 mr-2" />{" "}
             {isSmallScreen ? null : "Certificates"}
-          </TabsTrigger>
+          </TabsTrigger> */}
 
           <TabsTrigger value="Network">
             <Users className="w-4 h-4 mr-2" />{" "}
             {isSmallScreen ? null : "Network"}
           </TabsTrigger>
-          <TabsTrigger value="myPosts">
+          {/* <TabsTrigger value="myPosts">
             <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
         <Account value="account" isPatient={false} />
-        <LoginAndSecurity value="loginAndSecurity" />
-        <Certificates value="certificates" />
-        <Network value="Network" isPatient={false} />
-        <MyPosts value="myPosts" />
+        {/* <LoginAndSecurity value="loginAndSecurity" /> */}
+        {/* <Certificates value="certificates" /> */}
+        <Network value="Network" isPatient={false} userID={user?.UserID} />
+        {/* <MyPosts value="myPosts" /> */}
       </Tabs>
     </div>
   );

@@ -1,17 +1,23 @@
 "use client"
-import React from "react";
+import React, { useEffect } from "react";
 import { Tags } from "lucide-react";
 import users from "@/public/data/users";
 import TopDoctors from "../TopDoctors";
 import { useQuery } from "@apollo/client";
 import { GET_DOCTORS } from "@/graphql/queries/userQueries";
+import useAuth from "@/hooks/useAuth";
 
 const TopDoctorSection = () => {
+  const { user } = useAuth()
   const { data: topDoctors, loading, error } = useQuery(GET_DOCTORS)
+
+  const doctors = topDoctors?.GetDoctors.filter((doctor: any) => doctor.UserID !== user?.UserID)
+
+  console.log(doctors)
   const filteredUsers = users.slice(0, 6);
   return (
     <section className="w-full py-6">
-      <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold h-20 text-center px-3 text-primary-600 dark:text-primary-700 sticky top-12 bg-slate-800">
+      <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold h-20 text-center px-3 text-primary-600 dark:text-primary-700 sticky top-12 dark:bg-slate-800 bg-white">
         <Tags className="w-6 h-6 mr-2" /> Our Doctors
       </div>
       <div className="container px-4 md:px-6">
@@ -24,7 +30,7 @@ const TopDoctorSection = () => {
             providing you with the best possible care.
           </p>
         </div>
-        <TopDoctors items={topDoctors?.GetDoctors} />
+        <TopDoctors items={doctors} />
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
@@ -14,6 +15,7 @@ import { io, Socket } from "socket.io-client";
 import useSocket from "@/hooks/useSocket";
 import { uploadFile } from "@/utils/fileUpload";
 import { toast } from "@/components/ui/use-toast";
+import Loading from "@/common/Loader/Loading";
 
 const Chat = () => {
   const [messages, setMessages] = useState<
@@ -252,10 +254,16 @@ const Chat = () => {
   }, [progress])
   console.log(progress)
 
+
+
+
   return (
     <div className="flex w-full flex-col dark:bg-gray-950">
       <div className="flex h-full ">
-        <RecentChats recentChats={recentChats} selectChat={setSelectedChat} />
+        <>{
+          loading ? <Loading /> :
+            <RecentChats recentChats={recentChats} selectChat={setSelectedChat} />}
+        </>
         <div className="flex-1 mb-2 mx-2 dark:bg-slate-950">
           {selectedChat && (
             <>

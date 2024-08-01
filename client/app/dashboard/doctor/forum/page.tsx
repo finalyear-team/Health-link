@@ -61,162 +61,164 @@ const tabs: Tab[] = [
 ];
 
 const HomePage = () => {
-  const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState<string>(tabs[0].name);
-  const { data: forumPosts, loading: queryLoading, error: queryError } = useQuery(GET_FORUM_POSTS, {
-    variables: {
-      Query:
-        activeTab
-    }
-  })
-  const [questions, setQuestions] = useState(initialQuestions);
-  const [CreateForumPost, { data: forumPostData, loading, error }] = useMutation(CREATE_FORUM_POST, {
-    update(cache, { data: { CreateForumPost } }) {
-      const { GetForumPosts } = cache.readQuery({ query: GET_FORUM_POSTS }) as any
-      if (!GetForumPosts)
-        return
+  // const { user } = useAuth()
+  // const [activeTab, setActiveTab] = useState<string>(tabs[0].name);
 
-      return [CreateForumPost, ...GetForumPosts]
-    }
-  })
+  // const { data: forumPosts, refetch } = useQuery(GET_FORUM_POSTS, {
+  //   variables: {
+  //     Query: activeTab
+  //   }
+  // })
+  // const [open, setOpen] = useState(false)
 
-  const [editorContent, setEditorContent] = useState("");
+  // const [questions, setQuestions] = useState(initialQuestions);
+  // const [CreateForumPost, { data: forumPostData, loading, error }] = useMutation(CREATE_FORUM_POST, {
+  //   onCompleted: () => {
+  //     refetch(),
 
-  const handleEditorContentChange = (content: string) => {
-    setEditorContent(content);
-  };
+  //   }
+  // })
 
-  const handlePostSubmit = async (values: any) => {
-    try {
-      const html = await handleHtmlContent(editorContent)
-      if (!html && !values.title)
-        return
-      CreateForumPost({
-        variables: {
-          createForumPostInput: {
-            Title: values.title,
-            Question: html,
-            UserID: user?.UserID
-          }
-        }
-      })
+  // const [editorContent, setEditorContent] = useState("");
+
+  // const handleEditorContentChange = (content: string) => {
+  //   setEditorContent(content);
+  // };
+
+  // const handlePostSubmit = async (values: any) => {
+  //   try {
+  //     const html = await handleHtmlContent(editorContent)
+  //     if (!html && !values.title)
+  //       return
+  //     CreateForumPost({
+  //       variables: {
+  //         createForumPostInput: {
+  //           Title: values.title,
+  //           Question: html,
+  //           UserID: user?.UserID
+  //         }
+  //       }
+  //     })
 
 
-    } catch (error) {
-      console.log(error)
-    }
-    // const newQuestion = {
-    //   id: (questions.length + 1).toString(),
-    //   title,
-    //   description: content,
-    //   tags,
-    //   author: "Current User",
-    //   date: new Date(),
-    // };
-    // setQuestions([newQuestion, ...questions]);
-  };
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  //   // const newQuestion = {
+  //   //   id: (questions.length + 1).toString(),
+  //   //   title,
+  //   //   description: content,
+  //   //   tags,
+  //   //   author: "Current User",
+  //   //   date: new Date(),
+  //   // };
+  //   // setQuestions([newQuestion, ...questions]);
+  // };
 
-  const handleSearch = () => {
-    console.log("search")
-    // Handle search functionality
-  };
+  // const handleSearch = () => {
+  //   console.log("search")
+  //   // Handle search functionality
+  // };
 
 
   return (
-    <div className="relative flex flex-col items-center justify-center space-y-2">
-      <div className="sticky top-0 z-50 w-full bg-white dark:bg-slate-950">
-        <div className="flex items-center justify-between p-1">
-          <h1 className="text-xl font-bold">Forum</h1>
-          <Formik initialValues={{ searchText: "" }} onSubmit={handleSearch}>
-            {() => (
-              <Form className="" action="#" method="POST">
-                <Input
-                  type="text"
-                  name="searchText"
-                  placeholder="Search questions"
-                  className="w-[350px]"
-                />
-              </Form>
-            )}
-          </Formik>
+    <></>
+    // <div className="relative flex flex-col items-center justify-center space-y-2">
+    //   <div className="sticky top-0 z-50 w-full bg-white dark:bg-slate-950">
+    //     <div className="flex items-center justify-between p-1">
+    //       <h1 className="text-xl font-bold">Forum</h1>
+    //       {/* <Formik initialValues={{ searchText: "" }} onSubmit={handleSearch}>
+    //         {() => (
+    //           <Form className="" action="#" method="POST">
+    //             <Input
+    //               type="text"
+    //               name="searchText"
+    //               placeholder="Search questions"
+    //               className="w-[350px]"
+    //             />
+    //           </Form>
+    //         )}
+    //       </Formik> */}
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-5 h-5 mr-2" />
-                Ask Question
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <span className="flex items-center">
-                  <MessageCircleQuestion className="w-5 h-5 mr-2" /> Ask a
-                  Question.
-                </span>
-              </DialogHeader>
-              <Formik initialValues={{ title: "" }} onSubmit={handlePostSubmit}>
-                {({ isValid, isSubmitting }) => (
-                  <div>
-                    <Form className="p-2" action="#" method="POST">
-                      <Input
-                        type="text"
-                        name="title"
-                        placeholder="title"
-                        className="w-full text-lg font-bold"
-                      />
-                      <WysiwygForm onContentChange={handleEditorContentChange} />
-                      <Button
-                        className="z-50"
-                        type="submit"
-                        disabled={loading || isSubmitting}
-                      >
-                        Add a Question
-                      </Button>
-                    </Form>
-                  </div>
-                )}
-              </Formik>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="flex space-x-4 mt-2">
-            {tabs.map((tab) => (
-              <Button
-                variant={"empty"}
-                size={"sm"}
-                key={tab.name}
-                onClick={() => setActiveTab(tab.name)}
-                className={`hover:bg-slate-100 dark:hover:bg-slate-800 rounded-none transition-colors duration-300 ${activeTab === tab.name
-                  ? "border-b-4 border-primary-600 dark:border-primary-700 text-primary-600 dark:text-primary-700"
-                  : ""
-                  }`}
-              >
-                {tab.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
+    //       <Dialog open={open} onOpenChange={setOpen}>
+    //         <DialogTrigger asChild>
+    //           <Button>
+    //             <Plus className="w-5 h-5 mr-2" />
+    //             Ask Question
+    //           </Button>
+    //         </DialogTrigger>
+    //         <DialogContent>
+    //           <DialogHeader>
+    //             <span className="flex items-center">
+    //               <MessageCircleQuestion className="w-5 h-5 mr-2" /> Ask a
+    //               Question.
+    //             </span>
+    //           </DialogHeader>
+    //           <Formik initialValues={{ title: "" }} onSubmit={handlePostSubmit}>
+    //             {({ isValid, isSubmitting }) => (
+    //               <div>
+    //                 <Form className="p-2" action="#" method="POST">
+    //                   <Input
+    //                     type="text"
+    //                     name="title"
+    //                     placeholder="title"
+    //                     className="w-full text-lg font-bold"
+    //                   />
+    //                   <WysiwygForm onContentChange={handleEditorContentChange} />
+    //                   <Button
+    //                     className="z-50"
+    //                     type="submit"
+    //                     disabled={loading || isSubmitting}
+    //                   >
+    //                     Add a Question
+    //                   </Button>
+    //                 </Form>
+    //               </div>
+    //             )}
+    //           </Formik>
+    //         </DialogContent>
+    //       </Dialog>
+    //     </div>
+    //     <div className="flex flex-col items-center">
+    //       <div className="flex space-x-4 mt-2">
+    //         {tabs.map((tab) => (
+    //           <Button
+    //             variant={"empty"}
+    //             size={"sm"}
+    //             key={tab.name}
+    //             onClick={() => setActiveTab(tab.name)}
+    //             className={`hover:bg-slate-100 dark:hover:bg-slate-800 rounded-none transition-colors duration-300 ${activeTab === tab.name
+    //               ? "border-b-4 border-primary-600 dark:border-primary-700 text-primary-600 dark:text-primary-700"
+    //               : ""
+    //               }`}
+    //           >
+    //             {tab.name}
+    //           </Button>
+    //         ))}
+    //       </div>
+    //     </div>
+    //   </div>
 
-      <div className="min-h-full flex flex-wrap space-x-6 p-2">
-        <div className="max-w-4xl mx-auto mb-2">
-          {/* <PostForm onSubmit={handlePostSubmit} /> */}
-          {forumPosts?.GetForumPosts?.length === 0 ?
-            <div className="self-center text-lg font-bold">No Posts yet</div> :
-            <>
-              {forumPosts?.GetForumPosts.map((question: any) => (
-                <QuestionCard key={question.ForumPostID} {...question} />
-              ))}
-            </>
-          }
+    //   <div className="min-h-full flex flex-wrap space-x-6 p-2">
+    //     <div className="max-w-4xl mx-auto mb-2">
+    //       {/* <PostForm onSubmit={handlePostSubmit} /> */}
+    //       {forumPosts?.GetForumPosts?.length === 0 ?
+    //         <div className="self-center text-lg font-bold">No Posts yet</div> :
+    //         <>
+    //           {forumPosts?.GetForumPosts.map((question: any) => (
+    //             <QuestionCard key={question.ForumPostID} {...question} />
+    //           ))}
+    //         </>
+    //       }
 
-        </div>
-        <div className="flex flex-col max-w-lg p-4 border border-slate-200 shadow-sm dark:border-slate-500 rounded-lg sticky dark:bg-slate-950">
-          <h1 className="text-xl font-bold mb-4">Featured Doctors</h1>
-        </div>
-      </div>
-    </div>
+    //     </div>
+
+    //     {/* <div className="flex flex-col max-w-lg p-4 border border-slate-200 shadow-sm dark:border-slate-500 rounded-lg sticky dark:bg-slate-950">
+    //       <h1 className="text-xl font-bold mb-4">Featured Doctors</h1>
+    //     </div> */}
+
+    //   </div>
+    // </div>
   );
 };
 

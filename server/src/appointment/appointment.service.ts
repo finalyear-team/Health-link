@@ -10,7 +10,7 @@ import { ScheduleService } from 'src/schedule/schedule.service';
 import { ScheduleStatus, UpdateAppointmentType } from 'src/utils/types';
 import { decreaseHourByOne } from 'src/utils/converToIso';
 import { SocketGateway } from 'src/socket/socket.gateway';
-import { databaseDate } from 'src/utils/parseDate';
+import { databaseDate, parseDate } from 'src/utils/parseDate';
 import { Cron } from '@nestjs/schedule';
 import { isDateIn24Hours } from 'src/utils/validateTime';
 import { error } from 'console';
@@ -18,6 +18,7 @@ import { UserService } from 'src/user/user.service';
 import { getFormatedDate, getFormatedTime } from 'src/utils/TimeZoneConverter';
 import { PaymentService } from 'src/payment/payment.service';
 import { StreamChatService } from 'src/stream-chat/stream-chat.service';
+import { lte } from 'lodash';
 
 @Injectable()
 export class AppointmentService {
@@ -96,7 +97,6 @@ export class AppointmentService {
 
 
   async isAppointmentPendingOrBooked(ScheduleID: string, DoctorID: string, PatientID: string, AppointmentDate: Date, AppointmentTime: Date) {
-
 
 
     console.log(AppointmentDate)
@@ -187,12 +187,12 @@ export class AppointmentService {
 
     const { DoctorID, ScheduleID, PatientID, AppointmentDate, AppointmentTime, Note, Status, AppointmentType, VideoChatRoomID } = createAppointmentInput
 
-    console.log(AppointmentTime)
 
 
 
     if (!await this.isSelectedDateAvailable(ScheduleID, DoctorID, AppointmentDate, AppointmentTime))
       throw new Error("this slot is not available")
+
     if (await this.isAppointmentPendingOrBooked(ScheduleID, DoctorID, PatientID, AppointmentDate, AppointmentTime))
       throw new Error("this appointment is already pending or booked. try different date")
 
@@ -263,52 +263,58 @@ export class AppointmentService {
         }
 
       })
-      console.log(appointment)
+
+
+
+      const appointmentStartTime = new Date(appointment.AppointmentDate);
+      appointmentStartTime.setHours(appointment.AppointmentTime.getHours());
+      appointmentStartTime.setMinutes(appointment.AppointmentTime.getMinutes());
+
+      const appointmentEndTime = new Date(appointmentStartTime);
+      appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + Duration);
+
       const schedule = await this.findAndUpdateSchedule(appointment)
-      console.log(schedule)
       if (!schedule)
         throw new Error("come on man")
 
-      appointment = await this.prisma.appointments.update({
+      const currentTime = new Date()
+
+      // Update the specific appointment to 'booked'
+      await this.prisma.appointments.update({
         where: {
           AppointmentID: appointment.AppointmentID
         },
         data: {
-          ScheduleID: schedule.ScheduleID,
-          Status: "booked",
+          Status: 'booked',
           Duration
-        },
-        include: {
-          Doctor: {
-            select: {
-              UserID: true,
-              FirstName: true,
-              LastName: true,
-              Role: true,
-              DoctorDetails: {
-                select: {
-                  ConsultationFee: true
-                }
-              }
-            }
-          },
-          Patient: {
-            select: {
-              UserID: true,
-              FirstName: true,
-              LastName: true,
-              Role: true
-            }
-
-          }
         }
+      });
 
-      })
+      // Cancel other pending appointments in the same time range
+      await this.prisma.appointments.updateMany({
+        where: {
+          DoctorID,
+          Status: 'pending',
+          AppointmentDate: appointment.AppointmentDate,
+          AppointmentTime: {
+            gte: appointmentStartTime,
+            lt: appointmentEndTime
+          }
+        },
+        data: {
+          Status: 'cancelled'
+        }
+      });
+
+
+
+
+
+
+
 
       const Room = await this.updateVideoCallRoomMembersToken(appointment)
       const chatChannel = await this.streamChat.createDmChannel(appointment.DoctorID, appointment.PatientID)
-      console.log("chat channel")
-      console.log(chatChannel)
       const name = `${Status === AppointmentStatus.reschedulePending ? `${appointment.Patient.FirstName} ${appointment.Patient.LastName}` : ` Dr . ${appointment.Doctor.FirstName} ${appointment.Doctor.LastName}`}`;
 
       this.socket.appointmentNotification({
@@ -361,7 +367,6 @@ export class AppointmentService {
             ScheduleID: selectedSchedule.ScheduleID
           }
         })
-        console.log(deletedSchedule)
       }
 
       this.socket.appointmentNotification({
@@ -390,12 +395,7 @@ export class AppointmentService {
 
       const user = await this.userService.getUserDetails(UpdatedBy)
 
-
-
       const Status = user.Role === UserType.doctor ? AppointmentStatus.reschedulePending : AppointmentStatus.pending
-
-
-
 
       const appointment = await this.prisma.appointments.update({
         where: {
@@ -425,7 +425,6 @@ export class AppointmentService {
         UserID: appointment.DoctorID === appointment.UpdatedBy ? appointment.PatientID : appointment.DoctorID,
         appointment: appointment
       })
-      console.log(appointment)
       return appointment
     } catch (error) {
       throw error
@@ -456,8 +455,6 @@ export class AppointmentService {
             Status
           }
         })
-        console.log("status changed appointment")
-        console.log(changedAppointment)
         return changedAppointment
       }
 
@@ -476,7 +473,6 @@ export class AppointmentService {
 
       // Update the video call room
       const Room = await this.updateVideoCallRoomMembersToken(appointment);
-      console.log(Room)
 
 
       return appointment;
@@ -588,7 +584,6 @@ export class AppointmentService {
         pastAppointments
       }
     } catch (error) {
-      console.log(error)
       throw error
     }
   }
@@ -797,54 +792,54 @@ export class AppointmentService {
   async updateAppointmentStatus() {
     const currentDate = new Date()
     try {
-      const appointments = await this.prisma.appointments.updateMany({
+      const appointments = await this.prisma.appointments.findMany({
         where: {
           OR: [
             {
-              AppointmentDate: {
-                lt: currentDate, // Date is before current date
-              },
-              Status: {
-                notIn: ["completed", "overdue", "cancelled"], // Status not in these values
-              }
-            },
-            {
+              // AppointmentDate is before the current date
               AND: [
                 {
                   AppointmentDate: {
-                    equals: currentDate // Date is equal to current date
-                  }
-                },
-                {
-                  AppointmentTime: {
-                    lt: currentDate // Appointment time is before current date and time
-                  }
+                    lt: currentDate,
+                  },
                 },
                 {
                   Status: {
-                    notIn: ["completed", "overdue", "cancelled"], // Status not in these values
-                  }
-                }
-              ]
-            }
-          ]
+                    notIn: ["completed", "overdue", "cancelled"],
+                  },
+                },
+              ],
+            },
+            {
+              // AppointmentDate is today but AppointmentTime is before the current time
+              AND: [
+                {
+                  AppointmentDate: {
+                    equals: new Date(currentDate.toDateString()), // Only current date
+                  },
+                },
+                {
+                  AppointmentTime: {
+                    lt: currentDate,
+                  },
+                },
+                {
+                  Status: {
+                    notIn: ["completed", "overdue", "cancelled"],
+                  },
+                },
+              ],
+            },
+          ],
         },
-        data: {
-          Status: "overdue"
-        }
-      })
 
-      // console.log("overdue appointments")
-
-      // console.log(appointments)
+      });
 
     } catch (error) {
-      console.log(error)
-      throw error
-
+      console.log("Error updating appointment status:", error);
+      throw error;
     }
   }
-
 }
 
 

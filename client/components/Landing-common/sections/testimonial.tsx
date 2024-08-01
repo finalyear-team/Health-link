@@ -6,7 +6,7 @@ import { Avatar, AvatarImage,AvatarFallback } from '@/components/ui/avatar'
 const Testimonials = () => {
   return (
     <section className="w-full py-6">
-    <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold text-center px-3 text-primary-600 dark:text-primary-700 sticky top-11 bg-slate-800">
+    <div className="w-full flex items-center justify-center mb-2 text-2xl font-bold text-center px-3 text-primary-600 dark:text-primary-700 sticky top-11 dark:bg-slate-800 bg-white">
       <Quote className="w-6 h-6 mr-2" /> Testimonials
     </div>
     <div className="container px-4 md:px-6">

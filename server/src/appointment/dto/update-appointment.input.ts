@@ -23,23 +23,25 @@ export const updateSchema = z.object({
   Status: z.enum(StatusValue).optional(),
   AppointmentType: z.enum(TypeValue).optional(),
   Note: z.string().optional(),
-}).refine(({ AppointmentDate, AppointmentTime }) => {
-  try {
-    if (!AppointmentDate && !AppointmentTime)
-      return true
-    const now = new Date()
-    const currenttime = convertToIso(AppointmentTime);
-    if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) < 0)
-      return false
+})
+// .
+// refine(({ AppointmentDate, AppointmentTime }) => {
+//   try {
+//     if (!AppointmentDate && !AppointmentTime)
+//       return true
+//     const now = new Date()
+//     const currenttime = convertToIso(AppointmentTime);
+//     if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) < 0)
+//       return false
 
-    if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) === 0 && compareTimeOnly(currenttime, new Date()) < 0)
-      return false
-    return true;
-  } catch (e) {
-    return false;
-  }
+//     if (differenceInDays(new Date(format(AppointmentDate, "yyyy-MM-dd")), new Date(format(now, "yyyy-MM-dd"))) === 0 && compareTimeOnly(currenttime, new Date()) < 0)
+//       return false
+//     return true;
+//   } catch (e) {
+//     return false;
+//   }
 
-}, "Appointment can't be in the past");
+// }, "Appointment can't be in the past");
 
 
 export class UpdateAppointmentInput extends PartialType(CreateAppointmentInput) {

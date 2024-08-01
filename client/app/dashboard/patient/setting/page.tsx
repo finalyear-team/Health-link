@@ -11,11 +11,16 @@ import MyPosts from "@/components/settings/tabs/myPosts";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { Badge } from "@/components/ui/badge";
-import { KeyRound, Rss, User, Users } from "lucide-react";
+import { Camera, KeyRound, Rss, User, Users } from "lucide-react";
 import Container from "@/components/container/container";
 import PageLoader from "@/common/Loader/PageLoader";
 import { useToast } from "@/components/ui/use-toast";
 import useAuth from "@/hooks/useAuth";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@radix-ui/react-avatar";
+import { uploadFile } from "@/utils/fileUpload";
+import { UPDATE_USER } from "@/graphql/mutations/userMutations";
+import { useMutation } from "@apollo/client";
 
 interface StatsCardProps {
   followers: number;
@@ -38,24 +43,64 @@ const initialAvailability = {
 };
 
 export default function TabsDemo() {
+  const [hover, setHover] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<number | null | any>(0);
+
   const { user, isLoaded } = useAuth();
-  const Role = user?.Role;
-  const firstName = user?.FirstName;
-  const lastName = user?.LastName;
+  const [image, setImage] = useState(user?.ProfilePicture);
+
   const { toast } = useToast();
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
 
-  // handle availabilty
-  const handleAvailablity = (value: any) => {
-    console.log("weekdays: ", value.weekday);
-    console.log("startTime: ", value.startTime);
-    console.log("endTime: ", value.endTime);
+  const [updateUser] = useMutation(UPDATE_USER, {
+    onCompleted: (data) => {
+      toast({
+        title: "Success ",
+        description: "Profile update success",
+      });
 
-    toast({
-      title: "Set: Available Time",
-      description: "You have successfully set Available time",
-      variant: "success",
-    });
+
+
+    }
+  });
+
+  const firstName = user?.FirstName;
+  const lastName = user?.LastName;
+  const userName = user?.Username;
+  const userID = user?.UserID;
+  // const gender = user?.Gender === "male" ? "Mr." : "Ms.";
+  // console.log(user?.Gender);
+  const combinedName = firstName + " " + lastName;
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        if (!file)
+          return
+
+        const imageUrl = await uploadFile(file, "profilePicture", setProgress)
+
+        console.log(imageUrl)
+
+        if (!imageUrl)
+          return
+        updateUser({
+          variables: {
+            updateUserInput: {
+              UserID: user?.UserID,
+              ProfilePicture: imageUrl,
+            },
+          },
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Failed",
+        description: "Failed to update your profile picture, try again!",
+      });
+    }
   };
 
   useEffect(() => {
@@ -84,6 +129,7 @@ export default function TabsDemo() {
       </Container>
     );
   }
+  console.log(user)
   return (
     <div>
       <Head>
@@ -91,24 +137,43 @@ export default function TabsDemo() {
       </Head>
       {/* profile section */}
       <Card>
-        <div className=" flex items-center space-x-3 p-3 rounded">
+        <div className="flex items-center space-x-3 p-3 rounded">
           <div className="flex items-center flex-wrap space-y-2 ">
             <div className="flex items-center space-x-4">
-              <Image
-                src="/image/profile-picture.jpg"
-                width={128}
-                height={128}
-                alt="profile picture"
-                className="rounded-full border-2 border-secondary-700"
-              />
+              <div
+                className="relative w-32 h-32"
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+              >
+                <Avatar className="absolute inset-0  rounded-full cursor-pointer    w-28 h-28 ">
+                  <AvatarImage
+                    src={user?.ProfilePicture}
+                    alt="Profile Picture"
+                    className="object-cover w-full h-full rounded-full"
+                  />
+                  <AvatarFallback className="text-2xl font-medium">
+                    {firstName?.charAt(0).toUpperCase()}
+                    {lastName?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {hover && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full cursor-pointer">
+                    <Camera className="text-white text-2xl" />
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                )}
+              </div>
               <div>
-                <h2 className="text-xl font-bold">
-                  <span>Mr. </span> {firstName} {lastName}
-                </h2>
+                <h2 className="text-xl font-bold">{combinedName}</h2>
                 <div className="flex items-center space-x-2">
-                  <span className="text-slate-400">@{user?.Username}</span>
+                  <span className="text-slate-400 text-sm">@{userName}</span>
                   <div className="flex items-center space-x-2">
-                    <Badge variant={"secondary"}>Patient</Badge>
+                    <Badge variant={user?.Role}>{user?.Role}</Badge>
                   </div>
                 </div>
               </div>
@@ -121,22 +186,22 @@ export default function TabsDemo() {
           <TabsTrigger value="account">
             <User className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "Account"}
           </TabsTrigger>
-          <TabsTrigger value="loginAndSecurity">
+          {/* <TabsTrigger value="loginAndSecurity">
             <KeyRound className="w-4 h-4 mr-2" />{" "}
             {isSmallScreen ? null : "Password"}
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="Network">
             <Users className="w-4 h-4 mr-2" />
             {isSmallScreen ? null : "Network"}
           </TabsTrigger>
-          <TabsTrigger value="myPosts">
+          {/* <TabsTrigger value="myPosts">
             <Rss className="w-4 h-4 mr-2" /> {isSmallScreen ? null : "my Posts"}
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
         <Account value="account" isPatient={true} />
-        <LoginAndSecurity value="loginAndSecurity" />
-        <Network value="Network" isPatient={true} />
-        <MyPosts value="myPosts" />
+        {/* <LoginAndSecurity value="loginAndSecurity" /> */}
+        <Network value="Network" isPatient={true} userID={user?.UserID} />
+        {/* <MyPosts value="myPosts" /> */}
       </Tabs>
     </div>
   );

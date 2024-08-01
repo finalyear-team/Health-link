@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Scroll } from "lucide-react";
 import { validateCertificateInputs } from "@/utils/validationSchema";
 import {
@@ -12,9 +12,14 @@ import {
 import { TabsContent } from "@/components/ui/tabs";
 import CertificateDialog from "../ui/CertificateDialog";
 import { useToast } from "@/components/ui/use-toast";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_USER } from "@/graphql/mutations/userMutations";
 import CertificateCard from "../ui/CertificateCard";
+import { uploadFile } from "@/utils/fileUpload";
+import useAuth from "@/hooks/useAuth";
+import useUserStore from "@/store/userStore";
+import { GET_SIGNEDIN_USER, GET_USER } from "@/graphql/queries/userQueries";
+import { ref } from "firebase/storage";
 
 interface Certificate {
   id: string;
@@ -52,17 +57,73 @@ const dummyData: Certificate[] = [
 
 const Certificates = ({ value }: { value: string }) => {
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const { user } = useAuth()
+  const { data: userDetail, loading, error, refetch } = useQuery(GET_USER, {
+    variables: {
+      UserID: user?.UserID
+    }
+  })
+  const { EducationalBackground, setEducationalBackGround } = useUserStore()
   const { toast } = useToast();
-  const [updateUser] = useMutation(UPDATE_USER);
+  const [open, setOpen] = useState(false)
+  const [progress, setProgress] = useState<number | null | any>()
+  const [updateUser] = useMutation(UPDATE_USER, {
+    onCompleted: (data) => {
+      refetch()
+      setOpen(false)
+    }
+  });
+  const [certificate, setCertificate] = useState<any[]>()
+
+  useEffect(() => {
+    if (!userDetail && !userDetail?.GetUser?.EducationalBackground)
+      return
+
+    const AdditionalCertificate = JSON.parse(userDetail?.GetUser?.EducationalBackground)?.AdditionalCertifications
+
+    setCertificate(AdditionalCertificate?.map((certificate: any) => {
+      const info = JSON.parse(certificate)
+      return {
+        certificateId: info?.certificateId,
+        name: info.name,
+        previewUrl: info.file,
+        issueDate: info.issueDate,
+        description: info.description
+      }
+    }))
+
+
+
+  }, [userDetail])
 
   const handleCertificateSubmit = async (values: any) => {
     console.log(values, certificateFile);
-    // values.name, values.description,values.issueDate,value.imageURL
+
     try {
+      if (!certificateFile)
+        return
+      const certificateUrl = await uploadFile(certificateFile, "certification", setProgress)
+      console.log(certificateUrl)
+
       const { data } = await updateUser({
         variables: {
           updateUserInput: {
-            // e
+            UserID: user?.UserID,
+            DoctorDetails: {
+              EducationalBackground: {
+                ...EducationalBackground,
+                AdditionalCertifications: [JSON.stringify({
+                  name: values.name,
+                  file: certificateUrl,
+                  description: values.description,
+                  issueDate: new Date(values.issueDate),
+                  certificateId: values.certificateId,
+                })]
+              }
+            }
+
+
+            //
           },
         },
       });
@@ -90,6 +151,10 @@ const Certificates = ({ value }: { value: string }) => {
     certificateId: "",
   };
 
+
+  console.log(certificate)
+
+
   return (
     <TabsContent value={value}>
       <Card>
@@ -98,7 +163,7 @@ const Certificates = ({ value }: { value: string }) => {
             <span className="text-primary-700 font-medium">Certificates</span>
 
             <div className="flex items-center justify-between">
-              <CertificateDialog
+              <CertificateDialog open={open} setOpen={setOpen}
                 type="create"
                 initialValues={certInitialValues}
                 onSubmit={handleCertificateSubmit}
@@ -113,7 +178,7 @@ const Certificates = ({ value }: { value: string }) => {
         <CardContent>
           {dummyData.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {dummyData.map((certificate) => (
+              {EducationalBackground && EducationalBackground.AdditionalCertifications.length.map((certificate: any) => (
                 <CertificateCard
                   key={certificate.id}
                   certificateId={certificate.id}
@@ -129,7 +194,7 @@ const Certificates = ({ value }: { value: string }) => {
                       variant: "destructive",
                     });
                   }}
-                  onEdit={() => {}}
+                  onEdit={() => { }}
                 />
               ))}
             </div>

@@ -1,22 +1,21 @@
-
 enum UserType {
-    doctor,
-    patient,
-    admin,
-    moderator,
-    organization
-  }
+  doctor
+  patient
+  admin
+  moderator
+  organization
+}
 
-enum UserStatus{
+enum UserStatus {
   active
-  inactive   
+  inactive
   suspended
   blocked
   deleted
 }
 
-enum SuspendType{
-  suspend,
+enum SuspendType {
+  suspend
   unsuspend
 }
 
@@ -27,39 +26,36 @@ enum Gender {
 
 scalar Date
 
-type EducationalBackground{
+type EducationalBackground {
   Institution: String
   Degree: String
   Specialization: String
   GraduationYear: Int
   AdditionalCertifications: [String]
-
 }
 
-type User{
-   UserID: String
-   Username: String
-   Email: String
-   FirstName: String
-   LastName: String
-   Verified:Boolean
-   Bio: String
-   PhoneNumber: String
-   Address: String
-   ProfilePicture:String
-   Role: UserType
-   Status: UserStatus
-   Speciality:String
-   ExperienceYears:Int
-   ConsultationFee:Float
-   EducationalBackground:String
-   Rating:Float
-   Followers:Int
-   Following:Int
-   LicenseNumber:Int
+type User {
+  UserID: String
+  Username: String
+  Email: String
+  FirstName: String
+  LastName: String
+  Verified: Boolean
+  Bio: String
+  PhoneNumber: String
+  Address: String
+  ProfilePicture: String
+  Role: UserType
+  Status: UserStatus
+  Speciality: String
+  ExperienceYears: Int
+  ConsultationFee: Float
+  LicenseNumber:String
+  EducationalBackground: String
+  Rating: Float
+  Followers: Int
+  Following: Int
 }
-
-
 
 input UserDetailsInput {
   FirstName: String!
@@ -70,9 +66,9 @@ input UserDetailsInput {
   Gender: Gender!
   Bio: String
   PhoneNumber: String
-  Address: String 
+  Address: String
   ProfilePicture: String
-  Role:UserType!
+  Role: UserType!
 }
 
 input EducationalBackgroundInput {
@@ -83,80 +79,74 @@ input EducationalBackgroundInput {
   AdditionalCertifications: [String]
 }
 
-input DoctorDetails{
+input DoctorDetails {
   Speciality: String
   LicenseNumber: Int
-  ExperienceYears:Int
-  EducationalBackground:String
-  }
-
-
+  ExperienceYears: Int
+  EducationalBackground: String
+}
 
 input DoctorRegisterInput {
   UserDetails: UserDetailsInput
   Speciality: String
   LicenseNumber: Int
-  ExperienceYears:Int
-  EducationalBackground:EducationalBackgroundInput
+  ExperienceYears: Int
+  EducationalBackground: EducationalBackgroundInput
 }
 
-input DoctorUpdateInput{
-  ConsultationFee:Float
+input DoctorUpdateInput {
   Speciality: String
   LicenseNumber: String
-  ExperienceYears:Int
-  EducationalBackground:EducationalBackgroundInput
+  ExperienceYears: Int
+  EducationalBackground: EducationalBackgroundInput
 }
 
-input updateUserInput{
-  UserID:String!
+input updateUserInput {
+  UserID: String!
   FirstName: String
   LastName: String
   Username: String
-  Email:String
+  Email: String
+  # Role: String
   Gender: Gender
-  DateOfBirth:Date,
+  DateOfBirth: Date
   Bio: String
   PhoneNumber: String
-  Address: String 
+  Address: String
   ProfilePicture: String
-  DoctorDetails:DoctorUpdateInput
-
- 
+  DoctorDetails: DoctorUpdateInput
 }
-
-
-
 
 type Query {
   GetUsers: [User!]
-  GetUserByEmail(Email:String!):User
-  GetUser(id: String!): User
-  GetSignedInUser:User
-  GetDoctors:[User!]
-  GetFollowers(UserID:String!):[User]
-  GetFollowing(UserID:String!):[User]  
+  GetUserByEmail(Email: String!): User
+  GetUser(UserID: String!): User
+  GetSignedInUser: User
+  GetDoctors: [User!]
+  GetFollowers(UserID: String): [User]
+  GetFollowing(UserID: String): [User]
 }
-
 
 type Mutation {
   RegisterUser(RegisterInput: UserDetailsInput!): User!
-  DoctorRegister(DoctorDetailInput:DoctorRegisterInput!):User!
+  DoctorRegister(DoctorDetailInput: DoctorRegisterInput!): User!
   RemoveUser(UserID: String!): User!
-  Follow(FollowerID:String!,FollowingID:String!):User
-  UnFollow(FollowerID:String!,FollowingID:String!):User
-  UpdateUser(updateUserInput:updateUserInput):User!
-  SearchDoctors(searchQuery:String,sortingQuery:String,sortingOrder:String):[User]
-  SearchUsers(searchQuery:String):[User]
-  SuspendUser(UserID:String,suspendType:SuspendType!):User
+  Follow(FollowerID: String!, FollowingID: String!): User
+  UnFollow(FollowerID: String!, FollowingID: String!): User
+  UpdateUser(updateUserInput: updateUserInput): User!
+  SearchDoctors(
+    searchQuery: String
+    sortingQuery: String
+    sortingOrder: String
+  ): [User]
+  SearchUsers(searchQuery: String): [User]
+  SuspendUser(UserID: String, suspendType: SuspendType!): User
 }
 
-
-
-
-
-
-
-
-
-
+type Mutation {
+  UpdatePassword(
+    UserID: String!
+    CurrentPassword: String!
+    NewPassword: String!
+  ): User!
+}

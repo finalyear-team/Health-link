@@ -29,10 +29,10 @@ const Search = () => {
           <MdOutlineMarkUnreadChatAlt size={15} className="mr-2" />
           <span>Chat</span>
         </CommandItem>
-        <CommandItem>
+        {/* <CommandItem>
           <MdOutlineForum size={15} className="mr-2" />
           <span>Forum</span>
-        </CommandItem>
+        </CommandItem> */}
       </CommandGroup>
       <CommandSeparator />
       <CommandGroup heading="Settings">
@@ -40,10 +40,10 @@ const Search = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </CommandItem>
-        <CommandItem>
+        {/* <CommandItem>
           <CreditCard className="mr-2 h-4 w-4" />
           <span>Billing</span>
-        </CommandItem>
+        </CommandItem> */}
         <CommandItem>
           <MdOutlineSettings size={15} className="mr-2" />
           <span>Settings</span>

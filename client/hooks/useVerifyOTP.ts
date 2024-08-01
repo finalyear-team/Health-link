@@ -1,6 +1,5 @@
 "use client";
 
-import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -81,15 +80,23 @@ export const useVerifyOTP = () => {
       //     }
       //   })
 
-      setCompleted(true);
       // await setActive({ session: completeSignUp.createdSessionId });
       // console.log(doctorData)
       // console.log(patientData)
-      toast({
-        title: "Welcome to HealthLink!",
-        description: "We're excited to have you on board. Let's get started on your journey to better health!",
-        variant: "success",
-      });
+      if (signedInUser)
+        setTimeout(() => {
+          toast({
+            title: "Welcome to HealthLink!",
+            description: "We're excited to have you on board. Let's get started on your journey to better health!",
+            variant: "success",
+          });
+
+        }, 1000);
+
+
+
+
+      setCompleted(true);
       if (signedInUser)
         router.push("/dashboard");
     }

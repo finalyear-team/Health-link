@@ -12,6 +12,8 @@ export interface DoctorProfile {
   speciality: string;
   experience: number;
   hourlyRate: number;
+  isFollowing?: boolean;
+  onUnFollow?: () => void
   onFollow?: () => void;
   onMakeAppointment?: (profile: DoctorProfile) => void;
   profile?: DoctorProfile;

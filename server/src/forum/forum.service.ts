@@ -18,6 +18,7 @@ export class ForumService {
 
   async createForumPost(createForumInput: CreateForumInput) {
     try {
+      console.log("first")
       const forum = await this.prisma.forumPost.create({
         data: { ...createForumInput },
       });
@@ -35,7 +36,6 @@ export class ForumService {
         data: {
           ForumPostID,
           ...others,
-          Medias: Medias.length > 0 ? { createMany: { data: Medias } } : undefined,
         },
       });
       return forum;

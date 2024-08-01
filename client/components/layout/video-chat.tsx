@@ -22,6 +22,7 @@ import { NotificationType, UserType } from "@/types/types";
 import useAppointmentStore from "@/store/appointmentStore";
 import { io } from "socket.io-client"
 import formatScheduleTime from "@/utils/formatDate";
+import { useRouter } from "next/navigation";
 
 
 const ConsultationPage = ({ role }: { role: any }) => {
@@ -31,6 +32,7 @@ const ConsultationPage = ({ role }: { role: any }) => {
   const { selectedAppointment } = useAppointmentStore()
   const userID = selectedAppointment && role === UserType.DOCTOR ? selectedAppointment.PatientID : selectedAppointment.DoctorID
   const userName = selectedAppointment && role === UserType.DOCTOR ? selectedAppointment.DoctorName : selectedAppointment.PatientName
+
 
   const [AuthToken, setAuthToken] = useState<any>();
   const { participants } = useParticipants();
@@ -44,6 +46,9 @@ const ConsultationPage = ({ role }: { role: any }) => {
     appointmentTime,
     room,
   } = useVideoCallInfoStore()
+
+  const router = useRouter()
+
 
 
 
@@ -67,6 +72,12 @@ const ConsultationPage = ({ role }: { role: any }) => {
             title: "Token not created",
           });
       } catch (error) {
+        toast({
+          title: "Video call error",
+          description: `Something went wrong !! ${error} please retry again`,
+          variant: "error"
+
+        })
       }
     };
     fetchRoom();
@@ -99,6 +110,12 @@ const ConsultationPage = ({ role }: { role: any }) => {
         });
         sendJoinMessage()
       } catch (error) {
+        toast({
+          title: "Video call error",
+          description: `Something went wrong !! ${error} please retry again`,
+          variant: "error"
+
+        })
       }
     };
     join();
@@ -118,9 +135,9 @@ const ConsultationPage = ({ role }: { role: any }) => {
       <div className="w-full md:w-1/4">
         {/* <ParticipantList participants={participants} /> */}
         {/* <ChatBox /> */}
-        <div>
+        {/* <div>
           <Chat includeSider={false} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

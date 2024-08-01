@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RecentChat } from "./chat-list";
 import { UserType } from "@/types/types";
+import { useMutation } from "@apollo/client";
+import { DELETE_CHAT } from "@/graphql/mutations/chatMutations";
 
 const ChatHeader = ({ selectedChat }: any) => {
+
 
   return (
     <div className="flex items-center justify-between border-b border-slate-300 dark:border-slate-600 p-3 mb-2">

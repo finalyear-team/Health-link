@@ -105,7 +105,7 @@ const ContactInfoUpdate = ({ setIsVerifying, setEmailObj }: any) => {
       >
         {({ isValid, isSubmitting, resetForm }) => (
           <Form className="space-y-6">
-            <div className="flex space-x-5 flex-wrap">
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               <div className="flex flex-col gap-2 ">
                 <Input label="Email" name="email" type="email" />
                 {queryError && <p className="text-sm text-red-600">{queryError}</p>}

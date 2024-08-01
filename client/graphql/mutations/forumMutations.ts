@@ -3,11 +3,7 @@ import { gql } from '@apollo/client';
 export const CREATE_FORUM_POST = gql`
 mutation CreateForumPost($createForumPostInput: CreateForumInput!) { CreateForumPost(createForumInput: $createForumPostInput) {
           ForumPostID,
-          UserID,
-          Question,
-          CreatedAt,
-          UpdatedAt,
-        
+                 
 }
 }
 `;
@@ -17,11 +13,7 @@ mutation CreateForumAnswer($input: CreateForumAnswerInput!) {
 ForumPostID
   Answer
   UserID
-  Medias
-  Comments
-  CommentsCount
-  Likes
-  
+
   }
 }
 `;

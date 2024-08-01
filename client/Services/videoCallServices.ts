@@ -26,7 +26,7 @@ const checkRoom = async (id: string, token: string) => {
         console.log(room)
         return room
     } catch (error) {
-        throw new Error("something")
+        throw new Error("network error faild to fetch created room")
 
     }
 }
@@ -58,11 +58,11 @@ const newRoom = async (token: string) => {
             })
         });
         if (!response.ok)
-            throw new Error("request failed")
+            throw new Error("network error faild to fetch created room")
         return response.json()
     } catch (error) {
         console.log(error)
-        throw new Error("something")
+        throw new Error("network error faild to fetch created room")
     }
 }
 
@@ -120,6 +120,7 @@ export const getRoom = async ({ doctor, patient, appointmentDate, appointmentTim
 
     } catch (error) {
         console.log(error)
+        throw error
     }
 }
 

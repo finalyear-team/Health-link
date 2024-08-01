@@ -64,20 +64,20 @@ const PatientDahboard = () => {
           <div className="flex flex-col justify-between p-3">
             {/* the greeting and the name part */}
             <div className="flex flex-col space-y-4 text-4xl font-bold text-center">
-              <div className="flex space-x-3 items-center">
+              {/* <div className="flex space-x-3 items-center">
                 {" "}
                 <MdWavingHand size={30} color="#ffd700" className="mr-2" />{" "}
                 {currentTime}{" "}
-              </div>
+              </div> */}
               <span className="text-primary-600 dark:text-primary-700 flex items-center space-x-2">
                 Mr. {user?.FirstName} {user?.LastName} {!isLoaded && <Loader />}
               </span>{" "}
             </div>
             {/* the time show */}
             <div className="flex items-center space-x-6 mt-4">
-              <div className="flex space-x-3 text-3xl font-medium">
+              {/* <div className="flex space-x-3 text-3xl font-medium">
                 <Clock className="w-8 h-8 mr-2" /> {timeString}
-              </div>
+              </div> */}
               <Button variant={"secondary"}>
                 <Link
                   href="/dashboard/patient/setting"
@@ -91,11 +91,7 @@ const PatientDahboard = () => {
           </div>
           {/* radio button settings */}
           <div>
-            {Role === "provider" ? (
-              <Button size={"lg"} className="mb-2">
-                Generate a Summary
-              </Button>
-            ) : null}
+
 
             {/* <div className="relative rounded-lg border border-slate-100 dark:border-slate-500 shadow-sm">
               <QuickSettings />
@@ -114,7 +110,7 @@ const PatientDahboard = () => {
       </div>
       {/* small cards to display more detail */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
-        {image.map((value) => (
+        {/* {image.map((value) => (
           <DashboardCard
             key={value.title}
             link={value.link}
@@ -123,7 +119,7 @@ const PatientDahboard = () => {
             title={value.title}
             number={value.number}
           />
-        ))}
+        ))} */}
         {/* <DashboardCard />
         <DashboardCard />
         <DashboardCard />

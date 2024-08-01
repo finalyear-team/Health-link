@@ -24,6 +24,7 @@ export class StreamResolver {
   @Query("getChats")
   getChats(@Args("UserID") UserID: string, @Args("ChannelID") ChannelID: string) {
 
+
     return this.streamService.getChannelChats(UserID, ChannelID)
   }
 

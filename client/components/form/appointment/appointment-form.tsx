@@ -74,7 +74,7 @@ const createTimeSlots = (start: Date, end: Date, date: string, excludedRanges: A
   const now = new Date(format(new Date(), "yyyy-MM-dd"))
 
   if (differenceInDays(currentDate, now) === 0)
-    current = addHours(setMinutes(new Date(), 0), 1)
+    current = addMinutes(setMinutes(new Date(), 0), 5)
 
 
 
@@ -91,7 +91,7 @@ const createTimeSlots = (start: Date, end: Date, date: string, excludedRanges: A
     if (!isInExclusionRange) {
       times.push(format(current, "hh:mm a"));
     }
-    current = addMinutes(current, 60);
+    current = addMinutes(current, 5);
   }
 
   console.log("from slots")
@@ -104,7 +104,6 @@ const createTimeSlots = (start: Date, end: Date, date: string, excludedRanges: A
 const selectSchedule = (schedules: any[] | null, appointmentTime: string, date: Date | null, excludedRanges: Array<{ start: string; end: string }>) => {
   if (!schedules || schedules.length === 0)
     return
-  console.log("schedules")
   console.log(schedules)
   const slots = schedules.map((schedule) => (createTimeSlots(parse(formatScheduleTime(schedule.StartTime), "hh:mm a", new Date()), parse(formatScheduleTime(schedule.EndTime), "hh:mm a", new Date()), format(date || "", "yyyy-MM-dd"), excludedRanges)))
 
@@ -145,6 +144,8 @@ const AppointmentForm = ({ doctorId, patientId, name, existingAppointment }: any
 
   const clearSelection = useAppointmentStore((state) => state.clearSelection);
 
+  const { toast } = useToast();
+
   const [CreateAppointment, { data: createData, error: createError }] = useMutation(CREATE_APPOINTMENT, {
     onCompleted(data, clientOptions) {
       refetch()
@@ -157,6 +158,13 @@ const AppointmentForm = ({ doctorId, patientId, name, existingAppointment }: any
     },
     onError: (error) => {
       console.error('Mutation error:', error);
+      toast({
+        title: "Error Create appointment",
+        description: `Error creating appointment ${error.message}`,
+        variant: "error",
+      });
+
+
     }
 
   });
@@ -172,11 +180,16 @@ const AppointmentForm = ({ doctorId, patientId, name, existingAppointment }: any
     onError: (error) => {
 
       console.error('Mutation error:', error);
+      toast({
+        title: "Error update appointment",
+        description: `Error updating appointment`,
+        variant: "error",
+      });
+
     }
 
   });
 
-  const { toast } = useToast();
 
 
 
@@ -241,6 +254,12 @@ const AppointmentForm = ({ doctorId, patientId, name, existingAppointment }: any
         `Error ${existingAppointment ? "updating" : "creating"} appointment:`,
         error.message
       )
+      toast({
+        title: "Error Create appointment",
+        description: `Error creating appointment ${error.message}`,
+        variant: "error",
+      });
+
     }
   }
 

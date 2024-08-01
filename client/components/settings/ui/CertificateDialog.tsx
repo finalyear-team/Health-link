@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { Dispatch, SetStateAction, useCallback } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import {
   Dialog,
@@ -25,6 +25,9 @@ interface CertificateDialogProps {
   setCertificateFile: (file: File | null) => void;
   validateCertificateInputs: any;
   type: string;
+  formatBytes?: (size: number) => string;
+  open?: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>
 }
 
 const CertificateDialog = ({
@@ -34,6 +37,9 @@ const CertificateDialog = ({
   setCertificateFile,
   validateCertificateInputs,
   type,
+  open,
+  formatBytes,
+  setOpen
 }: CertificateDialogProps) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -51,14 +57,24 @@ const CertificateDialog = ({
     onDrop,
     accept: {
       "image/*": [".jpeg", ".png", ".jpg"],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
     },
   });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       {type === "create" ? (
         <DialogTrigger asChild>
-          <Button size="sm">
+          <Button
+            size="sm"
+            className={`${open
+              ? "rounded-tl-lg rounded-tr-lg rounded-bl-none rounded-br-none"
+              : ""
+              }`}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Certificate
           </Button>
@@ -87,18 +103,17 @@ const CertificateDialog = ({
                 )}
                 {type === "edit" && <DialogTitle>Edit Certificate</DialogTitle>}
                 <DialogDescription>
-                  Upload or drag and drop your certificate, then add a name and
-                  description.
+                  Upload or drag and drop your certificate, then add ID, issue
+                  date,a name and description.
                 </DialogDescription>
                 <div
                   {...getRootProps()}
-                  className={`border-dashed border-2 p-6 mb-4 text-center mt-3 ${
-                    isDragAccept
-                      ? "border-secondary-600 dark:border-secondary-700"
-                      : isDragReject
+                  className={`border-dashed border-2 p-6 mb-4 text-center mt-3 ${isDragAccept
+                    ? "border-secondary-600 dark:border-secondary-700"
+                    : isDragReject
                       ? "border-red-600 dark:border-red-700"
                       : "dark:border-slate-500 border-slate-300"
-                  }`}
+                    }`}
                 >
                   <input {...getInputProps()} />
                   {isDragReject && (
@@ -111,8 +126,15 @@ const CertificateDialog = ({
                   {isDragActive ? (
                     isDragAccept && <span>Drop the Certificate here ...</span>
                   ) : certificateFile ? (
-                    <div className="flex justify-between items-center">
-                      <p>{certificateFile.name}</p>
+                    <div className="flex justify-between items-center border-l-4 border-y-1 border-r-1 p-2 my-1 border-l-secondary-600">
+                      <div className="flex flex-col items-start space-y-1">
+                        <p>{certificateFile.name}</p>
+                        {formatBytes && (
+                          <div className="text-slate-400 italic text-sm">
+                            {formatBytes(certificateFile.size)}
+                          </div>
+                        )}
+                      </div>
                       <Button
                         onClick={() => setCertificateFile(null)}
                         variant={"ghost"}
@@ -129,7 +151,7 @@ const CertificateDialog = ({
                           browse.
                         </span>
                         <p className="italic text-xs mt-2">
-                          only Image(.png, .jpg, .jpeg) format is allowed
+                          only (.pdf, .doc, .png, .jpg, .jpeg) format is allowed
                         </p>
                       </div>
                     </div>

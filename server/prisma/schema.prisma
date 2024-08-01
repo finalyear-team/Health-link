@@ -188,7 +188,7 @@ model Users {
   Bio                   String?             @db.LongText
   PhoneNumber           String?
   Address               String?
-  ProfilePicture        String?
+  ProfilePicture        String?             @db.LongText
   Role                  UserType
   Status                UserStatus
   Verified              Boolean             @default(false)

@@ -56,7 +56,7 @@ const RecentChats = ({ recentChats, selectChat }: RecentChatsProps) => {
                 </div>
 
               </div>
-              <Badge variant={"secondary"}>2</Badge>
+              {/* <Badge variant={"secondary"}>2</Badge> */}
             </button>
 
 

@@ -31,20 +31,20 @@ const SideBarNavigation = ({
         goto={`/dashboard/${role}`}
         isActive={pathname === `/dashboard/${role}`}
       />
-      <NavItem
+      {/* <NavItem
         showText={showText}
         icon={<MdGrid3X3 size={20} />}
         text="Feed"
         goto={`/dashboard/${role}/feed`}
         isActive={pathname === `/dashboard/${role}/feed`}
-      />
-      <NavItem
+      /> */}
+      {/* <NavItem
         showText={showText}
         icon={<MdOutlineArticle size={20} />}
         text="Blog"
         goto={`/dashboard/${role}/blog`}
         isActive={pathname === `/dashboard/${role}/blog`}
-      />
+      /> */}
       <NavItem
         showText={showText}
         icon={<MdOutlineCalendarMonth size={20} />}
@@ -78,13 +78,13 @@ const SideBarNavigation = ({
         goto={`/dashboard/${role}/live`}
         isActive={pathname === `/dashboard/${role}/live`}
       />
-      <NavItem
+      {/* <NavItem
         showText={showText}
         icon={<MdOutlineForum size={20} />}
         text="Forum"
         goto={`/dashboard/${role}/forum`}
         isActive={pathname === `/dashboard/${role}/forum`}
-      />
+      /> */}
       <NavItem
         showText={showText}
         icon={<MdOutlineSettings size={20} />}

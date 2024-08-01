@@ -10,15 +10,17 @@ import { Gender, UserType } from "@/types/types";
 import { uploadFile } from "@/utils/fileUpload";
 import { app } from "@/firebase/firebase";
 
-export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: any[] | null) => {
-
+export const useSubmit = (
+  setStoredValues: any,
+  role: string,
+  selectedFiles?: any[] | null
+) => {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [completed, setCompleted] = useState(false);
   // const { isLoaded, signUp } = useSignUp();
   const [error, setError] = useState("");
   const setUserInformation = useUserStore((state) => state.setUserInformation);
   const user = useUserStore((state) => state.user);
-
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     // storing values in the zustands store
@@ -38,7 +40,6 @@ export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: an
       item3 = localStorage.getItem("patient_additionalInfo");
     }
 
-
     if (item1 && item2 && item3) {
       const parsedPersonal = JSON.parse(item1);
       const parsedContact = JSON.parse(item2);
@@ -53,15 +54,20 @@ export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: an
       //   return;
       // }
 
-
       try {
-        let certificateUrls: string[] = []
+        let certificateUrls: string[] = [];
         if (selectedFiles && selectedFiles?.length > 0) {
-          const uploadedUrls = selectedFiles.map(async (file) => uploadFile(file, "certification"))
-          certificateUrls = await Promise.all(uploadedUrls)
-          console.log(certificateUrls)
+          const uploadedUrls = selectedFiles.map(async (file) =>
+            uploadFile(file, "certification")
+          );
+          certificateUrls = await Promise.all(uploadedUrls);
+          console.log(certificateUrls);
         }
-        const { user: registeredUser, access_token, refresh_token } = await SignUp({
+        const {
+          user: registeredUser,
+          access_token,
+          refresh_token,
+        } = await SignUp({
           Username: user?.userName,
           FirstName: user?.firstName,
           LastName: user?.lastName,
@@ -71,9 +77,8 @@ export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: an
           Address: user?.address,
           DateOfBirth: user?.DOB,
           Gender: user?.gender,
-          Role: role === "provider" ? UserType.DOCTOR : UserType.PATIENT
-        })
-
+          Role: role === "provider" ? UserType.DOCTOR : UserType.PATIENT,
+        });
 
         if (registeredUser.Role === UserType.DOCTOR) {
           const doctorDetails = await registerDoctorDetails({
@@ -87,10 +92,9 @@ export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: an
               Degree: parsedProfessional.education,
               Specialization: parsedProfessional.specialization,
               GraduationYear: parsedProfessional.graduationYear,
-              AdditionalCertifications: certificateUrls
+              AdditionalCertifications: certificateUrls,
             },
-          }
-          )
+          });
         }
 
         // await signUp.create({
@@ -107,21 +111,20 @@ export const useSubmit = (setStoredValues: any, role: string, selectedFiles?: an
         //   strategy: "email_code",
         // });
 
-
         setCompleted(true);
         setPendingVerification(true);
       } catch (error: any) {
-        console.log(error)
+        console.log(error);
 
         console.log("The Error is as follows: ", error);
         setError(error.errors[0].longMessage);
       }
 
-      if (role === 'provider') {
+      if (role === "provider") {
         localStorage.removeItem("personalInfo");
         localStorage.removeItem("contactInfo");
         localStorage.removeItem("professionalInfo");
-      } else if (role === 'patient') {
+      } else if (role === "patient") {
         localStorage.removeItem("patient_personalInfo");
         localStorage.removeItem("patient_contactInfo");
         localStorage.removeItem("patient_additionalInfo");

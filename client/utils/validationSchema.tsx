@@ -3,10 +3,10 @@ import * as Yup from "yup";
 const currentYear = new Date().getFullYear();
 
 export const validationSchemaAddInfo = Yup.object().shape({
-  consultationFee: Yup.number()
-    .typeError("Consultation fee must be a number")
-    .required("Consultation fee is required")
-    .positive("Consultation fee must be a positive amount"),
+  // consultationFee: Yup.number()
+  //   .typeError("Consultation fee must be a number")
+  //   .required("Consultation fee is required")
+  //   .positive("Consultation fee must be a positive amount"),
   license: Yup.string()
     .matches(/^\d{10}$/, "License number must be 10 digits")
     .required("License number is required"),
@@ -25,7 +25,7 @@ export const validationSchemaAddInfo = Yup.object().shape({
     ),
   graduationYear: Yup.number()
     .typeError("Graduation year must be a number")
-    .min(1900, "Graduation year cannot be earlier than 1900")
+    .min(1950, "Graduation year cannot be earlier than 1950")
     .max(currentYear, `Graduation year cannot be later than ${currentYear}`)
     .required("Graduation year is required"),
   institution: Yup.string().required("Institution is required"),
@@ -51,9 +51,14 @@ export const validationSchemaContInfo = Yup.object().shape({
 });
 
 export const validationSchemaPersInfo = Yup.object().shape({
-  firstName: Yup.string().required("*First Name is required"),
-  lastName: Yup.string().required("*Last Name is required"),
-  userName: Yup.string().required("*User Name is required"),
+  firstName: Yup.string()
+    .required("*First Name is required")
+    .matches(/^[a-zA-Z]+$/, "*First Name must only contain letters"),
+  lastName: Yup.string()
+    .required("*Last Name is required")
+    .matches(/^[a-zA-Z]+$/, "*Last Name must only contain letters"),
+  userName: Yup.string()
+    .required("*User Name is required"),
   DOB: Yup.date()
     .required("*Date of Birth is required")
     .nullable()

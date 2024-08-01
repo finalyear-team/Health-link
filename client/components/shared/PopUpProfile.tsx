@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,8 +9,13 @@ import {
 } from "react-icons/md";
 import Rating from "./Rating";
 import { DoctorProfile } from "@/types";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import useAuth from "@/hooks/useAuth";
+import { GET_FOLLOWERS, GET_FOLLOWING } from "@/graphql/queries/userQueries";
+import client from "@/graphql/apollo-client";
 
 const DoctorProfileCard: React.FC<DoctorProfile> = ({
+  id,
   profilePicture,
   name,
   username,
@@ -20,23 +26,55 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
   speciality,
   experience,
   hourlyRate,
+  onUnFollow,
   onFollow,
   onMakeAppointment = (profile: DoctorProfile) => { },
   profile,
+  isFollowing,
 }) => {
+  const [followersdata, setFollowersData] = useState<any[]>([]);
+  const [followingdata, setFollowingData] = useState<any[]>([]);
+  const { user } = useAuth()
+  useEffect(() => {
+    if (!user) return;
+    const getFollowers = async () => {
+      const { data: getFollowers } = await client.query({
+        query: GET_FOLLOWERS,
+        variables: {
+          userID: user?.UserID,
+        },
+      });
+      const { data: getFollowing } = await client.query({
+        query: GET_FOLLOWING,
+        variables: {
+          userID: user?.UserID,
+        },
+      });
+
+      console.log(getFollowers);
+      console.log(getFollowing);
+
+      setFollowersData(getFollowers?.GetFollowers);
+      setFollowingData(getFollowing?.GetFollowing);
+    };
+    getFollowers();
+  }, [user]);
+
+  console.log("from pop overz")
+  console.log(followingdata)
+
   return (
     <div className="top-doctors flex flex-col justify-between hover:shadow-lg border border-stroke">
       <div className="flex items-center justify-between flex-wrap">
         <div className="flex items-center justify-center flex-nowrap">
-          <Image
-            src={profilePicture}
-            alt={`${name}'s profile`}
-            className="profile-image"
-            width={50}
-            height={50}
-          />
-          <div className="mt-2 ml-2">
-            <div className="flex items-center justify-center">
+          <Avatar>
+            <AvatarImage src={profilePicture || "/placeholder-profile.jpg"} />
+            <AvatarFallback>
+              {name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="mt-2 ml-2  ">
+            <div className="flex items-center justify-center w-full">
               <h3 className="text-lg font-semibold">{name}</h3>
               <span>
                 <MdVerified size={20} className="text-secondary-600 ml-2" />
@@ -51,9 +89,16 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
           </div>
         </div>
         <div>
-          <Button variant={"follow"} type="submit" onClick={onFollow}>
-            Follow
-          </Button>
+          {
+            isFollowing ?
+              <Button variant={"follow"} type="submit" onClick={onUnFollow}>
+                Unfollow
+              </Button> :
+              <Button variant={"follow"} type="submit" onClick={onFollow}>
+                Follow
+              </Button>
+          }
+
         </div>
       </div>
       <div className="mt-4 text-sm flex flex-col justify-between">
@@ -70,7 +115,7 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
             </div>
           </div>
           <span>
-            <Rating value={rating} />
+            {/* <Rating value={rating} /> */}
           </span>
         </div>
         {/* <span className="py-4"> {""} </span> */}
@@ -90,7 +135,7 @@ const DoctorProfileCard: React.FC<DoctorProfile> = ({
             </div>
           </div>
           <span className="proffesional-type text-2xl font-semibold shadow-sm">
-            {hourlyRate} Br/hr
+            {/* {hourlyRate} Br/hr */}
           </span>
         </div>
       </div>

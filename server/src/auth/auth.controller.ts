@@ -26,6 +26,7 @@ import * as crypto from "crypto"
 import { UserService } from 'src/user/user.service';
 import { Role } from '@prisma/client';
 import { DoctorDetailInput } from 'src/user/dto/create-user.input';
+import { error } from 'console';
 
 
 
@@ -143,29 +144,42 @@ export class AuthController {
   @Post("/verify-otp")
   async verifyOtp(@Req() req: Request, @Res() res: Response) {
     const storedOtp = this.otpStore.get(req.body.email);
-    if (!storedOtp && storedOtp === req.body.otp)
-      return res.status(403).json("invalid otp")
-    this.otpStore.delete(req.body.otp);
 
-    const user = await this.userService.getUserByEmail(req.body.email)
+    console.log(storedOtp)
+    console.log(req.body.otp)
 
-    if (!user)
-      res.status(404).json("email not found")
+    // throw new Error("error")
 
-    const updatedUser = await this.userService.updateUser({
-      UserID: user.UserID,
-      Verified: true
-    })
+    try {
+      if (storedOtp && storedOtp !== req.body.otp)
+        throw new Error("user not verified")
 
-    const payload = { sub: updatedUser.UserID, username: updatedUser.Username, role: updatedUser.Role }
+      const user = await this.userService.getUserByEmail(req.body.email)
 
-    const access_token = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "1hr")
+      if (!user)
+        throw new Error("user not found")
 
-    const refresh_token = this.authService.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
+      const updatedUser = await this.userService.updateUser({
+        UserID: user.UserID,
+        Verified: true
+      })
 
-    this.setAccessTokenCookie(res, access_token, refresh_token)
+      const payload = { sub: updatedUser.UserID, username: updatedUser.Username, role: updatedUser.Role }
 
-    res.status(200).json(updatedUser);
+      const access_token = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "1hr")
+
+      const refresh_token = this.authService.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "30d")
+
+      this.setAccessTokenCookie(res, access_token, refresh_token)
+
+      res.status(200).json(updatedUser);
+
+
+    } catch (error) {
+      throw error
+
+    }
+
 
   }
 

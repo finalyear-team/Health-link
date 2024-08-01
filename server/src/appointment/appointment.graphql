@@ -96,6 +96,8 @@ type Query {
 
   DoctorsAppointments(DoctorID:String!):[Appointment]
 
+   
+
   FilterUserAppointment(UserID:String!,Query:String!):[Appointment]
   
   FilterDoctorAppointment(DoctorID:String!,Query:String!):[Appointment]

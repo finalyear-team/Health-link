@@ -39,18 +39,18 @@ const Appointment = () => {
                 <User className="mr-2 h-4 w-4" />
                 <span>Account</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <CreditCard className="mr-2 h-4 w-4" />
                 <span>Billing</span>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <Keyboard className="mr-2 h-4 w-4" />
                 <span>Video</span>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -6,7 +6,7 @@ import { DoctorDetails, Prisma, UserType, Users } from '@prisma/client';
 import { SuspendType } from 'src/utils/types';
 import { boolean, promise } from 'zod';
 import { AllowlistIdentifier } from '@clerk/clerk-sdk-node';
-
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -16,57 +16,55 @@ export class UserService {
     try {
       const follower = await this.prisma.followers.findFirst({
         where: {
-          AND: [{
-            FollowerID
-          }, {
-            FollowingID
-          }
-          ]
+          AND: [
+            {
+              FollowerID,
+            },
+            {
+              FollowingID,
+            },
+          ],
         },
       });
 
-      return follower
+      return follower;
     } catch (error) {
-      throw error
-
+      throw error;
     }
-
   }
 
   async countFollowersAndFollowing(UserID: string) {
     try {
       const followers = await this.prisma.followers.count({
         where: {
-          FollowingID: UserID
-        }
-      })
+          FollowingID: UserID,
+        },
+      });
       const following = await this.prisma.followers.count({
         where: {
-          FollowerID: UserID
-        }
-      })
-      return { Followers: followers, Following: following }
+          FollowerID: UserID,
+        },
+      });
+      return { Followers: followers, Following: following };
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   async calculateAverageRating(DoctorID: string) {
-    console.log("aggregation")
+    console.log('aggregation');
     try {
       const averageRating = await this.prisma.doctorReviews.aggregate({
         _avg: {
-          Rating: true
+          Rating: true,
         },
         where: {
-          DoctorID
-        }
-      })
-      return averageRating._avg.Rating
-
+          DoctorID,
+        },
+      });
+      return averageRating._avg.Rating;
     } catch (error) {
-      throw error
-
+      throw error;
     }
   }
 
@@ -75,79 +73,89 @@ export class UserService {
       const user = await this.prisma.users.create({
         data: {
           ...RegisterInput,
-          Status: "active"
-        }
-      })
-      return user
+          Status: 'active',
+        },
+      });
+      return user;
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to register ", HttpStatus.INTERNAL_SERVER_ERROR)
+      console.log(error);
+      throw new HttpException(
+        'faild to register ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-
-
   async DoctorRegister(DoctorRegisterInput: DoctorDetailInput) {
-    const { UserDetails, ...others } = DoctorRegisterInput
+    const { UserDetails, ...others } = DoctorRegisterInput;
     try {
       const { DoctorDetails, ...UsersDetail } = await this.prisma.users.create({
         data: {
           ...UserDetails,
-          Status: "active",
+          Status: 'active',
           DoctorDetails: {
             create: {
-
-              ...others
-            }
-          }
-
+              ...others,
+            },
+          },
         },
         include: {
-          DoctorDetails: true
-        }
-      })
-      console.log("success")
-      return { ...UsersDetail, ...DoctorDetails }
+          DoctorDetails: true,
+        },
+      });
+      console.log('success');
+      return { ...UsersDetail, ...DoctorDetails };
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to register  ", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      console.log(error);
+      throw new HttpException(
+        'faild to register  ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-
 
   async getUsers(): Promise<Users[]> {
     try {
       const Users = await this.prisma.users.findMany({
         include: {
-          DoctorDetails: true
-        }
-      })
-      return Promise.all(Users.map((user) => ({ ...user, ...user?.DoctorDetails })));
+          DoctorDetails: true,
+        },
+      });
+      return Promise.all(
+        Users.map((user) => ({ ...user, ...user?.DoctorDetails })),
+      );
     } catch (error) {
-      throw new HttpException("faild to fetch users ", HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'faild to fetch users ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-
   async getUserDetails(Id: string) {
     try {
-      const { DoctorDetails, ...userDetails } = await this.prisma.users.findUnique({
-        where: {
-          UserID: Id
-        }, include: {
-          DoctorDetails: true
-        }
-      })
-      const followers = await this.countFollowersAndFollowing(userDetails.UserID)
-      const Rating = await this.calculateAverageRating(userDetails.UserID)
-      return { ...DoctorDetails, ...userDetails, ...followers, Rating }
+      const user =
+        await this.prisma.users.findUnique({
+          where: {
+            UserID: Id,
+          },
+          include: {
+            DoctorDetails: true,
+          },
+        });
+      const followers = await this.countFollowersAndFollowing(
+        user?.UserID,
+      );
+      const Rating = await this.calculateAverageRating(user?.UserID);
+      return { ...user.DoctorDetails, ...user, ...followers, Rating };
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to fetch details ", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      console.log(error);
+      throw new HttpException(
+        'faild to fetch details ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     } finally {
-      this.prisma.$disconnect()
+      this.prisma.$disconnect();
     }
   }
 
@@ -155,13 +163,11 @@ export class UserService {
     try {
       const user = await this.prisma.users.findUnique({
         where: {
-          Email: email
-        }
-      })
-      return user
-    } catch (error) {
-
-    }
+          Email: email,
+        },
+      });
+      return user;
+    } catch (error) { }
   }
 
   async searchUsers(searchQuery: string): Promise<Users[]> {
@@ -176,83 +182,91 @@ export class UserService {
             { Email: { contains: searchQuery } },
             { PhoneNumber: { contains: searchQuery } },
             { Address: { contains: searchQuery } },
-          ]
+          ],
         },
         include: {
-          DoctorDetails: true
-        }
-      })
-      const followersData = await Promise.all(users.map(async (user) => this.countFollowersAndFollowing(user.UserID)));
-      const Ratings = await Promise.all(users.map(async (user) => this.calculateAverageRating(user.UserID)))
+          DoctorDetails: true,
+        },
+      });
+      const followersData = await Promise.all(
+        users.map(async (user) => this.countFollowersAndFollowing(user.UserID)),
+      );
+      const Ratings = await Promise.all(
+        users.map(async (user) => this.calculateAverageRating(user.UserID)),
+      );
 
       return users.map((user, i) => ({
         ...user.DoctorDetails,
         ...user,
         ...followersData[i],
-        Rating: Ratings[i]
-
+        Rating: Ratings[i],
       }));
     } catch (error) {
-      throw error
+      throw error;
     }
   }
-
 
   async follow(FollowerID: string, FollowingID: string) {
     console.log("doctor following")
     try {
       if (await this.existingFollow(FollowerID, FollowingID))
-        throw new HttpException("You're Already following ", HttpStatus.BAD_REQUEST)
+        throw new HttpException(
+          "You're Already following ",
+          HttpStatus.BAD_REQUEST,
+        );
       const follow = await this.prisma.followers.create({
         data: {
           FollowerID,
-          FollowingID
+          FollowingID,
         },
         include: {
           Follower: true,
-          Following: true
-        }
-      })
-      return follow.Following
+          Following: true,
+        },
+      });
+      return follow.Following;
     } catch (error) {
-      throw error
-
+      throw error;
     }
-
   }
 
   async unfollow(FollowerID: string, FollowingID: string) {
     try {
-      if (!await this.existingFollow(FollowerID, FollowingID))
-        throw new HttpException(`You're not  following`, HttpStatus.BAD_REQUEST)
-      const { FollowersID } = await this.existingFollow(FollowerID, FollowingID)
+      if (!(await this.existingFollow(FollowerID, FollowingID)))
+        throw new HttpException(
+          `You're not  following`,
+          HttpStatus.BAD_REQUEST,
+        );
+      const { FollowersID } = await this.existingFollow(
+        FollowerID,
+        FollowingID,
+      );
       const unfollow = await this.prisma.followers.delete({
         where: {
           FollowersID,
           FollowerID,
-          FollowingID
+          FollowingID,
         },
-
-
-      })
-      return unfollow
+      });
+      return unfollow;
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to unfollow", HttpStatus.INTERNAL_SERVER_ERROR)
+      console.log(error);
+      throw new HttpException(
+        'faild to unfollow',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
   }
-
 
   async getDoctors() {
     try {
       const doctors = await this.prisma.users.findMany({
         where: {
-          Role: "doctor"
+          Role: 'doctor',
         },
         include: {
           DoctorDetails: true,
-          DoctorReviews: true
+          DoctorReviews: true,
         },
         orderBy: [
           {
@@ -266,62 +280,108 @@ export class UserService {
             },
           },
         ],
+      });
 
-      })
-
-      const Followers = await Promise.all(doctors.map(async (doctor) => this.countFollowersAndFollowing(doctor.UserID)))
-      const Ratings = await Promise.all(doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)))
-      console.log(Ratings)
-      return Promise.all(doctors.map((doctor, i) => ({ ...doctor.DoctorDetails, ...doctor, ...Followers[i], Rating: Ratings[i] })))
-
+      const Followers = await Promise.all(
+        doctors.map(async (doctor) =>
+          this.countFollowersAndFollowing(doctor.UserID),
+        ),
+      );
+      const Ratings = await Promise.all(
+        doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)),
+      );
+      console.log(Ratings);
+      return Promise.all(
+        doctors.map((doctor, i) => ({
+          ...doctor.DoctorDetails,
+          ...doctor,
+          ...Followers[i],
+          Rating: Ratings[i],
+        })),
+      );
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to fetch doctors", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      console.log(error);
+      throw new HttpException(
+        'faild to fetch doctors',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getFollowers(UserID: string) {
     try {
-      const followers = await this.prisma.users.findMany({
+      const followers = await this.prisma.followers.findMany({
         where: {
-          UserID,
-          FollowersFollowers: {
-            some: {
-              FollowingID: UserID
-            }
+          Following: {
+            UserID
           }
         },
+        include: {
+          Follower: {
+            include: {
+              DoctorDetails: true
+            }
+          }
+        }
+
+      });
+      console.log("followers")
+      console.log(followers)
+      return followers.map((follower) => {
+        const { DoctorDetails, ...others } = follower.Follower
+        return {
+          ...follower.Follower,
+          ...DoctorDetails
+        }
       })
-      return followers
     } catch (error) {
-      throw new HttpException("faild to fetch followers", HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'faild to fetch followers',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getFollowing(UserID: string) {
     try {
-      const following = await this.prisma.users.findMany({
+      const following = await this.prisma.followers.findMany({
         where: {
-          UserID,
-          FollowersFollowing: {
-            some: {
-              FollowerID: UserID
-            }
+          Follower: {
+            UserID
           }
         },
+        include: {
+          Following: {
+            include: {
+              DoctorDetails: true
+            }
+          }
+        }
+
+      });
+
+      return following.map((follower) => {
+        const { DoctorDetails, ...others } = follower.Following
+        return {
+          ...follower.Following,
+          ...DoctorDetails
+        }
       })
-      return following
 
+      // return following;
     } catch (error) {
-      throw new HttpException("faild to fetch followings", HttpStatus.INTERNAL_SERVER_ERROR)
-
-
+      throw new HttpException(
+        'faild to fetch followings',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  async searchDoctors(searchQuery: string, sortingQuery: string, sortingOrder: string): Promise<Users[]> {
-
+  async searchDoctors(
+    searchQuery: string,
+    sortingQuery: string,
+    sortingOrder: string,
+  ): Promise<Users[]> {
     try {
       const whereClause = {
         OR: [
@@ -331,46 +391,63 @@ export class UserService {
               { Username: { contains: searchQuery } },
               { LastName: { contains: searchQuery } },
               { Address: { contains: searchQuery } },
-            ]
+            ],
           },
           {
             DoctorDetails: {
-              Speciality: { contains: searchQuery }
-            }
-          }
-        ]
-      }
+              Speciality: { contains: searchQuery },
+            },
+          },
+        ],
+      };
 
       const doctors = await this.prisma.users.findMany({
         where: {
-          Role: "doctor",
-          ...whereClause
+          Role: 'doctor',
+          ...whereClause,
         },
         include: {
           DoctorDetails: true,
           DoctorReviews: {
             select: {
-              Rating: true
+              Rating: true,
             },
           },
         },
-        orderBy: [{
-          DoctorDetails: {
-            ExperienceYears: sortingQuery === 'ExperienceYears' ? sortingOrder as Prisma.SortOrder : undefined,
-            ConsultationFee: sortingQuery === 'ConsultationFee' ? sortingOrder as Prisma.SortOrder : undefined,
-          }
-        }, {
-          FollowersFollowing: {
-            _count: sortingQuery === 'Followers' ? sortingOrder as Prisma.SortOrder : "asc",
-          }
-        },
-        ].filter(Boolean)
+        orderBy: [
+          {
+            DoctorDetails: {
+              ExperienceYears:
+                sortingQuery === 'ExperienceYears'
+                  ? (sortingOrder as Prisma.SortOrder)
+                  : undefined,
+              ConsultationFee:
+                sortingQuery === 'ConsultationFee'
+                  ? (sortingOrder as Prisma.SortOrder)
+                  : undefined,
+            },
+          },
+          {
+            FollowersFollowing: {
+              _count:
+                sortingQuery === 'Followers'
+                  ? (sortingOrder as Prisma.SortOrder)
+                  : 'asc',
+            },
+          },
+        ].filter(Boolean),
       });
 
-      const followersData = await Promise.all(doctors.map(async (user) => this.countFollowersAndFollowing(user.UserID)));
-      const Ratings = await Promise.all(doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)))
+      const followersData = await Promise.all(
+        doctors.map(async (user) =>
+          this.countFollowersAndFollowing(user.UserID),
+        ),
+      );
+      const Ratings = await Promise.all(
+        doctors.map((doctor) => this.calculateAverageRating(doctor.UserID)),
+      );
 
-      console.log(doctors)
+      console.log(doctors);
 
       return doctors.map((user, i) => ({
         ...user.DoctorDetails,
@@ -379,23 +456,27 @@ export class UserService {
         Rating: Ratings[i],
       }));
     } catch (error) {
-      console.log(error)
-      throw new HttpException("faild to fetch doctors", HttpStatus.INTERNAL_SERVER_ERROR)
+      console.log(error);
+      throw new HttpException(
+        'faild to fetch doctors',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-
-
-
   async updateUser(updateUserInput: UpdateUserInput) {
-    const { UserID, DoctorDetails: DoctorUpdateDetails, ...otherUserDetails } = updateUserInput
-    const FirstName = otherUserDetails?.FirstName?.toLowerCase()
-    const LastName = otherUserDetails?.LastName?.toLowerCase()
-    const Speciality = DoctorUpdateDetails?.Speciality?.toLowerCase()
+    const {
+      UserID,
+      DoctorDetails: DoctorUpdateDetails,
+      ...otherUserDetails
+    } = updateUserInput;
+    const FirstName = otherUserDetails?.FirstName?.toLowerCase();
+    const LastName = otherUserDetails?.LastName?.toLowerCase();
+    const Speciality = DoctorUpdateDetails?.Speciality?.toLowerCase();
     try {
       const { DoctorDetails, ...Userdata } = await this.prisma.users.update({
         where: {
-          UserID
+          UserID,
         },
         data: {
           FirstName,
@@ -406,48 +487,91 @@ export class UserService {
             update: {
               Speciality,
               ...DoctorUpdateDetails,
-              EducationalBackground: JSON.stringify(DoctorUpdateDetails?.EducationalBackground)
-            }
-          }
+              EducationalBackground: JSON.stringify(
+                DoctorUpdateDetails?.EducationalBackground,
+              ),
+            },
+          },
         },
         include: {
-          DoctorDetails: true
-        }
-      })
-      return { ...DoctorDetails, ...Userdata }
+          DoctorDetails: true,
+        },
+      });
+      return { ...DoctorDetails, ...Userdata };
     } catch (error) {
-      throw new HttpException("faild to update ", HttpStatus.INTERNAL_SERVER_ERROR)
+      console.log(error)
+      throw new HttpException(
+        'faild to update ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async suspendUser(UserID: string, suspendType: SuspendType) {
-    const Status = suspendType == "suspend" ? "suspended" : "active"
+    const Status = suspendType == 'suspend' ? 'suspended' : 'active';
     try {
       const User = await this.prisma.users.update({
         where: {
-          UserID
-        }
-        , data: {
-          Status
+          UserID,
+        },
+        data: {
+          Status,
         },
         include: {
-          DoctorDetails: true
-        }
-      },
-
-      )
-      return User
-
+          DoctorDetails: true,
+        },
+      });
+      return User;
     } catch (error) {
-      throw new HttpException("faild to suspend user ", HttpStatus.INTERNAL_SERVER_ERROR)
-
+      throw new HttpException(
+        'faild to suspend user ',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
+  async VerifyLicenseNumber() { }
 
-  async VerifyLicenseNumber() {
+  // Function to update the password
+  async updatePassword(
+    UserID: string,
+    CurrentPassword: string,
+    NewPassword: string,
+  ) {
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: { UserID },
+      });
 
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
 
+      const isMatch = await bcrypt.compare(CurrentPassword, user.Password);
+      if (!isMatch) {
+        throw new HttpException(
+          'Current password is incorrect',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(NewPassword, salt);
+
+      // Update the password in the database
+      const updatedUser = await this.prisma.users.update({
+        where: { UserID: UserID },
+        data: { Password: hashedPassword },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        'Failed to update password',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
-
 }

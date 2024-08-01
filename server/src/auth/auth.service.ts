@@ -74,6 +74,7 @@ export class AuthService {
             const user = await this.prisma.users.findUnique({
                 where: { Email: Email },
             })
+            console.log(user)
             if (!user)
                 throw new UnauthorizedException("Invalid credentials.check your username or password!!")
             if (user && !user.Verified)

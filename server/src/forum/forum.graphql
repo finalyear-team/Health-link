@@ -44,7 +44,7 @@ type Forum {
   CreatedAt:Date
   UpdatedAt:Date
   ForumAnswer:[ForumAnswer]
-  Author:Author!
+
 }
 
 input CreateForumInput {
@@ -73,6 +73,7 @@ input UpdateForumAnswerInput {
   UserID:String!
 }
 
+
 type Query {
   GetForumPosts(Query:String): [Forum]
   GetForumPost(ForumPostID: String!): Forum
@@ -85,7 +86,7 @@ type Mutation {
   UpdateForum(updateForumInput: UpdateForumInput!): Forum!
   RemoveForumPost(ForumPostID:String!):Forum!
   
-  CreateForumAnswer(createForumAnswerInput: CreateForumAnswerInput!): Forum!
+  CreateForumAnswer(createForumAnswerInput: CreateForumAnswerInput!): ForumAnswer!
   UpdateForumAnswer(updateForumAnswerInput:UpdateForumAnswerInput):Forum!
 
   IncreaseForumAnswerView(ForumAnswerID:String):ForumAnswer!  

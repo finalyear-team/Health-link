@@ -27,7 +27,7 @@ const ProffessionalInfoUpdate = () => {
     educationValue,
     specializationValue: EducationalBackground?.Specialization,
     graduationYear: EducationalBackground.GraduationYear,
-    license: user?.LicenseNumber.toString(),
+    license: user?.LicenseNumber?.toString(),
     experiance: user?.ExperienceYears,
     consultationFee: user?.ConsultationFee,
   };

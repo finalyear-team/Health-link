@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Controls from "@/components/video/Controls ";
 
 import Video from "./Video";
-import { selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare, useVideo, selectLocalPeer, selectRemotePeers } from "@100mslive/react-sdk";
+import { selectIsConnectedToRoom, selectLocalVideoTrackID, useAVToggle, useDevices, useHMSActions, useHMSStore, useScreenShare, useVideo, selectLocalPeer, selectRemotePeers, useHMSNotifications } from "@100mslive/react-sdk";
 import useAuth from "@/hooks/useAuth";
 import { AppointmentStatus, UserType } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -24,7 +24,9 @@ const VideoCall = ({ role }: { role: any }) => {
   const { showVideoChat, cancelVideoChat } = useAppointmentStore()
   const { user } = useAuth();
   const [openAlert, setOpenAlert] = useState(false)
+  const notification = useHMSNotifications()
 
+  console.log(notification)
   const { refetch } = useQuery(GET_USER_APPOINTMENTS, {
     variables: { userID: user?.UserID },
   });
@@ -67,6 +69,7 @@ const VideoCall = ({ role }: { role: any }) => {
       )
 
   };
+
 
   return (
     <div className="relative flex flex-col h-[80vh] bg-slate-200 justify-center items-center shadow-sm rounded mr-2">

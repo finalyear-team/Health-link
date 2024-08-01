@@ -17,6 +17,12 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-red-500 text-slate-50 hover:bg-red-500/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/80",
         outline: "text-slate-950 dark:text-slate-50",
+        admin:
+          "border-transparent bg-secondary-600 text-secondary-700 hover:bg-opacity-10 bg-opacity-5",
+        doctor:
+          "border-transparent bg-primary-600 text-primary-700 hover:bg-opacity-10 bg-opacity-5",
+        patient:
+          "border-transparent bg-yellow-600 text-yellow-700 hover:bg-opacity-10 bg-opacity-5",
       },
     },
     defaultVariants: {

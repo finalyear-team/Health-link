@@ -117,7 +117,6 @@ export class ScheduleService {
 
     const existingDays = existingSchedules.map(schedule => schedule.WeekDay);
 
-    console.log("days to delete")
 
     // Step 2: Determine which days need to be updated and which need to be created
     const daysToUpdate = WeekDay ? WeekDay.filter(day => existingDays.includes(day)) : [];
@@ -240,7 +239,6 @@ export class ScheduleService {
 
       return WeekdaySchedules && WeekdaySchedules.length > 0 ? WeekdaySchedules : schedule
     } catch (error) {
-      console.log(error)
       throw error
     }
   }
@@ -291,7 +289,6 @@ export class ScheduleService {
   //
   async updateSchedule(updateScheduleInput: UpdateScheduleInput) {
     const { ScheduleID, DoctorID, ...others } = updateScheduleInput
-    console.log(others)
     return null
     try {
       // const schedule = await this.prisma.doctorSchedule.update({
@@ -331,7 +328,6 @@ export class ScheduleService {
       })
       return schedules
     } catch (error) {
-      console.log(error)
       throw error
     }
   }
@@ -347,7 +343,6 @@ export class ScheduleService {
           ScheduleType: "normal"
         }
       })
-      console.log(schedules)
       return schedules
     } catch (error) {
       console.log(error)
@@ -409,7 +404,6 @@ export class ScheduleService {
         }
       })
 
-      console.log(schedules)
 
       return schedules
     } catch (error) {
@@ -427,8 +421,6 @@ export class ScheduleService {
         }
       })
 
-      console.log("removed schedule")
-      console.log(schedules)
 
       return schedules
     } catch (error) {

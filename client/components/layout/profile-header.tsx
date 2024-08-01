@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { MdVerified } from "react-icons/md";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
+import { format } from "date-fns";
 
 interface SocialMediaHeaderCardProps {
   profilePicture: string;
@@ -35,17 +36,17 @@ const ProfileHeader: FC<SocialMediaHeaderCardProps> = ({
         <div className="flex flex-col justify-start -space-y-2">
           <div className="font-semibold text-sm flex items-center">
             {name}
-            <MdVerified size={16} className="text-secondary-600 mx-1" /> •
-            <Button
+            {/* <MdVerified size={16} className="text-secondary-600 mx-1" /> • */}
+            {/* <Button
               variant="link"
               className="text-primary-600 dark:text-primary-700"
             >
               Follow
-            </Button>
+            </Button> */}
           </div>
-          <div className="text-sm text-slate-400">
+          <div className="p-1 text-sm text-slate-400">
             @{username} • <Badge>{userType}</Badge> •{" "}
-            {postTime.toLocaleString()}
+            {postTime && format(postTime.toLocaleString(), "hh:mm a")}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,103 +15,58 @@ import { Formik, Form } from "formik";
 import { Loader2, UserCheck, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery, useMutation, gql } from "@apollo/client";
+import { GET_FOLLOWERS, GET_FOLLOWING } from "@/graphql/queries/userQueries";
+import useAuth from "@/hooks/useAuth";
+import client from "@/graphql/apollo-client";
+import { UNFOLLOW_DOCTOR } from "@/graphql/mutations/userMutations";
 
-interface NetworkType {
-  id: number;
-  name: string;
-  username: string;
-  bio: string;
-  avatar: string;
-}
 
-const followers: NetworkType[] = [
-  // {
-  //   id: 1,
-  //   name: "John Doe",
-  //   username: "@johndoe",
-  //   bio: "Web Developer | Tech Enthusiast",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 2,
-  //   name: "Jane Smith",
-  //   username: "@janesmith",
-  //   bio: "Designer | Creative Visionary",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 3,
-  //   name: "Michael Johnson",
-  //   username: "@mjohnson",
-  //   bio: "Entrepreneur | Growth Hacker",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 4,
-  //   name: "Emily Davis",
-  //   username: "@emilydavis",
-  //   bio: "Photographer | Nature Lover",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 5,
-  //   name: "David Lee",
-  //   username: "@davidlee",
-  //   bio: "Software Engineer | Open Source Contributor",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-];
-
-const following: NetworkType[] = [
-  // {
-  //   id: 1,
-  //   name: "Sarah Lee",
-  //   username: "@sarahlee",
-  //   bio: "Lifestyle Blogger | Minimalist",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 2,
-  //   name: "Alex Chen",
-  //   username: "@alexchen",
-  //   bio: "Product Manager | Growth Strategist",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 3,
-  //   name: "Olivia Patel",
-  //   username: "@oliviapatel",
-  //   bio: "Fitness Enthusiast | Wellness Coach",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 4,
-  //   name: "Ryan Kim",
-  //   username: "@ryankim",
-  //   bio: "Data Scientist | Machine Learning Expert",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // {
-  //   id: 5,
-  //   name: "Isabella Gonzalez",
-  //   username: "@isabellagonzalez",
-  //   bio: "Graphic Designer | Brand Strategist",
-  //   avatar: "/placeholder-user.jpg",
-  // },
-  // 
-];
 
 const Network = ({
   value,
   isPatient,
+  userID,
 }: {
   value: string;
   isPatient: boolean;
+  userID: string;
 }) => {
   const router = useRouter();
-  const [filteredFollowers, setFilteredFollowers] = useState(followers);
-  const [filteredFollowing, setFilteredFollowing] = useState(following);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [filteredFollowers, setFilteredFollowers] = useState<any>([]);
+  const [filteredFollowing, setFilteredFollowing] = useState<any[]>([]);
+  const [followersdata, setFollowersData] = useState<any[]>([]);
+  const [followingdata, setFollowingData] = useState<any[]>([]);
+
+  // Use Apollo Client's useMutation hook for unfollow
+  const [unfollowDoctor] = useMutation(UNFOLLOW_DOCTOR);
+
+  useEffect(() => {
+    if (!user) return;
+    const getFollowers = async () => {
+      const { data: getFollowers } = await client.query({
+        query: GET_FOLLOWERS,
+        variables: {
+          userID: user?.UserID,
+        },
+      });
+      const { data: getFollowing } = await client.query({
+        query: GET_FOLLOWING,
+        variables: {
+          userID: user?.UserID,
+        },
+      });
+
+      console.log(getFollowers);
+      console.log(getFollowing);
+
+      setFollowersData(getFollowers?.GetFollowers);
+      setFollowingData(getFollowing?.GetFollowing);
+    };
+    getFollowers();
+  }, [user]);
 
   // handle search for following
   const handleFollowingSearch = (values: any) => {
@@ -119,31 +74,30 @@ const Network = ({
     const searchTerm = values.followingSearch.toLowerCase();
     const searchedFollowing =
       values.followingSearch.length > 0
-        ? following.filter(
-            (item) =>
-              item.name.toLowerCase().includes(searchTerm) ||
-              item.username.toLowerCase().includes(searchTerm)
-          )
-        : following;
+        ? followingdata?.filter(
+          (item: any) =>
+            item.FirstName.toLowerCase().includes(searchTerm) ||
+            item.Username.toLowerCase().includes(searchTerm)
+        )
+        : followingdata;
 
-    setFilteredFollowing(searchedFollowing);
+    setFilteredFollowing(searchedFollowing || []);
   };
 
   // handle search for followers
-
   const handleFollwersSearch = (values: any) => {
     console.log(values);
     const searchTerm = values.followersSearch.toLowerCase();
     const searchedFollowers =
       values.followersSearch.length > 0
-        ? followers.filter(
-            (item) =>
-              item.name.toLowerCase().includes(searchTerm) ||
-              item.username.toLowerCase().includes(searchTerm)
-          )
-        : followers;
+        ? followersdata.filter(
+          (item: any) =>
+            item.FirstName.toLowerCase().includes(searchTerm) ||
+            item.Username.toLowerCase().includes(searchTerm)
+        )
+        : followersdata;
 
-    setFilteredFollowers(searchedFollowers);
+    setFilteredFollowers(searchedFollowers || []);
   };
 
   // handle the follow and unfollow logic
@@ -152,18 +106,25 @@ const Network = ({
     { setSubmitting }: any
   ) => {
     try {
-      // the mutation goes here
+      // Execute the unfollow mutation
+      await unfollowDoctor({
+        variables: {
+          FollowerID: user?.UserID,
+          FollowingID: values.userId,
+        },
+      });
+      setFollowingData(followingdata?.filter((follow) => follow.UserID !== values.userId))
       toast({
-        title: "Succesfully Unfollowed",
-        description:
-          "Your have succesfully unfollowed Dr. " + values.name + ".",
+        title: "Successfully Unfollowed",
+        description: "You have successfully unfollowed " + values.name + ".",
         variant: "success",
       });
+      // Optionally, refresh the followers and following lists
     } catch (error) {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Error occured while trying to unfollow. Try again.",
+        description: "Error occurred while trying to unfollow. Try again.",
         variant: "destructive",
       });
     } finally {
@@ -194,30 +155,30 @@ const Network = ({
                           type="search"
                           name="followersSearch"
                           placeholder="search"
-                          disabled={followers.length > 0 ? false : true}
+                          disabled={followersdata.length > 0 ? false : true}
                         />
                       </Form>
                     )}
                   </Formik>
                 </CardHeader>
                 <CardContent className="p-6 grid gap-4 h-fit">
-                  {filteredFollowers.length > 0 ? (
-                    filteredFollowers.map((user, index) => (
+                  {followersdata.length > 0 ? (
+                    followersdata?.map((user: any, index: number) => (
                       <div
                         key={index}
                         className="grid grid-cols-[48px_1fr] items-center gap-4 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-md p-2 transition-colors"
-                        onClick={() => router.push(`/profile/${user.username}`)}
+                        onClick={() => router.push(`/profile/${user.UserID}`)}
                       >
                         <Avatar>
-                          <AvatarImage src="/placeholder-user.jpg" />
+                          <AvatarImage src={user.ProfilePicture || "/placeholder-user.jpg"} />
                           <AvatarFallback>
-                            {user.name.charAt(0).toUpperCase()}
+                            {user.FirstName.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="space-y-1">
-                          <div className="font-medium">{user.name}</div>
+                          <div className="font-medium">{user.FirstName}</div>
                           <div className="text-sm text-muted-foreground">
-                            {user.username}
+                            {user.Username}
                           </div>
                         </div>
                       </div>
@@ -244,40 +205,40 @@ const Network = ({
                         type="search"
                         name="followingSearch"
                         placeholder="search"
-                        disabled={following.length > 0 ? false : true}
+                        disabled={followingdata.length > 0 ? false : true}
                       />
                     </Form>
                   )}
                 </Formik>
               </CardHeader>
               <CardContent className="p-6 grid gap-4 h-fit">
-                {filteredFollowing.length > 0 ? (
-                  filteredFollowing.map((user, index) => (
+                {followingdata.length > 0 ? (
+                  followingdata.map((user: any, index: number) => (
                     <div
                       key={index}
                       className="flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-md p-2 transition-colors"
                     >
                       <div
                         className="grid grid-cols-[48px_1fr] items-center gap-4"
-                        onClick={() => router.push(`/profile/${user.username}`)}
+                        onClick={() => router.push(`/profile/${user.Username}`)}
                       >
                         <Avatar>
-                          <AvatarImage src="/placeholder-user.jpg" />
+                          <AvatarImage src={user.ProfilePicture || "/placeholder-user.jpg"} />
                           <AvatarFallback>
-                            {user.name.charAt(0).toUpperCase()}
+                            {user.FirstName.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="space-y-1">
-                          <div className="font-medium">{user.name}</div>
+                          <div className="font-medium">{user.FirstName}</div>
                           <div className="text-sm text-muted-foreground">
-                            {user.username}
+                            {user.Username}
                           </div>
                         </div>
                       </div>
                       <Formik
                         initialValues={{
-                          userId: user.id,
-                          name: user.name,
+                          userId: user.UserID,
+                          name: user.FirstName,
                         }}
                         onSubmit={handleFollowUnfollowSubmit}
                       >
@@ -300,7 +261,7 @@ const Network = ({
                   <div className="flex flex-col items-center w-full space-y-2">
                     <UserCheck className="w-10 h-10 text-slate-500" />
                     <CardDescription>No Following.</CardDescription>
-                    <Button variant={"ghost"}>Start Exploring</Button>
+                    {/* <Button variant={"ghost"}>Start Exploring</Button> */}
                   </div>
                 )}
               </CardContent>

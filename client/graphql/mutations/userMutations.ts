@@ -130,7 +130,7 @@ export const FOLLOW_DOCTOR = gql`
 
 export const UNFOLLOW_DOCTOR = gql`
    mutation UnFollow($FollowerID:String!,$FollowingID:String!){
-      Follow(FollowerID:$FollowerID,FollowingID:$FollowingID){
+    UnFollow(FollowerID:$FollowerID,FollowingID:$FollowingID){
         UserID,
         Username,
         FirstName,

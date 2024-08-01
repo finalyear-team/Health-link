@@ -144,9 +144,9 @@ const Consultation = () => {
               Explore our dedicated team of doctors ready to provide
               personalized care tailored to your needs.
             </p>
-            <Button variant={"secondary"}>
+            {/* <Button variant={"secondary"}>
               <MdOutlineSavedSearch size={20} /> Advanced Search by Symptoms
-            </Button>
+            </Button> */}
           </div>
           {/* search and filter */}
 
@@ -157,7 +157,7 @@ const Consultation = () => {
                 setSpecializationValue={setSpecializationValue}
               />
             </div>
-            <div>
+            {/* <div>
               <Formik initialValues={initialValues} onSubmit={handleSubmit}>
                 {({ isValid, isSubmitting }) => (
                   <Form className="flex justify-between items-center space-x-5">
@@ -183,7 +183,7 @@ const Consultation = () => {
                   </Form>
                 )}
               </Formik>
-            </div>
+            </div> */}
             <div>
               <Select onValueChange={handleCriteriaChange}>
                 <SelectTrigger className="w-[180px]">
@@ -211,7 +211,7 @@ const Consultation = () => {
                   </SelectGroup>
                   <SelectGroup className="mt-4">
                     <SelectLabel>Type</SelectLabel>
-                    <RadioGroup
+                    {/* <RadioGroup
                       defaultValue="asc"
                       onChange={handleSortOrderChange}
                     >
@@ -223,7 +223,7 @@ const Consultation = () => {
                         <RadioGroupItem value="desc" id="r2" />
                         <Label htmlFor="r2">Descending</Label>
                       </div>
-                    </RadioGroup>
+                    </RadioGroup> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
