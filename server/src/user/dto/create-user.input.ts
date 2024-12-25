@@ -32,6 +32,29 @@ export const RegisterSchema = z.object({
 
 })
 
+
+@InputType()
+export class OAuthUserRegister {
+    @Field()
+    FirstName: string;
+
+    @Field()
+    LastName: string;
+
+    @Field()
+    Email: string;
+
+    @Field({ nullable: true })
+    ProfilePicture?: string;
+
+    @Field()
+    Role: UserType
+
+
+
+
+}
+
 @InputType()
 export class UserDetailsInput {
     @Field()

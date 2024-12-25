@@ -177,62 +177,68 @@ enum notificationType {
 }
 
 model Users {
-  UserID                String              @id @default(uuid())
-  Username              String
+  UserID                String               @id @default(uuid())
   FirstName             String?
   LastName              String?
+  Username              String?
   Password              String?
-  Email                 String              @unique
+  Email                 String               @unique
   DateOfBirth           DateTime?
   Gender                Gender?
-  Bio                   String?             @db.LongText
+  Bio                   String?              @db.LongText
   PhoneNumber           String?
   Address               String?
-  ProfilePicture        String?             @db.LongText
+  ProfilePicture        String?              @db.LongText
   Role                  UserType
-  Status                UserStatus
-  Verified              Boolean             @default(false)
-  CreatedAt             DateTime            @default(now())
-  UpdatedAt             DateTime            @updatedAt
+  Status                UserStatus           @default(active)
+  Verified              Boolean              @default(false)
+  CreatedAt             DateTime             @default(now())
+  UpdatedAt             DateTime             @updatedAt
   LastLogin             DateTime?
   MedicalRecord         MedicalRecord[]
   DoctorDetails         DoctorDetails?
-  Reviews               DoctorReviews[]     @relation("patient_review")
-  Appointments          Appointments[]      @relation("patient_appointment")
-  UpdateAppointment     Appointments[]      @relation("update_appointment")
-  AppointmentsCancelled Appointments[]      @relation("appointmentCancelledby")
-  // Consultancy           Consultancy[]
-  // PatientBooking        Booking[]           @relation("patientBooking")
-  // BookingCancelled      Booking[]
+  Reviews               DoctorReviews[]      @relation("patient_review")
+  Appointments          Appointments[]       @relation("patient_appointment")
+  UpdateAppointment     Appointments[]       @relation("update_appointment")
+  AppointmentsCancelled Appointments[]       @relation("appointmentCancelledby")
   ForumPost             ForumPost[]
   ForumAnswer           ForumAnswer[]
   Comment               Comments[]
   Like                  Likes[]
-  Prescription          Prescription[]      @relation("patient_prescription")
+  Prescription          Prescription[]       @relation("patient_prescription")
   Feedback              UserFeedback[]
   FeedbackReply         Reply[]
   ChatMessage           ChatMessage[]
   VideoChatMembers      MemberInVideoChat[]
   ChannelMembers        ChannelMember[]
   Schedules             DoctorSchedule[]
-  DoctorReviews         DoctorReviews[]     @relation("doctor_review")
-  DoctorAppointments    Appointments[]      @relation("doctor_appointment")
-  // Consultancy           Consultancy[]
-  // Booking               Booking[]
+  DoctorReviews         DoctorReviews[]      @relation("doctor_review")
+  DoctorAppointments    Appointments[]       @relation("doctor_appointment")
   Blog                  BlogPost[]
   Post                  Post[]
-  DoctorPrescription    Prescription[]      @relation("doctor_prescription")
-  Payment               Payment[]           @relation("patient_payment")
-  DoctorPayment         Payment[]           @relation("doctor_payment")
+  DoctorPrescription    Prescription[]       @relation("doctor_prescription")
+  Payment               Payment[]            @relation("patient_payment")
+  DoctorPayment         Payment[]            @relation("doctor_payment")
   VideoChatRoom         VideoChatRoom[]
-  FollowersFollowing    Followers[]         @relation("following")
-  FollowersFollowers    Followers[]         @relation("followers")
+  FollowersFollowing    Followers[]          @relation("following")
+  FollowersFollowers    Followers[]          @relation("followers")
   Notification          Notification[]
   Bookmarks             Bookmark[]
   Report                Report[]
   Wallet                Wallet[]
+  Organization          HealthOrganization[]
+  BlackListedToken      TokenBlackList[]
 
   @@index([Email], name: "email_index")
+}
+
+model TokenBlackList {
+  TokenID       String    @id @default(uuid())
+  Token         String
+  UserID        String
+  BlackListedAt DateTime  @default(now())
+  ExpiresAt     DateTime?
+  User          Users     @relation(fields: [UserID], references: [UserID])
 }
 
 model MedicalRecord {
@@ -242,6 +248,7 @@ model MedicalRecord {
   Diagnosis    Json?
   Medications  Json?
   Allergies    Json?
+  Note         String?  @db.LongText
   Patient      Users    @relation(onDelete: Cascade, fields: [UserID], references: [UserID])
 
   @@index([UserID], name: "user_record_index")
@@ -253,6 +260,7 @@ model DoctorDetails {
   ConsultationFee       Float?
   EducationalBackground Json?
   LicenseNumber         String?
+  LicenseFile           String?
   ExperienceYears       Int?
   User                  Users   @relation(onDelete: Cascade, fields: [DoctorID], references: [UserID])
 
@@ -292,64 +300,20 @@ model Appointments {
   UpdatedAt       DateTime          @updatedAt
   UpdatedBy       String?
   CancelledBy     String?
-
   CancelledReason String?
   VideoChatRoomID String
-  Doctor          Users   @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
-  Patient         Users   @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
-  Updated         Users?  @relation(onDelete: Cascade, "update_appointment", fields: [UpdatedBy], references: [UserID])
-  Cancelled       Users?  @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
+  Doctor          Users             @relation(onDelete: Cascade, "doctor_appointment", fields: [DoctorID], references: [UserID])
+  Patient         Users             @relation(onDelete: Cascade, "patient_appointment", fields: [PatientID], references: [UserID])
+  Updated         Users?            @relation(onDelete: Cascade, "update_appointment", fields: [UpdatedBy], references: [UserID])
+  Cancelled       Users?            @relation(onDelete: Cascade, "appointmentCancelledby", fields: [CancelledBy], references: [UserID])
 
   Schedule      DoctorSchedule? @relation(onDelete: SetNull, fields: [ScheduleID], references: [ScheduleID])
-  // Booking         Booking[]
   Payment       Payment?
   VideoChatRoom VideoChatRoom   @relation(onDelete: Cascade, fields: [VideoChatRoomID], references: [RoomID])
 
   @@index([Status], name: "status_index")
   @@index([DoctorID, PatientID], name: "doctor_patient_index")
 }
-
-// model Booking {
-//   BookingID       String        @id @default(uuid())
-//   CreatedAt       DateTime      @default(now())
-//   UpdatedAt       DateTime      @updatedAt
-//   Status          String        @default("Pending")
-//   PatientID       String
-//   DoctorID        String
-//   AppointmentID   String        @unique
-//   ReminderSent    Boolean       @default(false)
-//   ReminderDate    DateTime?
-//   CancelledBy     String?       @unique
-//   CancelledReason String?
-//   Doctor          DoctorDetails @relation(onDelete: Cascade,fields: [DoctorID], references: [DoctorID])
-//   Patient         Users         @relation(onDelete: Cascade,"patientBooking", fields: [PatientID], references: [UserID])
-//   Appointment     Appointments? @relation(onDelete: Cascade,fields: [AppointmentID], references: [AppointmentID])
-//   Cancelled       Users?        @relation(onDelete: Cascade,fields: [CancelledBy], references: [UserID])
-
-//   @@index([DoctorID], name: "patient_doctor_index")
-// }
-
-// model Consultancy {
-//   ConsultancyID   String            @id @default(uuid())
-//   DoctorID        String
-//   PatientID       String
-//   Appointment     String
-//   ConsultancyDate DateTime   
-//   ConsultancyTime DateTime   @db.Time()
-//   Duration        Int
-//   Status          AppointmentStatus
-//   AppointmentType AppointmentType
-//   Note           String?           @db.LongText
-//   CreatedAt       DateTime          @default(now())
-//   UpdatedAt       DateTime          @updatedAt
-//   CancelledBy     String?
-//   CancelledReason String?
-//   Doctor          DoctorDetails     @relation(onDelete: Cascade,fields: [DoctorID], references: [DoctorID])
-//   Patient         Users             @relation(onDelete: Cascade,fields: [PatientID], references: [UserID])
-//   Payment         Payment?
-
-//   @@index([Status], name: "consultancy_status_index")
-// }
 
 model VideoChatRoom {
   RoomID        String              @id
@@ -705,7 +669,50 @@ model Transaction {
   @@index([WalletID], name: "transaction_wallet_index")
 }
 
+model HealthOrganization {
+  OrganizationID    String           @id @default(uuid())
+  Name              String
+  Logo              String?
+  StreetAddress     String?
+  PostalCode        String?
+  City              String
+  State             String?
+  Country           String
+  TIN               String
+  OrganizationType  OrganizationType
+  LicenseNumber     String
+  AdminID           String
+  Admin             Users            @relation(fields: [AdminID], references: [UserID])
+  IsVerified        Boolean          @default(false)
+  AccreditationDate DateTime?
+  ContactPhone      String?
+  ContactEmail      String?
+  Website           String?
+  CreatedAt         DateTime         @default(now())
+  UpdatedAt         DateTime         @updatedAt
+}
+
 enum TransactionType {
   debit
   credit
+}
+
+enum OrganizationType {
+  generalHospital
+  specialtyHospital
+  clinic
+  diagnosticCenter
+  laboratory
+  pharmacy
+  nursingHome
+  rehabilitationCenter
+  primaryHealthcareCenter
+  dentalClinic
+  maternityHome
+  mentalHealthCenter
+  surgeryCenter
+  opticalClinic
+  urgentCareCenter
+  fertilityClinic
+  ambulatoryCareCenter
 }

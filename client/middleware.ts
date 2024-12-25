@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authMiddleware, redirectToSignIn } from "@clerk/nextjs/server";
-import { clerkClient } from "@clerk/nextjs/server";
+// import { authMiddleware, redirectToSignIn } from "@clerk/nextjs/server";
+// import { clerkClient } from "@clerk/nextjs/server";
 
 
 

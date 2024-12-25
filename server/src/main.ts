@@ -10,7 +10,8 @@ async function bootstrap() {
     origin: ['http://localhost:3000', "http://localhost:3001", "https://checkout.chapa.co"],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
-    exposedHeaders: ['Authorization'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
+    exposedHeaders: ['Authorization']
   });
   app.use(CookieParser())
   await app.listen(4000);

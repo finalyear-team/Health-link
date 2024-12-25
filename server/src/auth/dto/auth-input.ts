@@ -1,7 +1,8 @@
 
-import { Gender, UserType } from '@prisma/client';
+import { Gender,  UserType } from '@prisma/client';
 import { format } from 'date-fns';
 import { parseDate } from 'src/utils/parseDate';
+import { UserStatus } from 'src/utils/types';
 import { z } from 'zod';
 
 
@@ -30,7 +31,6 @@ export class SignInDto {
 export const RegisterSchema = z.object({
     FirstName: z.string({ message: "First name is not correct" }),
     LastName: z.string({ message: "Last name is not correct" }),
-    Username: z.string({ message: "Username is not correct" }),
     Email: z.string().email({ message: "Email is not correct" }),
     Role: z.enum(RoleValues, { message: "Role error" }),
     Password: z.string({ message: "password required" }),
@@ -55,8 +55,7 @@ export const RegisterSchema = z.object({
 
 
 export class SignUpDto {
-    Username: string
-    Password: string
+    Password?: string
     Email: string
     FirstName: string
     LastName: string
@@ -64,6 +63,7 @@ export class SignUpDto {
     PhoneNumber?: string
     DateOfBirth: Date
     Role: UserType
+    Status:UserStatus.ACTIVE
 
     constructor(input: any) {
         const validatedInput = RegisterSchema.parse(input)

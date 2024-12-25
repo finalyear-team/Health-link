@@ -138,3 +138,32 @@ export enum UpdateAppointmentType {
   RESCHEDULEAPPOINTMENT = "rescheduleAppointment"
 }
 
+
+export enum OrganizationType {
+  GENERAL_HOSPITAL = "generalHospital",
+  SPECIALTY_HOSPITAL = "specialtyHospital",
+  CLINIC = "clinic",
+  DIAGNOSTIC_CENTER = "diagnosticCenter",
+  LABORATORY = "laboratory",
+  PHARMACY = "pharmacy",
+  NURSING_HOME = "nursingHome",
+  REHABILITATION_CENTER = "rehabilitationCenter",
+  PRIMARY_HEALTHCARE_CENTER = "primaryHealthcareCenter",
+  DENTAL_CLINIC = "dentalClinic",
+  MATERNITY_HOME = "maternityHome",
+  MENTAL_HEALTH_CENTER = "mentalHealthCenter",
+  SURGERY_CENTER = "surgeryCenter",
+  OPTICAL_CLINIC = "opticalClinic",
+  URGENT_CARE_CENTER = "urgentCareCenter",
+  FERTILITY_CLINIC = "fertilityClinic",
+  AMBULATORY_CARE_CENTER = "ambulatoryCareCenter",
+}
+
+
+export interface googleProfile {
+  Email: string,
+  FirstName: string,
+  LastName: string,
+  ProfilePicture: string
+
+}

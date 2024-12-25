@@ -1,95 +1,22 @@
-import * as React from "react";
-import { Field, ErrorMessage } from "formik";
-import { cn } from "@/lib/utils";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { Button } from "./button";
+import * as React from "react"
 
-interface InputProps {
-  label?: string;
-  value?: string;
-  className?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  type: string;
-  name: string;
-  idd?: string;
-  autoComplete?: string;
-  accept?: string;
-  showError?: boolean;
-  optional?: boolean;
-  onChange?: (even: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-}
+import { cn } from "@/lib/utils"
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, optional, className, name, type, ...rest }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false);
-
-    const togglePasswordVisibility = () => {
-      setShowPassword((prevState) => !prevState);
-    };
-
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+  ({ className, type, ...props }, ref) => {
     return (
-      <div
-        className={`${
-          type === "checkbox" ? "flex flex-row items-center space-x-2" : ""
-        }`}
-      >
-        {type === "checkbox" ? (
-          <Field id={name} name={name} type={type} {...rest} />
-        ) : null}
-        <label
-          htmlFor={name}
-          className="font-main text-sm text-dark-700 dark:text-slate-50 font-medium"
-        >
-          {label ? (
-            <div>
-              {label}{" "}
-              {optional ? (
-                <span>(optional) </span>
-              ) : (
-                <span className="text-sm text-red-600"> * </span>
-              )}
-            </div>
-          ) : (
-            ""
-          )}
-        </label>
-
-        {type !== "checkbox" ? (
-          <div className="relative">
-            <Field
-              id={name}
-              name={name}
-              type={showPassword ? "text" : type}
-              {...rest}
-              className={cn(
-                "flex h-11 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm  file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus:ring-primary-600 focus:border-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300",
-                className
-              )}
-            />
-            {type === "password" && (
-              <Button
-                type="button"
-                variant={"empty"}
-                size={"icon"}
-                onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 px-3 flex items-center"
-              >
-                {showPassword ? (
-                  <EyeOffIcon className="h-4 w-4" />
-                ) : (
-                  <EyeIcon className="h-4 w-4" />
-                )}
-              </Button>
-            )}
-          </div>
-        ) : null}
-        <ErrorMessage name={name} component="div" className="input__error" />
-      </div>
-    );
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-slate-950 placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:border-slate-800  dark:ring-offset-slate-950 dark:file:text-slate-50 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
   }
-);
-Input.displayName = "Input";
+)
+Input.displayName = "Input"
 
-export { Input };
+export { Input }

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateUserInput } from './dto/update-user.input';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DoctorDetailInput, UserDetailsInput } from './dto/create-user.input';
+import { DoctorDetailInput, OAuthUserRegister, UserDetailsInput } from './dto/create-user.input';
 import { DoctorDetails, Prisma, UserType, Users } from '@prisma/client';
 import { SuspendType } from 'src/utils/types';
 import { boolean, promise } from 'zod';
@@ -68,7 +68,11 @@ export class UserService {
     }
   }
 
-  async RegisterUser(RegisterInput: UserDetailsInput) {
+
+
+
+  async RegisterUser(RegisterInput: UserDetailsInput | OAuthUserRegister) {
+    console.log(RegisterInput)
     try {
       const user = await this.prisma.users.create({
         data: {

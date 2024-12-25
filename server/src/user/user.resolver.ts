@@ -6,7 +6,7 @@ import { DoctorDetailInput, UserDetailsInput } from './dto/create-user.input';
 import { RoleGuard, UserRoles } from 'src/access-control/role.guard';
 import { SuspendType, UserType } from 'src/utils/types';
 import { UseGuards } from '@nestjs/common';
-import { ClerkAuthGuard, JWTGuard } from 'src/auth/auth.guard';
+import { JWTGuard } from 'src/auth/auth.guard';
 import { User } from '@clerk/clerk-sdk-node';
 import { ClerkMiddleware } from 'src/clerk.middleware';
 
@@ -48,6 +48,9 @@ export class UserResolver {
     return user;
   }
 
+
+
+
   @Mutation('DoctorRegister')
   async doctorRegister(
     @Args('DoctorDetailInput') doctorDetailInput: DoctorDetailInput,
@@ -57,6 +60,9 @@ export class UserResolver {
     const doctor = await this.userService.DoctorRegister(input);
     return doctor;
   }
+
+
+
 
   @Query('GetDoctors')
   async findDoctors() {

@@ -10,7 +10,7 @@
 }
 
 body {
-  @apply bg-white dark:bg-slate-800;
+  /* @apply bg-white dark:bg-slate-800; */
 }
 
 .glow {
@@ -78,6 +78,16 @@ body {
 .custome-input {
   @apply appearance-none dark:placeholder-gray-100 h-fit sm:h-12 relative w-full px-3 py-2 border border-gray-600 placeholder-dark-300 placeholder:text-sm dark:bg-dark-500 dark:text-gray-100 text-gray-900 rounded focus:outline-none focus:ring-primary-600 focus:border-primary-500 focus:z-10;
 }
+
+.shad-input {
+  @apply placeholder:text-gray-600 bg-slate-50 border border-black/30 hover:border-black h-12 focus-visible:ring-4 focus-visible:ring-primary-300 focus-visible:outline-none focus:border-black focus-visible:ring-offset-0 !important;
+}
+
+
+.shad-form-btn {
+  @apply bg-primary-400 p-4 h-12 text-gray-900 hover:bg-primary-200 text-lg font-medium !important;
+}
+
 
 .input__error {
   @apply text-red-500 font-main text-xs mt-1 flex flex-wrap w-[250px];
