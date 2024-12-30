@@ -92,3 +92,6 @@ export interface AppointmentNotification {
   appointmentDate: string;
   appointmentTime: string;
 }
+export interface User{
+  
+}

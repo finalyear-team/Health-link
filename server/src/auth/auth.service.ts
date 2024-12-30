@@ -102,11 +102,19 @@ export class AuthService {
                 }
             })
 
-            if (!user)
-                user = await this.userService.RegisterUser({ FirstName, LastName, ProfilePicture, Email, Role: UserType.PATIENT })
-            
 
-            return user
+            // immediate invoked function  to determine if user should be  redirected to register page
+            const redirect = (() => {
+                if (!user)
+                    return true;
+                return user.isSocialAccount
+
+            })();
+
+            const registeredUser = user ? user : await this.userService.RegisterUser({ FirstName, LastName, ProfilePicture, Email, Role: UserType.PATIENT, isSocialAccount: true })
+
+
+            return { user: registeredUser, redirect }
 
         } catch (error) {
             console.log(error)
@@ -125,11 +133,13 @@ export class AuthService {
             })
             if (!user)
                 throw new UnauthorizedException("Invalid credentials.check your Email or password!!")
+
+            if (user && !this.validatePassword(Password, user.Password))
+                throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
+
             if (user && !user.Verified)
                 throw new UnauthorizedException("user not verified")
 
-            if (!this.validatePassword(Password, user.Password))
-                throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
 
             const updatedUser = await this.prisma.users.update({
                 where: {

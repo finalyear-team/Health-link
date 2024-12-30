@@ -192,6 +192,7 @@ model Users {
   Role                  UserType
   Status                UserStatus           @default(active)
   Verified              Boolean              @default(false)
+  isSocialAccount       Boolean              @default(false)
   CreatedAt             DateTime             @default(now())
   UpdatedAt             DateTime             @updatedAt
   LastLogin             DateTime?

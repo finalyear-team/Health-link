@@ -1,5 +1,4 @@
 import React from "react";
-import { Field, ErrorMessage } from "formik";
 
 interface GenderSelectorProps {
   label?: string;

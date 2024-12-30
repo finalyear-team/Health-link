@@ -50,9 +50,8 @@ export class OAuthUserRegister {
     @Field()
     Role: UserType
 
-
-
-
+    @Field()
+    isSocialAccount?: boolean
 }
 
 @InputType()

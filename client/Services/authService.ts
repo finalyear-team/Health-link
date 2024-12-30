@@ -8,7 +8,7 @@ export const signIn = async (Email: string, Password: string) => {
             "http://localhost:4000/auth/signin",
             { Email, Password },
             {
-                withCredentials: true, // Send cookies with the request
+                withCredentials: true,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -44,9 +44,6 @@ export const sendEmail = async (email: string, firstName: string) => {
 };
 
 export const SignUp = async (signUpInput: any) => {
-    console.log("from signup service");
-    console.log(signUpInput);
-
     try {
         const response = await axios.post(
             "http://localhost:4000/auth/register",

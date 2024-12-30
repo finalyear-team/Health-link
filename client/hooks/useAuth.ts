@@ -69,7 +69,7 @@ const useAuth = () => {
         }
     }, []);
 
-    // Replace with your authentication check logic
+   
 
 
     return {
