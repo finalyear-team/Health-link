@@ -24,7 +24,7 @@ import { MailService } from 'src/mail/mail.service';
 import { Token, validate } from 'graphql';
 import * as crypto from "crypto"
 import { UserService } from 'src/user/user.service';
-import { Role } from '@prisma/client';
+import { Role, Users } from '@prisma/client';
 import { DoctorDetailInput } from 'src/user/dto/create-user.input';
 import { error } from 'console';
 import { AuthGuard } from '@nestjs/passport';
@@ -127,6 +127,20 @@ export class AuthController {
 
   @Post('register')
   async signup(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    try {
+      const registerdUser = await this.userService.getUserByEmail(req.body.Email)
+      let user: Users;
+      if (!registerdUser)
+        user = await this.userService.RegisterUser(req.body)
+      if (registerdUser.isSocialAccount)
+        user = await this.userService.updateUser({ UserID: registerdUser.UserID, ...req.body })
+      console.log("from register user");
+      console.log(user)
+      res.status(201).json(user)
+    } catch (error: any) {
+      res.status(500).json("something went wrong");
+
+    }
 
   }
 
@@ -143,7 +157,6 @@ export class AuthController {
     const { Email, Password } = req.body
     const user = await this.authService.Login({ Email, Password })
     return user
-
 
   }
 

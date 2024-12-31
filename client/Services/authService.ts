@@ -45,6 +45,7 @@ export const sendEmail = async (email: string, firstName: string) => {
 
 export const SignUp = async (signUpInput: any) => {
     try {
+        console.log("this is from signup", signUpInput)
         const response = await axios.post(
             "http://localhost:4000/auth/register",
             signUpInput,
@@ -57,7 +58,7 @@ export const SignUp = async (signUpInput: any) => {
         );
 
         const data = await response.data;
-        await sendEmail(data.user.Email, data.user.Username);
+        // await sendEmail(data.user.Email, data.user.Username);
         return data;
     } catch (error) {
         console.error("Error during sign up:", error);

@@ -196,7 +196,14 @@ model Users {
   CreatedAt             DateTime             @default(now())
   UpdatedAt             DateTime             @updatedAt
   LastLogin             DateTime?
-  MedicalRecord         MedicalRecord[]
+  CurrentMedication     String?              @db.LongText
+  PastMedicalHisotry    String?              @db.LongText
+  FamilyMedicalHistory  String?              @db.LongText
+  Allergies             String?              @db.LongText
+  MedicalInfoConsent    Boolean              @default(false)
+  PrivacyPolicyConsent  Boolean              @default(false)
+  ConsentVersion        String?              @default("1.0")
+  ConsentDate           DateTime?            @default(now())
   DoctorDetails         DoctorDetails?
   Reviews               DoctorReviews[]      @relation("patient_review")
   Appointments          Appointments[]       @relation("patient_appointment")
@@ -229,6 +236,7 @@ model Users {
   Wallet                Wallet[]
   Organization          HealthOrganization[]
   BlackListedToken      TokenBlackList[]
+  MedicalRecord         MedicalRecord[]
 
   @@index([Email], name: "email_index")
 }

@@ -122,6 +122,9 @@ input:-webkit-autofill:hover {
   @apply bg-primary-400 p-4 h-12 text-gray-900 hover:bg-primary-200 text-lg font-medium !important;
 }
 
+.checkbox-label {
+  @apply cursor-pointer text-sm font-medium text-dark-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 md:leading-none;
+}
 
 .input__error {
   @apply text-red-500 font-main text-xs mt-1 flex flex-wrap w-[250px];

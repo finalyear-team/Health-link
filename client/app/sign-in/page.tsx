@@ -64,15 +64,15 @@ const LoginPage = () => {
       console.log(err)
     }
 
-    // setSubmitting(false);
-    // resetForm();
   };
 
   return (
     <div className="w-screen overflow-x-hidden flex h-screen  bg-white text-gray-900 max-h-screen">
       <div className="mt-10 flex-1 flex flex-col px-16 h-[calc(100vh-2.5rem)] overflow-y-auto space-y-4 hide-scrollbar">
         <div className="self-center p-4  border borde-green-500 rounded-full">
-          <Image src={logo} alt="logo" width={1000} height={1000} className="w-fit" />
+          <Link href={"/"}>
+            <Image src={logo} alt="logo" width={1000} height={1000} className="w-fit" />
+          </Link>
         </div>
         <div>
           <h2 className="mt-6 text-center  text-slate-800 text-2xl  font-extrabold">
@@ -95,10 +95,7 @@ const LoginPage = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-
               />
-
-
               <FormField
                 control={form.control}
                 name="password"
@@ -115,15 +112,7 @@ const LoginPage = () => {
                   </FormItem>
                 )}
               />
-
-
-
             </div>
-
-            <div className="flex items-center justify-between text-sm">
-
-            </div>
-
             <div>
               <Button disabled={isSubmitting} className="w-full shad-form-btn" type="submit">
                 {isSubmitting ? (
@@ -134,11 +123,11 @@ const LoginPage = () => {
                 Login
               </Button>
 
-              <div className="text-sm mt-4 text-center">
+              <div className="text-md mt-4 text-center">
                 Don&apos;t have an account?
                 <Link
-                  href="/sign-up"
-                  className="font-main font-medium text-primary-600 hover:text-primary-700"
+                  href="/register"
+                  className="font-medium underline  hover:text-blue-600"
                 >
                   Sign Up
                 </Link>

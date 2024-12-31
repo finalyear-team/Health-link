@@ -72,7 +72,6 @@ export class UserService {
 
 
   async RegisterUser(RegisterInput: UserDetailsInput | OAuthUserRegister) {
-    console.log(RegisterInput)
     try {
       const user = await this.prisma.users.create({
         data: {
@@ -170,6 +169,7 @@ export class UserService {
           Email: email,
         },
       });
+
       return user;
     } catch (error) { }
   }

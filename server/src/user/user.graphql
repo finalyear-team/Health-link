@@ -55,6 +55,7 @@ type User {
   Rating: Float
   Followers: Int
   Following: Int
+  isSocialAccount:Boolean
 }
 
 input UserDetailsInput {

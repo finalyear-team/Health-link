@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE `Users` ADD COLUMN `Allergies` LONGTEXT NULL,
+    ADD COLUMN `ConsentDate` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    ADD COLUMN `ConsentVersion` VARCHAR(191) NULL DEFAULT '1.0',
+    ADD COLUMN `CurrentMedication` LONGTEXT NULL,
+    ADD COLUMN `FamilyMedicalHistory` LONGTEXT NULL,
+    ADD COLUMN `MedicalInfoConsent` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `PastMedicalHisotry` LONGTEXT NULL,
+    ADD COLUMN `PrivacyPolicyConsent` BOOLEAN NOT NULL DEFAULT false;

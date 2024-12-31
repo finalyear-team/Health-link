@@ -1,23 +1,19 @@
 "use client"
-import Container from "@/components/container/container";
-import { MdCircle } from "react-icons/md";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
 import useUserStore from "@/store/userStore";
 import client from "@/graphql/apollo-client";
 import { GET_USER_BY_EMAIL } from "@/graphql/queries/userQueries";
 import { z } from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useState } from "react";
 
-import PhoneInput from "react-phone-number-input"
 import 'react-phone-number-input/style.css'
-import { E164Number } from "libphonenumber-js/core"
+import FormButton from "@/components/shared/FormButton";
+import CustomFormField from "@/components/shared/CustomeFormField";
+import { FormFieldTypes } from "@/types/types";
 
 export const ContantInfoSchema = z
   .object({
@@ -72,7 +68,6 @@ const ContactInfo = ({
     "patient_contactInfo",
     {
       email: user ? user.Email : "",
-      password: "",
       phone: "",
       address: "",
     }
@@ -84,12 +79,11 @@ const ContactInfo = ({
       email: user ? user.Email : "",
       password: "",
       // confirmPassword: "",
-      phone: "",
-      address: "",
+      phone: storedValues.phone ? storedValues.phone : "",
+      address: storedValues.address ? storedValues.address : "",
     },
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     console.log("additional infor loadeds")
@@ -106,7 +100,7 @@ const ContactInfo = ({
       console.log(data)
       setEmailChecking(loading)
 
-      if (data.GetUserByEmail) {
+      if (data.GetUserByEmail.Email && data.GetUserByEmail.isSocialAccount) {
         setError("Email already registered. please use different email address")
         return
       }
@@ -115,68 +109,45 @@ const ContactInfo = ({
 
       setTimeout(() => {
         setStoredValues(valuesWithoutPassword);
-        setSubmitting(false);
+        setIsSubmitting(false);
         onNext();
       }, 1000);
 
     } catch (error) {
 
     }
-    // const { password, ...valuesWithoutPassword } = values;
 
-    // // setting the values into the store
-    // setUserInformation(values);
-
-    // setTimeout(() => {
-    //   setStoredValues(valuesWithoutPassword);
-    //   setSubmitting(false);
-    //   onNext();
-    // }, 1000);
   };
 
   return (
     <div className="mt-5 flex flex-col lg:flex-row items-center justify-center lg:space-x-8   p-4">
-      <div className="min-w-[50%] border rounded-lg p-8 ">
+      <div className="min-w-[50%] w-full  lg:w-auto border rounded-lg p-8 ">
         <h2 className="text-base font-bold text-primary-600">
           Contact Information
         </h2>
         <Form  {...form}>
-          <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(onSubmit)} method="POST">
-            <FormField
+          <form className="w-full mt-8 space-y-6" onSubmit={form.handleSubmit(onSubmit)} method="POST">
+            {error && <p className="text-red-500 font-medium text-md">{error}</p>}
+            <CustomFormField
               control={form.control}
+              label="Email"
               name="email"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel className="text-gray-800 text-md font-medium">Email</FormLabel>
-                  <FormControl>
-                    <Input type="text" placeholder="Enter Your First name" className="shad-input w-full md:w-[75%]" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Enter your email address"
+              fieldType={FormFieldTypes.INPUT}
+              className="w-full md:w-[75%]"
             />
-            <div className="flex md:flex-row flex-col gap-5">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel className="text-gray-800 text-md font-medium">Password</FormLabel>
-                    <FormControl className="">
-                      <div className="relative  w-full md:w-3/4">
-                        <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" className="shad-input  " {...field} />
-                        <button type="button" className="absolute top-1/4 right-1 text-gray-700 z-10" onClick={() => setShowPassword(!showPassword)} >
-                          {showPassword ? <EyeOff /> : <Eye />}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              {/* Password */}
-              {/* <FormField
+            <CustomFormField
+              control={form.control}
+              label="Password"
+              name="password"
+              placeholder="Enter new password"
+              fieldType={FormFieldTypes.PASSWORD}
+              className="w-full md:w-[75%]"
+            />
+
+            {/* Password */}
+            {/* <FormField
                 control={form.control}
                 name="confirmPassword"
                 render={({ field }) => (
@@ -194,55 +165,26 @@ const ContactInfo = ({
                   </FormItem>
                 )}
               /> */}
-            </div>
-            <FormField
+
+            <CustomFormField
               control={form.control}
+              label="Phone Number"
               name="phone"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel className="text-gray-800 text-md font-medium">Phone number</FormLabel>
-                  <PhoneInput defaultCountry="ET"
-                    placeholder={"0900000000/0700000000"}
-                    onChange={field.onChange}
-                    international withCountryCallingCode
-                    value={field.value as E164Number | undefined}
-                    className="shad-input w-full md:w-[75%] bg-white  rounded-md p-2 " />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Address */}
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel className="text-gray-800 text-md font-medium">Address</FormLabel>
-                  <FormControl>
-                    <Input type="text" placeholder="Address" className="shad-input  w-full md:w-[75%] " {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              fieldType={FormFieldTypes.PHONE_INPUT}
+              className="w-full md:w-[75%]"
             />
 
-            <div className="space_buttons">
-              <div>
-                <Button variant={"outline"} type="button" onClick={onBack} className="bg-slate-800 hover:bg-slate-700 text-white hover:text-white">
-                  Back
-                </Button>
-              </div>
-              <div>
-                <Button disabled={isSubmitting || emailChecking} type="submit" className="border bg-white hover:bg-white text-gray-800 border-gray-600  hover:border-gray-800  ">
-                  {isSubmitting || emailChecking ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    ""
-                  )}{" "}
-                  Next
-                </Button>
-              </div>
-            </div>
+            {/* Address */}
+            <CustomFormField
+              control={form.control}
+              label="Address"
+              name="address"
+              placeholder="Enter your address"
+              fieldType={FormFieldTypes.INPUT}
+              className="w-full md:w-[75%]"
+            />
+
+            <FormButton Next="Next" onBack={onBack} disabled={isSubmitting || emailChecking} />
           </form>
         </Form>
       </div>

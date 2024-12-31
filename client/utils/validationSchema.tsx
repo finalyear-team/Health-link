@@ -1,6 +1,39 @@
+import { Gender, UserType } from "@/types/types";
 import * as Yup from "yup";
+import { z } from "zod"
 
 const currentYear = new Date().getFullYear();
+
+const nameregex = /^[a-zA-Z]+(?:[\s'-][a-zA-Z]+)*$/
+
+export const personalInfoSchema = z.object({
+  firstName: z.string().regex(nameregex, {
+    message: "Invalid name"
+  }).nonempty("First name is required"),
+  lastName: z.string().regex(nameregex, {
+    message: "Invalid name"
+  }).nonempty("First name is required"),
+  DOB: z.date({ message: "Date of birth is required" }).refine((value) => {
+    console.log("from form", value)
+    if (!value) return false; // If no value is provided
+    const today = new Date();
+    const birthDate = new Date(value);
+
+    // Calculate age
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    const dayDifference = today.getDate() - birthDate.getDate();
+
+    if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+      age--;
+    }
+
+    return age >= 18;
+  }, { message: "You must be at least 18 years old to register." }),
+
+  gender: z.enum([Gender.FEMALE, Gender.MALE], { message: "This field is required" }),
+  role: z.enum([UserType.PATIENT, UserType.DOCTOR])
+});
 
 export const validationSchemaAddInfo = Yup.object().shape({
   // consultationFee: Yup.number()

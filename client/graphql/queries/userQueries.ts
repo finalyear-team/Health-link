@@ -32,7 +32,8 @@ export const GET_USER_BY_EMAIL = gql`
        Username,
        Email,
        Role,
-       Verified
+       Verified,
+       isSocialAccount
     }
 
   }

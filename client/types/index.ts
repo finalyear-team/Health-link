@@ -46,7 +46,13 @@ export interface UserRegister {
   password: string;
   phone: string;
   address: string;
-  role: UserType
+  role: UserType,
+  currentMedication: string
+  allergies: string
+  familyMedicalHistory: string
+  pastMedicalHistory: string
+  medicalInfoConsent: boolean,
+  privacyPolicyConsent: boolean,
   specialization: string;
   education: string;
   consultationFee: number;
@@ -92,6 +98,6 @@ export interface AppointmentNotification {
   appointmentDate: string;
   appointmentTime: string;
 }
-export interface User{
-  
+export interface User {
+
 }

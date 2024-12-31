@@ -1,14 +1,35 @@
-import Container from "@/components/container/container";
-import { Formik, Form } from "formik";
-import { MdCircle } from "react-icons/md";
+"use client"
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { validationSchemaAgreeToTerms } from "@/utils/validationSchema";
-import VerifyAccount from "@/components/layout/VerifyAccount";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useSubmit } from "@/hooks/useSubmit";
-import { Loader2 } from "lucide-react";
+import { z } from "zod"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form } from "@/components/ui/form";
+import { useState } from "react";
+import CustomFormField from "@/components/shared/CustomeFormField";
+import { FormFieldTypes } from "@/types/types";
+import FormButton from "@/components/shared/FormButton";
+import VerifyAccount from "@/components/layout/VerifyAccount";
+
+export const MedicalInfoSchema = z
+  .object({
+    currentMedication: z.string().optional(),
+
+    allergies: z.string().optional(),
+
+    familyMedicalHistory: z.string().optional(),
+
+    pastMedicalHistory: z.string().optional(),
+
+    medicalInfoConsent: z.boolean().optional(),
+
+    privacyPolicyConsent: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the privacy policy.",
+    }),
+
+  })
+
 
 const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
   const [storedValues, setStoredValues] = useLocalStorage(
@@ -17,7 +38,19 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
       agreedToTerms: true,
     }
   );
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const form = useForm<z.infer<typeof MedicalInfoSchema>>({
+    resolver: zodResolver(MedicalInfoSchema),
+    defaultValues: {
+      currentMedication: "",
+      allergies: "",
+      familyMedicalHistory: "",
+      pastMedicalHistory: "",
+      medicalInfoConsent: false,
+      privacyPolicyConsent: false,
+    },
+  })
 
 
   const {
@@ -25,80 +58,82 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
     error: submitError,
     pendingVerification,
     completed,
-  } = useSubmit(setStoredValues, "patient");
+  } = useSubmit(setStoredValues, "patient", setIsSubmitting);
 
   return (
-    <Container>
+    <>
       {!pendingVerification && (
-        <div className="custom-container flex items-center justify-center flex-wrap space-x-5 my-8">
-          <div className="w-1/3">
-            <MdCircle size={50} color="#C4C4C4" />
-            <h2 className="text-2xl font-extrabold text-dark-700 dark:text-slate-50">
-              Complete Your Account
-            </h2>
+        <div className="w-full mt-5 flex flex-col lg:flex-row items-center justify-center lg:space-x-8   p-4">
+          <div className="min-w-[50%] border rounded-lg p-8 ">
             <h2 className="text-base font-bold text-primary-600">
-              Professional Information (3/3)
+              Medical information
             </h2>
-            <Formik
-              initialValues={storedValues}
-              onSubmit={handleSubmit}
-              validationSchema={validationSchemaAgreeToTerms}
-            >
-              {({ isValid, isSubmitting }) => (
-                <Form className="mt-8 space-y-6" action="#" method="POST">
-                  <div className="">
-                    {/* <div className="">
-                          <Input
-                            name="profilePicture"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            label="Profile Picture"
-                          />
-                        </div> */}
-                    {/* agree to the terms */}
-                    <div className="mt-3">
-                      <Input
-                        name="agreedToTerms"
-                        type="checkbox"
-                        label=" I agree to the Terms and Conditions of HealthLink"
-                      />
-                    </div>
-                    <div className="py-4">
-                      {submitError && (
-                        <p className="text-xs text-red-600">{submitError}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space_buttons">
-                    <div>
-                      <Button
-                        variant={"outline"}
-                        type="button"
-                        onClick={onBack}
-                      >
-                        Back
-                      </Button>
-                    </div>
-                    <div>
-                      <Button
-                        disabled={!isValid || isSubmitting || completed}
-                        type="submit"
-                      >
-                        {isSubmitting || completed ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          ""
-                        )}{" "}
-                        Finish
-                      </Button>
-                    </div>
-                  </div>
-                </Form>
-              )}
-            </Formik>
+            <Form  {...form}>
+              <form className="w-full mt-8 space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
+                <div className="flex flex-col lg:flex-row gap-4 ">
+
+                  <CustomFormField
+                    control={form.control}
+                    label="Current Medication (if any)"
+                    name="currentMedication"
+                    placeholder=""
+                    fieldType={FormFieldTypes.TEXTAREA}
+                    className="w-full md:w-[75%]"
+                  />
+                  <CustomFormField
+                    control={form.control}
+                    label="Allergies (if any)"
+                    name="allergies"
+                    placeholder=""
+                    fieldType={FormFieldTypes.TEXTAREA}
+                    className="w-full md:w-[75%]"
+                  />
+                </div>
+                <div className="flex flex-col lg:flex-row gap-4 ">
+                  <CustomFormField
+                    control={form.control}
+                    label="Family Medical History"
+                    name="familyMedicalHistory"
+                    placeholder=""
+                    fieldType={FormFieldTypes.TEXTAREA}
+                    className="w-full md:w-[75%]"
+                  />
+                  <CustomFormField
+                    control={form.control}
+                    label="Past Medical History"
+                    name="pastMedicalHistory"
+                    placeholder=""
+                    fieldType={FormFieldTypes.TEXTAREA}
+                    className="w-full md:w-[75%]"
+                  />
+                </div>
+
+                <CustomFormField
+                  control={form.control}
+                  label="By checking this box, I consent to the sharing of my medical information with Health-Link providers to facilitate healthcare services."
+                  name="medicalInfoConsent"
+                  placeholder=""
+                  fieldType={FormFieldTypes.CHECKBOX}
+                  className="w-full md:w-[75%]"
+                />
+                <CustomFormField
+                  control={form.control}
+                  label="I agree to the privacy policy."
+                  name="privacyPolicyConsent"
+                  fieldType={FormFieldTypes.CHECKBOX}
+                  className="w-full md:w-[75%]"
+                />
+
+                <div className="py-4">
+                  {submitError && (
+                    <p className="text-xs text-red-600">{submitError}</p>
+                  )}
+                </div>
+                <FormButton onBack={onBack} Next="Finish" disabled={completed || isSubmitting} />
+              </form>
+            </Form>
           </div>
-          <div className="w-2/3">
+          <div className="">
             <Image
               src="/image/professional_information.svg"
               alt="right-side"
@@ -111,7 +146,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
       )}
 
       {pendingVerification && <VerifyAccount error={submitError} />}
-    </Container>
+    </>
   );
 };
 
