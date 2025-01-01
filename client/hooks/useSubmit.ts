@@ -14,7 +14,6 @@ export const useSubmit = (
 ) => {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [completed, setCompleted] = useState(false);
-  // const { isLoaded, signUp } = useSignUp();
   const [error, setError] = useState("");
   const setUserInformation = useUserStore((state) => state.setUserInformation);
   const user = useUserStore((state) => state.user);
@@ -34,17 +33,16 @@ export const useSubmit = (
       // }
       const {
         user: registeredUser,
-        access_token,
-        refresh_token,
+        otpVerify
       } = await SignUp({
-        FirstName: user?.firstName,
-        LastName: user?.lastName,
-        Email: user?.email,
-        Password: user?.password,
-        PhoneNumber: user?.phone,
-        Address: user?.address,
-        DateOfBirth: user?.DOB,
-        Gender: user?.gender,
+        FirstName: user?.FirstName,
+        LastName: user?.LastName,
+        Email: user?.Email,
+        Password: user?.Password,
+        PhoneNumber: user?.PhoneNumber,
+        Address: user?.Address,
+        DateOfBirth: user?.DateOfBirth,
+        Gender: user?.Gender,
         isSocialAccount: false,
         Role: role === "provider" ? UserType.DOCTOR : UserType.PATIENT,
         CurrentMedication: values?.currentMedication,
@@ -73,12 +71,12 @@ export const useSubmit = (
       // }
 
       setCompleted(true);
-      setPendingVerification(true);
+      setUserInformation(registeredUser)
+      setPendingVerification(otpVerify as boolean);
     } catch (error: any) {
-      console.log(error);
 
       console.log("The Error is as follows: ", error);
-      setError(error.errors[0].longMessage);
+      setError(error.message);
     }
 
     if (role === "provider") {

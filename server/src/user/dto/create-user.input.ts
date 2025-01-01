@@ -62,6 +62,9 @@ export class UserDetailsInput {
     FirstName: string;
 
     @Field()
+    Password: string;
+
+    @Field()
     LastName: string;
 
     @Field()
@@ -75,6 +78,9 @@ export class UserDetailsInput {
 
     @Field()
     Gender: Gender;
+
+    @Field()
+    OTPSecret?: string
 
     @Field({ nullable: true })
     Bio?: string;

@@ -1,4 +1,4 @@
-import { AppointmentStatus, Gender, NotificationType, UserType } from "./types";
+import { AppointmentStatus, Gender, NotificationType, UserStatus, UserType } from "./types";
 
 export interface DoctorProfile {
   id: number;
@@ -36,33 +36,64 @@ export interface AppointmentType {
 
 // updated user interface to be consistent with the backend user Data
 export interface UserRegister {
-  id: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
-  DOB: Date;
-  gender: Gender;
-  email: string;
-  password: string;
-  phone: string;
-  address: string;
-  role: UserType,
-  currentMedication: string
-  allergies: string
-  familyMedicalHistory: string
-  pastMedicalHistory: string
-  medicalInfoConsent: boolean,
-  privacyPolicyConsent: boolean,
-  specialization: string;
-  education: string;
-  consultationFee: number;
-  license: number;
-  experiance: number;
-  agreedToTerms: true;
-  institution: string;
-  additionalInfo?: File | undefined;
-  graduationYear: number;
+  UserID: string;
+  FirstName: string;
+  LastName: string;
+  Username: string;
+  DateOfBirth: Date;
+  Gender: Gender;
+  Email: string;
+  Password: string;
+  PhoneNumber: string;
+  Address: string;
+  ProfilePicture: string;
+  Role: UserType;
+  OTPSecret: string;
+  CurrentMedication: string;
+  PastMedicalHisotry: string;
+  FamilyMedicalHistory: string;
+  Allergies: string;
+  MedicalInfoConsent: boolean;
+  PrivacyPolicyConsent: boolean;
+  ConsentVersion: string;
+  ConsentDate: Date;
+  Status: UserStatus;
+  Verified: boolean;
+  isSocialAccount: boolean;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+  LastLogin: Date;
+
 }
+
+// export interface UserRegister {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   userName: string;
+//   DOB: Date;
+//   gender: Gender;
+//   email: string;
+//   password: string;
+//   phone: string;
+//   address: string;
+//   role: UserType,
+//   currentMedication: string
+//   allergies: string
+//   familyMedicalHistory: string
+//   pastMedicalHistory: string
+//   medicalInfoConsent: boolean,
+//   privacyPolicyConsent: boolean,
+//   specialization: string;
+//   education: string;
+//   consultationFee: number;
+//   license: number;
+//   experiance: number;
+//   agreedToTerms: true;
+//   institution: string;
+//   additionalInfo?: File | undefined;
+//   graduationYear: number;
+// }
 
 export interface PopoverNotification {
   NotificationID: string;

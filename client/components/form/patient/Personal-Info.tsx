@@ -30,10 +30,10 @@ const PersonalInfo = ({
   const [storedValues, setStoredValues] = useLocalStorage(
     "patient_personalInfo",
     {
-      firstName: user ? user.FirstName : "",
-      lastName: user ? user.LastName : "",
-      DOB: "",
-      gender: "",
+      FirstName: user ? user.FirstName : "",
+      LastName: user ? user.LastName : "",
+      DateOfBirth: "",
+      Gender: "",
       role: UserType.PATIENT
     }
   );
@@ -41,11 +41,11 @@ const PersonalInfo = ({
   const form = useForm<z.infer<typeof personalInfoSchema>>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      firstName: user ? user.FirstName : "",
-      lastName: user ? user.LastName : "",
-      DOB: storedValues?.DOB ? new Date(storedValues?.DOB) : new Date(),
-      gender: storedValues?.gender ? storedValues?.gender : undefined,
-      role: UserType.PATIENT
+      FirstName: user ? user.FirstName : "",
+      LastName: user ? user.LastName : "",
+      DateOfBirth: storedValues?.DateOfBirth ? new Date(storedValues?.DateOfBirth) : new Date(),
+      Gender: storedValues?.Gender ? storedValues?.Gender : undefined,
+      Role: UserType.PATIENT
     },
   })
 
@@ -82,14 +82,14 @@ const PersonalInfo = ({
               <CustomFormField
                 control={form.control}
                 label="Legal First name"
-                name="firstName"
+                name="FirstName"
                 placeholder="Enter your first name"
                 fieldType={FormFieldTypes.INPUT}
               />
               <CustomFormField
                 control={form.control}
                 label="Legal Last name"
-                name="lastName"
+                name="LastName"
                 placeholder="Enter your last name"
                 fieldType={FormFieldTypes.INPUT}
               />
@@ -98,15 +98,15 @@ const PersonalInfo = ({
             <CustomFormField
               control={form.control}
               label="Date of Birth"
-              name="DOB"
+              name="DateOfBirth"
               fieldType={FormFieldTypes.DATE_PICKER}
             />
 
             <CustomFormField
               control={form.control}
               label="Gender"
-              name="gender"
-              placeholder="select gender"
+              name="Gender"
+              placeholder="select Gender"
               fieldType={FormFieldTypes.SELECT}
             >
               <>

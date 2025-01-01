@@ -7,13 +7,13 @@ const currentYear = new Date().getFullYear();
 const nameregex = /^[a-zA-Z]+(?:[\s'-][a-zA-Z]+)*$/
 
 export const personalInfoSchema = z.object({
-  firstName: z.string().regex(nameregex, {
+  FirstName: z.string().regex(nameregex, {
     message: "Invalid name"
   }).nonempty("First name is required"),
-  lastName: z.string().regex(nameregex, {
+  LastName: z.string().regex(nameregex, {
     message: "Invalid name"
   }).nonempty("First name is required"),
-  DOB: z.date({ message: "Date of birth is required" }).refine((value) => {
+  DateOfBirth: z.date({ message: "Date of birth is required" }).refine((value) => {
     console.log("from form", value)
     if (!value) return false; // If no value is provided
     const today = new Date();
@@ -31,8 +31,8 @@ export const personalInfoSchema = z.object({
     return age >= 18;
   }, { message: "You must be at least 18 years old to register." }),
 
-  gender: z.enum([Gender.FEMALE, Gender.MALE], { message: "This field is required" }),
-  role: z.enum([UserType.PATIENT, UserType.DOCTOR])
+  Gender: z.enum([Gender.FEMALE, Gender.MALE], { message: "This field is required" }),
+  Role: z.enum([UserType.PATIENT, UserType.DOCTOR])
 });
 
 export const validationSchemaAddInfo = Yup.object().shape({

@@ -7,6 +7,8 @@ import * as crypto from "crypto"
 import { DoctorDetailsInputs, SignInDto, SignUpDto } from './dto/auth-input';
 import axios from 'axios';
 import { googleProfile, UserType } from 'src/utils/types';
+import * as OTPAuth from "otpauth"
+import { MailService } from 'src/mail/mail.service';
 
 
 
@@ -17,7 +19,8 @@ export class AuthService {
     private salt: string
 
 
-    constructor(private readonly prisma: PrismaService, private readonly userService: UserService, private readonly jwtService: JwtService) {
+
+    constructor(private readonly prisma: PrismaService, private readonly userService: UserService, private readonly jwtService: JwtService,) {
         this.salt = process.env.HASH_KEY_SALT
     }
 
@@ -65,6 +68,68 @@ export class AuthService {
         return now >= expirationTimestamp;
     }
 
+    encryptSecret = (secret: string, key: string): string => {
+        try {
+            console.log(key.length)
+            const iv = crypto.randomBytes(16);
+
+            const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'utf8'), iv);
+
+            let encrypted = cipher.update(secret, 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+
+            return iv.toString('hex') + encrypted;
+        } catch (error) {
+            throw new Error(`Encryption failed: ${error.message}`);
+        }
+    };
+
+    decryptSecret = (encrypted: string, key: string): string => {
+        try {
+
+
+            const iv = Buffer.from(encrypted.slice(0, 32), 'hex');
+
+            const encryptedSecret = encrypted.slice(32);
+
+            const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'utf8'), iv);
+
+            // Decrypt the secret
+            let decrypted = decipher.update(encryptedSecret, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+
+            return decrypted;
+        } catch (error) {
+            throw new Error(`Decryption failed: ${error.message}`);
+        }
+    };
+
+
+    generateOtpSecret = () => {
+        const secret = new OTPAuth.Secret({ size: 20 })
+        return secret.base32
+    }
+
+    generateTOTP = (secret: string) => {
+        const totp = new OTPAuth.TOTP({
+            secret: OTPAuth.Secret.fromBase32(secret),
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+        });
+        return totp.generate();
+    }
+
+    validateTOTP(token: string, secret: string): boolean {
+        const totp = new OTPAuth.TOTP({
+            secret: OTPAuth.Secret.fromBase32(secret),
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+        });
+        const delta = totp.validate({ token, window: 1 });
+        return delta !== null;
+    }
 
 
     async getNewGoogleAccessToken(refresh_token: string) {
@@ -96,14 +161,8 @@ export class AuthService {
     async googleLogin(profile: googleProfile) {
         const { FirstName, LastName, ProfilePicture, Email } = profile
         try {
-            let user = await this.prisma.users.findUnique({
-                where: {
-                    Email: profile.Email
-                }
-            })
+            let user = await this.userService.getUserByEmail(Email)
 
-
-            // immediate invoked function  to determine if user should be  redirected to register page
             const redirect = (() => {
                 if (!user)
                     return true;
@@ -128,18 +187,13 @@ export class AuthService {
 
     async Login({ Email, Password }: SignInDto) {
         try {
-            const user = await this.prisma.users.findUnique({
-                where: { Email: Email },
-            })
+            const user = await this.userService.getUserByEmail(Email)
+
             if (!user)
                 throw new UnauthorizedException("Invalid credentials.check your Email or password!!")
 
             if (user && !this.validatePassword(Password, user.Password))
                 throw new UnauthorizedException("Invalid credentials .please check your username or password!!")
-
-            if (user && !user.Verified)
-                throw new UnauthorizedException("user not verified")
-
 
             const updatedUser = await this.prisma.users.update({
                 where: {
@@ -150,24 +204,10 @@ export class AuthService {
                 }
             })
 
-
             const { Password: userPassword, CreatedAt, UpdatedAt, LastLogin, ...others } = updatedUser
-            const payload = {
-                sub: updatedUser.UserID,
-                username: updatedUser.FirstName,
-                role: updatedUser.Role,
-                status: updatedUser.Status
-            }
 
+            return { ...others }
 
-            const access_token = this.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m")
-            const refresh_token = this.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "7d")
-
-            return {
-                access_token: access_token,
-                refresh_token: refresh_token,
-                user: { ...others }
-            }
 
         } catch (error) {
             if (error instanceof ZodError) {
@@ -188,14 +228,17 @@ export class AuthService {
         try {
             const { Password, ...others } = registerInput
             const hashedPassword = await this.HashPassword(Password || "")
-            const user = await this.prisma.users.create({
-                data: {
-                    Password: hashedPassword as string,
-                    ...others
 
-                }
+            const OTPSecret = this.encryptSecret(this.generateOtpSecret(), process.env.OTP_ENCRYPTION_KEY);
+            const user = await this.userService.RegisterUser({
+                Password: hashedPassword as string,
+                OTPSecret,
+                ...others
+
             })
+            return user
         } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
 

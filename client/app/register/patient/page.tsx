@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AdditionalInfo from "@/components/form/patient/Additional-Info";
 import ContactInfo from "@/components/form/patient/Contact-Info";
 import PersonalInfo from "@/components/form/patient/Personal-Info";
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@apollo/client";
@@ -26,7 +25,7 @@ const PatientSignUp = () => {
     skip: !patientId
   })
 
-  
+
 
   if (error) {
     toast({
@@ -48,7 +47,7 @@ const PatientSignUp = () => {
     setStep(step - 1);
   };
 
-
+  console.log(data)
 
   return (
     <>
@@ -104,7 +103,7 @@ const PatientSignUp = () => {
               </h2>
             </div>
             {step === 1 && <PersonalInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
-            {step === 2 && <ContactInfo onNext={handleNext} onBack={handleBack} />}
+            {step === 2 && <ContactInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
             {step === 3 && <AdditionalInfo onBack={handleBack} />}
 
             <div className="text-md mt-4 mb-4 text-center">

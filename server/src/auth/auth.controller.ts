@@ -82,6 +82,32 @@ export class AuthController {
     });
   };
 
+  private sendOtp = async (Email: string, FirstName) => {
+    try {
+      const otpsecret = this.authService.generateOtpSecret();
+      const totp = this.authService.generateTOTP(otpsecret);
+      const response = await this.mailService.sendVerificationEmail(Email, FirstName, totp)
+
+      console.log("from mail")
+      console.log(response)
+
+      return true
+
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
+    }
+
+  }
+
+  private generateAndSetTokens = async (user: any, res: Response) => {
+    const payload = { sub: user.UserID, username: user.FirstName, role: UserType.PATIENT }
+    const access_token = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m");
+    const refresh_token = this.authService.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "7d");
+
+    this.setAccessTokenCookie(res, access_token, refresh_token);
+
+  }
 
   @Get("google/signin")
   @UseGuards(GoogleOAuthGuard)
@@ -104,16 +130,15 @@ export class AuthController {
       const response = await this.authService.googleLogin(user);
       if (response.redirect) {
         return res.redirect(`${process.env.FRONTEND_URL}/register/patient?patientId=${response.user.UserID}&SocialAccount=true`)
-
       }
-      const payload = { sub: response.user.UserID, username: response.user.FirstName, role: UserType.PATIENT }
-      const access_token = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, payload, "15m");
-      const refresh_token = this.authService.generateJWTToken(process.env.JWT_REFRESH_KEY, payload, "60d");
 
-      this.setAccessTokenCookie(res, access_token, refresh_token);
+      if (response.user && !response.user.Verified) {
+        this.sendOtp(user.Email, user.FirstName)
+        return res.redirect(`${process.env.FRONTEND_URL}/sign-in?UID=${response.user.UserID}&verify=true`)
+      }
+
+      this.generateAndSetTokens(response.user, res)
       return res.redirect(`${process.env.FRONTEND_URL}/dashboard/${response.user.Role}`);
-
-
 
     } catch (error) {
       console.log(error)
@@ -130,14 +155,28 @@ export class AuthController {
     try {
       const registerdUser = await this.userService.getUserByEmail(req.body.Email)
       let user: Users;
+      console.log(registerdUser)
+
       if (!registerdUser)
-        user = await this.userService.RegisterUser(req.body)
-      if (registerdUser.isSocialAccount)
-        user = await this.userService.updateUser({ UserID: registerdUser.UserID, ...req.body })
-      console.log("from register user");
-      console.log(user)
-      res.status(201).json(user)
+        user = await this.authService.Register(req.body)
+
+      if (registerdUser && registerdUser.isSocialAccount) {
+        const OTPSecret = this.authService.encryptSecret(this.authService.generateOtpSecret(), process.env.OTP_ENCRYPTION_KEY);
+
+        user = await this.userService.updateUser({ UserID: registerdUser.UserID, OTPSecret, ...req.body })
+      }
+
+      user = registerdUser
+
+      this.sendOtp(user.Email, user.FirstName)
+
+      return res.status(201).send({
+        user: user,
+        otpVerify: true
+      })
+
     } catch (error: any) {
+      console.log(error)
       res.status(500).json("something went wrong");
 
     }
@@ -154,9 +193,65 @@ export class AuthController {
 
   @Post('signin')
   async signin(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const { Email, Password } = req.body
-    const user = await this.authService.Login({ Email, Password })
-    return user
+    try {
+      const { Email, Password } = req.body
+      const user = await this.authService.Login({ Email, Password })
+
+      if (user && !user.Verified) {
+        this.sendOtp(user.Email, user.FirstName)
+        return res.status(200).send({
+          user: user,
+          otpVerify: true
+        })
+      }
+
+
+      this.generateAndSetTokens(user, res)
+
+      return res.status(200).send({
+        user: user,
+        otpVerify: false
+      })
+
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
+    }
+
+
+  }
+
+
+  @Post("verify-otp")
+  async verifyOtp(@Body('token') token: string, @Body("UserID") UserID: string, @Res() res: Response) {
+    try {
+      console.log("this from verify-otp")
+      const user = await this.userService.getUserDetails(UserID)
+      console.log(user)
+
+      if (!user)
+        res.status(401).send("User not found....")
+
+      const decryptedOtpsecret = this.authService.decryptSecret(user.OTPSecret, process.env.OTP_ENCRYPTION_KEY)
+      console.log(decryptedOtpsecret)
+      console.log(token)
+
+      const isValid = this.authService.validateTOTP(token, decryptedOtpsecret)
+      console.log(isValid)
+
+      if (!isValid)
+        return res.status(403).send("Token is not valid")
+
+      this.generateAndSetTokens(user, res)
+
+      return res.status(200).send(user)
+
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send("something went wrong ....")
+
+
+    }
 
   }
 

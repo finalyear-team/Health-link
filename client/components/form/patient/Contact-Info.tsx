@@ -14,10 +14,11 @@ import 'react-phone-number-input/style.css'
 import FormButton from "@/components/shared/FormButton";
 import CustomFormField from "@/components/shared/CustomeFormField";
 import { FormFieldTypes } from "@/types/types";
+import { PhoneNumber } from "react-phone-number-input";
 
 export const ContantInfoSchema = z
   .object({
-    password: z
+    Password: z
       .string()
       .min(8, { message: "*Password must be at least 8 characters" })
       .max(20, { message: "*Password must be at most 20 characters" })
@@ -31,16 +32,16 @@ export const ContantInfoSchema = z
     //   .string()
     //   .nonempty({ message: "*Confirm password is required!" }),
 
-    email: z
+    Email: z
       .string()
       .email({ message: "Invalid email" })
       .nonempty({ message: "*Email is required!" }),
 
-    address: z
+    Address: z
       .string()
       .nonempty({ message: "*Address is required" }),
 
-    phone: z
+    PhoneNumber: z
       .string()
       .regex(/^\+251[79]\d{8}$|^(07|09)\d{8}$/, {
         message: "*Invalid Ethiopian phone number",
@@ -61,26 +62,27 @@ const ContactInfo = ({
   onBack: () => void;
   user?: any
 }) => {
+  console.log(user)
   const setUserInformation = useUserStore((state) => state.setUserInformation);
   const [error, setError] = useState<string | null>()
   const [emailChecking, setEmailChecking] = useState(false)
   const [storedValues, setStoredValues] = useLocalStorage(
     "patient_contactInfo",
     {
-      email: user ? user.Email : "",
-      phone: "",
-      address: "",
+      Email: user ? user.Email : "",
+      PhoneNumber: "",
+      Address: "",
     }
   );
 
   const form = useForm<z.infer<typeof ContantInfoSchema>>({
     resolver: zodResolver(ContantInfoSchema),
     defaultValues: {
-      email: user ? user.Email : "",
-      password: "",
+      Email: user ? user.Email : "",
+      Password: "",
       // confirmPassword: "",
-      phone: storedValues.phone ? storedValues.phone : "",
-      address: storedValues.address ? storedValues.address : "",
+      PhoneNumber: storedValues.PhoneNumber ? storedValues.PhoneNumber : "",
+      Address: storedValues.Address ? storedValues.Address : "",
     },
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -93,15 +95,15 @@ const ContactInfo = ({
       const { data, loading } = await client.query({
         query: GET_USER_BY_EMAIL,
         variables: {
-          Email: values.email
+          Email: values.Email
         }
 
       })
       console.log(data)
       setEmailChecking(loading)
 
-      if (data.GetUserByEmail.Email && data.GetUserByEmail.isSocialAccount) {
-        setError("Email already registered. please use different email address")
+      if (data?.GetUserByEmail && data.GetUserByEmail.Email && !data.GetUserByEmail.isSocialAccount) {
+        setError("Email already registered. please use different email Address")
         return
       }
 
@@ -114,6 +116,7 @@ const ContactInfo = ({
       }, 1000);
 
     } catch (error) {
+      console.log(error)
 
     }
 
@@ -131,8 +134,8 @@ const ContactInfo = ({
             <CustomFormField
               control={form.control}
               label="Email"
-              name="email"
-              placeholder="Enter your email address"
+              name="Email"
+              placeholder="Enter your email Address"
               fieldType={FormFieldTypes.INPUT}
               className="w-full md:w-[75%]"
             />
@@ -140,7 +143,7 @@ const ContactInfo = ({
             <CustomFormField
               control={form.control}
               label="Password"
-              name="password"
+              name="Password"
               placeholder="Enter new password"
               fieldType={FormFieldTypes.PASSWORD}
               className="w-full md:w-[75%]"
@@ -168,8 +171,8 @@ const ContactInfo = ({
 
             <CustomFormField
               control={form.control}
-              label="Phone Number"
-              name="phone"
+              label="PhoneNumber Number"
+              name="PhoneNumber"
               fieldType={FormFieldTypes.PHONE_INPUT}
               className="w-full md:w-[75%]"
             />
@@ -178,8 +181,8 @@ const ContactInfo = ({
             <CustomFormField
               control={form.control}
               label="Address"
-              name="address"
-              placeholder="Enter your address"
+              name="Address"
+              placeholder="Enter your Address"
               fieldType={FormFieldTypes.INPUT}
               className="w-full md:w-[75%]"
             />

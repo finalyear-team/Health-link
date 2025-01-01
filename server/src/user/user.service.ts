@@ -170,8 +170,12 @@ export class UserService {
         },
       });
 
+      console.log(user)
+
       return user;
-    } catch (error) { }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async searchUsers(searchQuery: string): Promise<Users[]> {

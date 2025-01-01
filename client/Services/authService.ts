@@ -86,11 +86,11 @@ export const registerDoctorDetails = async (doctorDetailsInput: any) => {
     }
 }
 
-export const confrimEmailOTP = async (email: string, otp: string) => {
+export const confrimEmailOTP = async (token: string, UserID: string) => {
     try {
         const response = await axios.post(
             "http://localhost:4000/auth/verify-otp",
-            { email, otp },
+            { token, UserID },
             {
                 withCredentials: true,
                 headers: {

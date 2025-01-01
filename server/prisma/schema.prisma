@@ -194,6 +194,7 @@ model Users {
   Verified              Boolean              @default(false)
   isSocialAccount       Boolean              @default(false)
   CreatedAt             DateTime             @default(now())
+  OTPSecret             String?              @db.LongText
   UpdatedAt             DateTime             @updatedAt
   LastLogin             DateTime?
   CurrentMedication     String?              @db.LongText

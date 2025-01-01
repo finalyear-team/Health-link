@@ -14,17 +14,17 @@ import VerifyAccount from "@/components/layout/VerifyAccount";
 
 export const MedicalInfoSchema = z
   .object({
-    currentMedication: z.string().optional(),
+    CurrentMedication: z.string().optional(),
 
-    allergies: z.string().optional(),
+    Allergies: z.string().optional(),
 
-    familyMedicalHistory: z.string().optional(),
+    FamilyMedicalHistory: z.string().optional(),
 
-    pastMedicalHistory: z.string().optional(),
+    PastMedicalHistory: z.string().optional(),
 
-    medicalInfoConsent: z.boolean().optional(),
+    MedicalInfoConsent: z.boolean().optional(),
 
-    privacyPolicyConsent: z.boolean().refine((val) => val === true, {
+    PrivacyPolicyConsent: z.boolean().refine((val) => val === true, {
       message: "You must agree to the privacy policy.",
     }),
 
@@ -35,7 +35,12 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
   const [storedValues, setStoredValues] = useLocalStorage(
     "patient_additionalInfo",
     {
-      agreedToTerms: true,
+      CurrentMedication: "",
+      Allergies: "",
+      FamilyMedicalHistory: "",
+      PastMedicalHistory: "",
+      MedicalInfoConsent: false,
+      PrivacyPolicyConsent: false
     }
   );
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -43,12 +48,12 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
   const form = useForm<z.infer<typeof MedicalInfoSchema>>({
     resolver: zodResolver(MedicalInfoSchema),
     defaultValues: {
-      currentMedication: "",
-      allergies: "",
-      familyMedicalHistory: "",
-      pastMedicalHistory: "",
-      medicalInfoConsent: false,
-      privacyPolicyConsent: false,
+      CurrentMedication: storedValues.CurrentMedication ? storedValues.CurrentMedication : "",
+      Allergies: storedValues.Allergies ? storedValues.Allergies : "",
+      FamilyMedicalHistory: storedValues.FamilyMedicalHistory ? storedValues.FamilyMedicalHistory : "",
+      PastMedicalHistory: storedValues.PastMedicalHistory ? storedValues.PastMedicalHistory : "",
+      MedicalInfoConsent: false,
+      PrivacyPolicyConsent: false,
     },
   })
 
@@ -63,7 +68,10 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
   return (
     <>
       {!pendingVerification && (
-        <div className="w-full mt-5 flex flex-col lg:flex-row items-center justify-center lg:space-x-8   p-4">
+        <div className="w-full mt-5 flex flex-col lg:flex-row items-center justify-center lg:space-x-8 p-4">
+          {submitError &&
+            <p className="text-center text-red-500">{submitError}</p>
+          }
           <div className="min-w-[50%] border rounded-lg p-8 ">
             <h2 className="text-base font-bold text-primary-600">
               Medical information
@@ -75,7 +83,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                   <CustomFormField
                     control={form.control}
                     label="Current Medication (if any)"
-                    name="currentMedication"
+                    name="CurrentMedication"
                     placeholder=""
                     fieldType={FormFieldTypes.TEXTAREA}
                     className="w-full md:w-[75%]"
@@ -83,7 +91,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                   <CustomFormField
                     control={form.control}
                     label="Allergies (if any)"
-                    name="allergies"
+                    name="Allergies"
                     placeholder=""
                     fieldType={FormFieldTypes.TEXTAREA}
                     className="w-full md:w-[75%]"
@@ -93,7 +101,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                   <CustomFormField
                     control={form.control}
                     label="Family Medical History"
-                    name="familyMedicalHistory"
+                    name="FamilyMedicalHistory"
                     placeholder=""
                     fieldType={FormFieldTypes.TEXTAREA}
                     className="w-full md:w-[75%]"
@@ -101,7 +109,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                   <CustomFormField
                     control={form.control}
                     label="Past Medical History"
-                    name="pastMedicalHistory"
+                    name="PastMedicalHistory"
                     placeholder=""
                     fieldType={FormFieldTypes.TEXTAREA}
                     className="w-full md:w-[75%]"
@@ -111,7 +119,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                 <CustomFormField
                   control={form.control}
                   label="By checking this box, I consent to the sharing of my medical information with Health-Link providers to facilitate healthcare services."
-                  name="medicalInfoConsent"
+                  name="MedicalInfoConsent"
                   placeholder=""
                   fieldType={FormFieldTypes.CHECKBOX}
                   className="w-full md:w-[75%]"
@@ -119,7 +127,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
                 <CustomFormField
                   control={form.control}
                   label="I agree to the privacy policy."
-                  name="privacyPolicyConsent"
+                  name="PrivacyPolicyConsent"
                   fieldType={FormFieldTypes.CHECKBOX}
                   className="w-full md:w-[75%]"
                 />
@@ -145,7 +153,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
         </div>
       )}
 
-      {pendingVerification && <VerifyAccount error={submitError} />}
+      {pendingVerification && <VerifyAccount />}
     </>
   );
 };

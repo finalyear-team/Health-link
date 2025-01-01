@@ -9,31 +9,65 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
-import { useVerifyOTP } from "@/hooks/useVerifyOTP";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import { z } from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useToast } from "../ui/use-toast";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import useUserStore from "@/store/userStore";
+import { confrimEmailOTP } from "@/Services/authService";
 
 const otpSchema = z.object({
   code: z.string()
 })
 
 
-const VerifyAccount = ({ error }: { error: string }) => {
-  const { onPressVerify, error: verifyError, completed } = useVerifyOTP();
-  const codeInitial = { code: "" };
+const VerifyAccount = ({ UserID }: { UserID?: string }) => {
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
     defaultValues: {
       code: ""
     },
   })
+  const { toast } = useToast();
+  const [error, setError] = useState("");
+  const [completed, setCompleted] = useState(false);
+  const router = useRouter();
+  const userInformation = useUserStore((state) => state.user);
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
+
+  const onsubmit = async (value: z.infer<typeof otpSchema>) => {
+    try {
+      console.log(userInformation);
+      const signedInUser = await confrimEmailOTP(value.code, UserID || userInformation?.UserID as string)
 
 
+      if (signedInUser)
+        setTimeout(() => {
+          toast({
+            title: "Welcome to HealthLink!",
+            description: "We're excited to have you on board. Let's get started on your journey to better health!",
+            variant: "success",
+          });
+        }, 1000);
 
-
-
+      setCompleted(true);
+      if (signedInUser)
+        router.push("/dashboard");
+    }
+    catch (err: any) {
+      console.log(err)
+      console.error(JSON.stringify(err, null, 2));
+      setError(err.errors[0].longMessage);
+      toast({
+        title: "Error Creating Your Account!",
+        description: "Please try Again!",
+        variant: "error",
+      });
+    }
+  };
 
   return (
     <div className="verify_container ">
@@ -52,7 +86,7 @@ const VerifyAccount = ({ error }: { error: string }) => {
           className="my-8 space-y-6 flex flex-col items-center justify-center"
           action="#"
           method="POST"
-          onSubmit={form.handleSubmit(onPressVerify)}
+          onSubmit={form.handleSubmit(onsubmit)}
         >
           <label className="font-main text-sm text-dark-700 dark:text-slate-200 font-medium mt-3">
             Enter the Verification code sent to your Email.
@@ -81,8 +115,8 @@ const VerifyAccount = ({ error }: { error: string }) => {
             )}
           />
           <div className="py-4">
-            {(error || verifyError) && (
-              <p className="text-xs text-red-600">{error || verifyError}</p>
+            {(error) && (
+              <p className="text-xs text-red-600">{error || error}</p>
             )}
           </div>
           <Button
