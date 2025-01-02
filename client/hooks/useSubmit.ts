@@ -5,6 +5,7 @@ import useUserStore from "@/store/userStore";
 import { SignUp, registerDoctorDetails } from "@/Services/authService";
 import { UserType } from "@/types/types";
 import { uploadFile } from "@/utils/fileUpload";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const useSubmit = (
   setStoredValues: any,
@@ -17,6 +18,9 @@ export const useSubmit = (
   const [error, setError] = useState("");
   const setUserInformation = useUserStore((state) => state.setUserInformation);
   const user = useUserStore((state) => state.user);
+  const patientId = useSearchParams().get("patientId")
+  const pathname = usePathname()
+  const router = useRouter()
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     setUserInformation(values);
@@ -73,6 +77,8 @@ export const useSubmit = (
       setCompleted(true);
       setUserInformation(registeredUser)
       setPendingVerification(otpVerify as boolean);
+      router.push(`${pathname}${patientId ? "&verify=true" : "?verify=true"}`)
+
     } catch (error: any) {
 
       console.log("The Error is as follows: ", error);

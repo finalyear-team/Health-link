@@ -67,7 +67,7 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <>
-      {!pendingVerification && (
+    
         <div className="w-full mt-5 flex flex-col lg:flex-row items-center justify-center lg:space-x-8 p-4">
           {submitError &&
             <p className="text-center text-red-500">{submitError}</p>
@@ -151,9 +151,8 @@ const AdditionalInfo = ({ onBack }: { onBack: () => void }) => {
             />
           </div>
         </div>
-      )}
 
-      {pendingVerification && <VerifyAccount />}
+     
     </>
   );
 };

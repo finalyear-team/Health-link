@@ -9,6 +9,7 @@ import axios from 'axios';
 import { googleProfile, UserType } from 'src/utils/types';
 import * as OTPAuth from "otpauth"
 import { MailService } from 'src/mail/mail.service';
+import * as bcrypt from 'bcrypt';
 
 
 
@@ -25,20 +26,14 @@ export class AuthService {
     }
 
     async HashPassword(Password: string) {
-        const newHash = await new Promise((resolve, reject) => {
-            crypto.scrypt(Password, this.salt, 64, (err: Error | null, derivedKey: Buffer | null) => {
-                if (err)
-                    reject(err)
-                resolve(derivedKey.toString("hex"))
-            })
-        })
-        return newHash
+        const salt = await bcrypt.genSalt();
+        const hash = await bcrypt.hash(Password, salt);
+        return hash
     }
 
 
     async validatePassword(Password: string, hashedPassword: any) {
-        const newHash = await this.HashPassword(Password)
-        return (newHash === hashedPassword)
+        return await bcrypt.compare(Password, hashedPassword);
     };
 
 
@@ -68,37 +63,38 @@ export class AuthService {
         return now >= expirationTimestamp;
     }
 
-    encryptSecret = (secret: string, key: string): string => {
+    encryptSecret = (secret: string, password: string): string => {
         try {
-            console.log(key.length)
             const iv = crypto.randomBytes(16);
+            const salt = crypto.randomBytes(16).toString('hex');
+            const key = crypto.scryptSync(password, salt, 32);
 
-            const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'utf8'), iv);
+            const cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+            const encrypted = Buffer.concat([cipher.update(secret, 'utf8'), cipher.final()]);
 
-            let encrypted = cipher.update(secret, 'utf8', 'hex');
-            encrypted += cipher.final('hex');
-
-            return iv.toString('hex') + encrypted;
+            return `${salt}:${iv.toString('hex')}:${encrypted.toString('hex')}`;
         } catch (error) {
             throw new Error(`Encryption failed: ${error.message}`);
         }
     };
 
-    decryptSecret = (encrypted: string, key: string): string => {
+    decryptSecret = (encrypted: string, password: string): string => {
         try {
+            const [salt, ivHex, encryptedData] = encrypted.split(':');
+            if (!salt || !ivHex || !encryptedData) {
+                throw new Error('Invalid encrypted data format');
+            }
 
+            const iv = Buffer.from(ivHex, 'hex');
+            const key = crypto.scryptSync(password, salt, 32);
 
-            const iv = Buffer.from(encrypted.slice(0, 32), 'hex');
+            const decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+            const decrypted = Buffer.concat([
+                decipher.update(Buffer.from(encryptedData, 'hex')),
+                decipher.final(),
+            ]);
 
-            const encryptedSecret = encrypted.slice(32);
-
-            const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'utf8'), iv);
-
-            // Decrypt the secret
-            let decrypted = decipher.update(encryptedSecret, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
-
-            return decrypted;
+            return decrypted.toString('utf8');
         } catch (error) {
             throw new Error(`Decryption failed: ${error.message}`);
         }
@@ -111,23 +107,29 @@ export class AuthService {
     }
 
     generateTOTP = (secret: string) => {
+        console.log()
         const totp = new OTPAuth.TOTP({
             secret: OTPAuth.Secret.fromBase32(secret),
             algorithm: 'SHA1',
             digits: 6,
-            period: 30,
+            period: 900,
         });
+        console.log(totp.generate())
         return totp.generate();
     }
 
     validateTOTP(token: string, secret: string): boolean {
+        console.log(secret)
+        console.log(token)
         const totp = new OTPAuth.TOTP({
             secret: OTPAuth.Secret.fromBase32(secret),
             algorithm: 'SHA1',
             digits: 6,
-            period: 30,
+            period: 900,
         });
+
         const delta = totp.validate({ token, window: 1 });
+        console.log(totp.secret)
         return delta !== null;
     }
 
@@ -230,6 +232,7 @@ export class AuthService {
             const hashedPassword = await this.HashPassword(Password || "")
 
             const OTPSecret = this.encryptSecret(this.generateOtpSecret(), process.env.OTP_ENCRYPTION_KEY);
+
             const user = await this.userService.RegisterUser({
                 Password: hashedPassword as string,
                 OTPSecret,
@@ -243,9 +246,6 @@ export class AuthService {
         }
 
     }
-
-
-
 
     async resetEmail(email: string) {
         try {

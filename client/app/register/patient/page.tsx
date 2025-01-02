@@ -13,10 +13,13 @@ import { toast } from "@/components/ui/use-toast";
 import logo from "@/public/image/brand/logo-icon.svg"
 import Image from "next/image";
 import Link from "next/link";
+import VerifyAccount from "@/components/layout/VerifyAccount";
 
 const PatientSignUp = () => {
   const [step, setStep] = useState(1);
   const patientId = useSearchParams().get("patientId")
+  const verify = useSearchParams().get("verify")
+  console.log(verify)
   const router = useRouter()
 
   const { loading, error, data } = useQuery(GET_USER, {
@@ -94,28 +97,34 @@ const PatientSignUp = () => {
         }
       `}</style>
             </div>
-            <div className="w-full flex flex-col justify-center align-middle items-center gap-10 pt-5 bg-white">
-              <Link href={"/"}>
-                <Image src={logo} alt="logo" width={1000} height={1000} className="w-fit" />
-              </Link>
-              <h2 className="mt-6 text-center  text-slate-800 text-4xl  font-bold">
-                Create an account
-              </h2>
-            </div>
-            {step === 1 && <PersonalInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
-            {step === 2 && <ContactInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
-            {step === 3 && <AdditionalInfo onBack={handleBack} />}
+            {verify ? <VerifyAccount /> : (
+              <>
+                <div className="w-full flex flex-col justify-center align-middle items-center gap-10 pt-5 bg-white">
+                  <Link href={"/"}>
+                    <Image src={logo} alt="logo" width={1000} height={1000} className="w-fit" />
+                  </Link>
+                  <h2 className="mt-6 text-center  text-slate-800 text-4xl  font-bold">
+                    Create an account
+                  </h2>
+                </div>
+                {step === 1 && <PersonalInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
+                {step === 2 && <ContactInfo onNext={handleNext} onBack={handleBack} user={data && data?.GetUser} />}
+                {step === 3 && <AdditionalInfo onBack={handleBack} />}
 
-            <div className="text-md mt-4 mb-4 text-center">
-              Already have an account?
-              <Link
-                href="/sign-up"
-                className="font-medium underline   hover:text-blue-600"
-              >
-                Login
-              </Link>
-            </div>
+                <div className="text-md mt-4 mb-4 text-center">
+                  Already have an account?
+                  <Link
+                    href="/sign-up"
+                    className="font-medium underline   hover:text-blue-600"
+                  >
+                    Login
+                  </Link>
+                </div>
+              </>
+
+            )}
           </div>
+
 
 
           <Footer />

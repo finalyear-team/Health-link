@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/store/userStore";
 import { confrimEmailOTP } from "@/Services/authService";
+import Link from "next/link";
 
 const otpSchema = z.object({
   code: z.string()
@@ -41,26 +42,20 @@ const VerifyAccount = ({ UserID }: { UserID?: string }) => {
   const onsubmit = async (value: z.infer<typeof otpSchema>) => {
     try {
       console.log(userInformation);
+
       const signedInUser = await confrimEmailOTP(value.code, UserID || userInformation?.UserID as string)
 
 
-      if (signedInUser)
-        setTimeout(() => {
-          toast({
-            title: "Welcome to HealthLink!",
-            description: "We're excited to have you on board. Let's get started on your journey to better health!",
-            variant: "success",
-          });
-        }, 1000);
-
       setCompleted(true);
-      if (signedInUser)
-        router.push("/dashboard");
+      if (signedInUser) {
+        setUserInformation(signedInUser)
+        router.push("/dashboard")
+      };
     }
     catch (err: any) {
       console.log(err)
       console.error(JSON.stringify(err, null, 2));
-      setError(err.errors[0].longMessage);
+      setError(err.message);
       toast({
         title: "Error Creating Your Account!",
         description: "Please try Again!",
@@ -122,15 +117,21 @@ const VerifyAccount = ({ UserID }: { UserID?: string }) => {
           <Button
             disabled={completed}
             type="submit"
+            className="bg-primary-600 text-white text-sm font-semibold"
           >
             {completed ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2  h-4 w-4 animate-spin" />
             ) : (
               ""
             )}{" "}
             Submit Verification Code
           </Button>
+          <div className="flex justify-between items-center">
+            <Link href={"/sign-in"} className="text-sm font-medium">Back to  Login</Link>
+
+          </div>
         </form>
+
 
       </Form>
     </div>
