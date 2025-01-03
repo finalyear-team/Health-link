@@ -53,15 +53,17 @@ export class AuthService {
             })
             return decodedToken
         } catch (error) {
-            console.log(error)
+            throw new Error(error.message)
         }
 
     }
+
 
     isTokenExpired(expirationTimestamp: number) {
         const now = Date.now() / 1000;
         return now >= expirationTimestamp;
     }
+
 
     encryptSecret = (secret: string, password: string): string => {
         try {

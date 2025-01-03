@@ -3,7 +3,6 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useUser, UserButton } from "@clerk/nextjs";
 import { MdDehaze, MdOutlineKey, MdOutlinePowerSettingsNew, MdOutlineSecurity } from "react-icons/md";
 import { useQuery } from "@apollo/client";
 import { GET_SIGNEDIN_USER } from "@/graphql/queries/userQueries";
@@ -29,9 +28,11 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import useUserStore from "@/store/userStore";
 
 const Header = () => {
   // const { isSignedIn } = useUser();
+  const userInformation=useUserStore()
   const { user, isSignedIn } = useAuth();
 
   console.log(user);
@@ -73,7 +74,7 @@ const Header = () => {
               <DropdownMenuGroup>
                 <DropdownMenuItem>
                   {isSignedIn ? (
-                    <Link href={"/dashboard"} className="txt_dasbrd">
+                    <Link href={`${user.Role}/${user.UserID}`} className="txt_dasbrd">
                       Dashboard
                     </Link>
                   ) : (
@@ -81,7 +82,7 @@ const Header = () => {
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link href={"/dashboard/patient/consultation"}>
+                  <Link href={"/patient/consultation"}>
                     Find a Doctor
                   </Link>
                 </DropdownMenuItem>

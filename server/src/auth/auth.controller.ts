@@ -30,6 +30,7 @@ import { error } from 'console';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleOAuthGuard } from './google-oauth.guard';
 import { UserType } from 'src/utils/types';
+import { update } from 'lodash';
 
 
 
@@ -206,7 +207,6 @@ export class AuthController {
         })
       }
 
-
       this.generateAndSetTokens(user, res)
 
       return res.status(200).send({
@@ -228,7 +228,7 @@ export class AuthController {
     try {
 
       console.log("this from verify-otp")
-      const user = await this.userService.getUserDetails(UserID)
+      let user = await this.userService.getUserDetails(UserID)
 
       if (!user)
         res.status(401).send("User not found....")
@@ -236,14 +236,19 @@ export class AuthController {
       const decryptedOtpsecret = this.authService.decryptSecret(user.OTPSecret, process.env.OTP_ENCRYPTION_KEY)
 
       const isValid = this.authService.validateTOTP(token, decryptedOtpsecret)
-      console.log(isValid)
+
 
       if (!isValid)
         return res.status(403).send("Token is not valid")
 
       this.generateAndSetTokens(user, res)
 
-      return res.status(200).send(user)
+      const updatedUser = await this.userService.updateUser({
+        UserID: user.UserID,
+        Verified: true
+      })
+
+      return res.status(200).send(updatedUser)
 
     } catch (error) {
       console.log(error)
@@ -276,11 +281,66 @@ export class AuthController {
   }
 
 
+  @Post('validate')
+  async validateAccessToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const access_token = req.headers.authorization?.split(' ')[1];
+
+    console.log("validate access token from nextjs")
+    if (!access_token)
+      throw new HttpException("Access token is missing", HttpStatus.BAD_REQUEST);
+
+    try {
+      const payload = await this.authService.validateToken(access_token, process.env.JWT_SECRET_KEY)
+      res.status(200).json({
+        valid: true,
+        payload
+      })
+    } catch (error) {
+      res.status(401).json({ valid: false, error: error.message });
+    }
+  }
+
   @Post('refresh')
   async refreshAccessToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { refresh_token } = req.body
+    console.log("refresh_token")
+    console.log(refresh_token)
+
+    if (!refresh_token)
+      throw new UnauthorizedException("Refresh token is missing")
+
+    try {
+
+      const payload = await this.authService.validateToken(refresh_token, process.env.JWT_REFRESH_KEY)
+
+
+      const newAccessToken = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, {
+        sub: payload.sub,
+        username: payload.username,
+        role: payload.role
+      }, "15m")
+
+
+      const newRefreshToken = this.authService.generateJWTToken(process.env.JWT_REFRESH_KEY, {
+        sub: payload.sub,
+        username: payload.username,
+        role: payload.role
+      }, "7d")
+
+      res.status(200).json({
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken,
+      });
+
+    } catch (error) {
+      res.status(401).json({ valid: false, error: error.message });
+    }
 
 
   }

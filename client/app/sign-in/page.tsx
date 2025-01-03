@@ -40,6 +40,7 @@ const LoginPage = () => {
   const verify = useSearchParams().get("verify")
   const [verifyOtp, setVerifyOtp] = useState(verify ? true : false)
   const userInformation = useUserStore((state) => state.user);
+  const setUserInformation = useUserStore((state) => state.setUserInformation);
   const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
@@ -54,12 +55,16 @@ const LoginPage = () => {
 
     try {
       setIsSubmitting(true)
-      const user = await signIn(values.email, values.password)
+      const { user, otpVerify } = await signIn(values.email, values.password)
+      console.log(user)
 
-      setVerifyOtp(user.otpVerify as boolean)
+      console.log(otpVerify)
 
-      if (user)
-        router.push("/dashboard");
+      setUserInformation(user)
+      setVerifyOtp(otpVerify as boolean)
+
+      if (user && !otpVerify)
+        router.push(`/${user.Role}`);
 
 
     } catch (err: any) {
@@ -68,7 +73,7 @@ const LoginPage = () => {
     }
 
   };
-  console.log(verify)
+  console.log(verifyOtp)
 
   return (
     <>

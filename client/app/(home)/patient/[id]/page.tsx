@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+// import { useUser } from "@clerk/nextjs";
 import Container from "@/components/container/container";
 import { Clock, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
 import useAuth from "@/hooks/useAuth";
 
-const PatientDahboard = () => {
+const PatientDahboard = ({ params }: { params: { id: string } }) => {
   const [currentTime, setCurrentTime] = useState("");
   const [timeString, setTimeString] = useState("");
 

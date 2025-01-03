@@ -8,11 +8,8 @@ import Service from "@/components/Landing-common/sections/services";
 import Testimonials from "@/components/Landing-common/sections/testimonial";
 import TopDoctorSection from "@/components/Landing-common/sections/top-doctors";
 import { useEffect } from "react";
-import axios from "axios";
 
 const Home = () => {
-
-
 
 
   return (

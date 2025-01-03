@@ -19,7 +19,6 @@ const PatientSignUp = () => {
   const [step, setStep] = useState(1);
   const patientId = useSearchParams().get("patientId")
   const verify = useSearchParams().get("verify")
-  console.log(verify)
   const router = useRouter()
 
   const { loading, error, data } = useQuery(GET_USER, {
@@ -124,9 +123,6 @@ const PatientSignUp = () => {
 
             )}
           </div>
-
-
-
           <Footer />
         </div>
       }
