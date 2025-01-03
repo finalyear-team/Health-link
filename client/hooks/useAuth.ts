@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { GET_SIGNEDIN_USER } from '@/graphql/queries/userQueries';
 import { useQuery } from '@apollo/client';
 import { refreshAccessToken } from '@/Services/authService';
+import useUserStore from '@/store/userStore';
 
 const publicRoutes = [
     "/sign-up",
@@ -20,6 +21,7 @@ const publicRoutes = [
 
 const useAuth = () => {
     const router = useRouter();
+    const setUserInformation = useUserStore((state) => state.setUserInformation);
 
     const { data, loading, error } = useQuery(GET_SIGNEDIN_USER)
 
@@ -39,15 +41,14 @@ const useAuth = () => {
                 setIsSignedIn(true)
             if (error?.message === "Unauthorized") {
                 try {
-                    const signedUser = await refreshAccessToken()
+                    const { user } = await refreshAccessToken()
 
-                    if (signedUser) {
+                    if (user) {
                         setIsSignedIn(true)
-                        setUser(signedUser)
+                        setUserInformation(user)
+                        setUser(user)
                     }
                 } catch (error: any) {
-                    console.log(!isPublicRoute)
-                    console.log(pathname)
                     if (error.response.status === 401 && !isPublicRoute) {
                         console.log("come on man")
                         router.push("/sign-in")
@@ -60,22 +61,17 @@ const useAuth = () => {
     }, [data, error])
 
 
-
-
-
     useEffect(() => {
         if (data && !data.GetSignedInUser && !isPublicRoute) {
             router.push('/sign-in');
         }
     }, []);
 
-   
-
 
     return {
         user: data?.GetSignedInUser || user,
         isSignedIn,
-        isLoaded: isSignedIn
+        isLoading: loading
     };
 };
 

@@ -137,7 +137,7 @@ export class UserService {
 
   async getUserDetails(Id: string) {
     try {
-      const user =
+      const { Password, CreatedAt, UpdatedAt, LastLogin, ...others } =
         await this.prisma.users.findUnique({
           where: {
             UserID: Id,
@@ -147,10 +147,10 @@ export class UserService {
           },
         });
       const followers = await this.countFollowersAndFollowing(
-        user?.UserID,
+        others?.UserID,
       );
-      const Rating = await this.calculateAverageRating(user?.UserID);
-      return { ...user.DoctorDetails, ...user, ...followers, Rating };
+      const Rating = await this.calculateAverageRating(others?.UserID);
+      return { ...others.DoctorDetails, ...others, ...followers, Rating };
     } catch (error) {
       console.log(error);
       throw new HttpException(

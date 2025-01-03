@@ -19,7 +19,6 @@ export class JWTGuard extends AuthGuard('jwt') {
     // If it's a GraphQL request, extract the request object from the context
     if (isGraphql) {
       const { req } = ctx.getContext();
-      console.log(req)
       return super.canActivate(new ExecutionContextHost([req]));
     }
 

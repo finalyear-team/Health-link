@@ -13,10 +13,18 @@ import DashboardCard from "@/components/dashboard/card";
 import image from "@/public/data/image";
 import Loader from "@/common/Loader/Loading";
 import useAuth from "@/hooks/useAuth";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "@/graphql/queries/userQueries";
 
 const PatientDahboard = ({ params }: { params: { id: string } }) => {
   const [currentTime, setCurrentTime] = useState("");
   const [timeString, setTimeString] = useState("");
+  const { data, loading, error } = useQuery(GET_USER, {
+    variables: {
+      UserID: params.id
+    }
+  })
+  const user = data && data?.GetUser
 
   useEffect(() => {
     const updateGreetingAndTime = () => {
@@ -48,14 +56,10 @@ const PatientDahboard = ({ params }: { params: { id: string } }) => {
     // Set up an interval to update the time every minute
     const intervalId = setInterval(updateGreetingAndTime, 60000);
 
-    // Clean up the interval on unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // const { user, isSignedIn, isLoaded } = useUser();
-  const { user, isSignedIn, isLoaded } = useAuth()
-  console.log(user)
-  const Role = user?.Role;
+
 
   return (
     <div>
@@ -70,7 +74,7 @@ const PatientDahboard = ({ params }: { params: { id: string } }) => {
                 {currentTime}{" "}
               </div> */}
               <span className="text-primary-600 dark:text-primary-700 flex items-center space-x-2">
-                Mr. {user?.FirstName} {user?.LastName} {!isLoaded && <Loader />}
+                Mr. {user?.FirstName} {user?.LastName} {loading && <Loader />}
               </span>{" "}
             </div>
             {/* the time show */}

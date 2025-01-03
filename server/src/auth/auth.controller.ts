@@ -278,6 +278,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+
   }
 
 
@@ -288,7 +289,8 @@ export class AuthController {
   ) {
     const access_token = req.headers.authorization?.split(' ')[1];
 
-    console.log("validate access token from nextjs")
+    console.log("validate access token from nextjs");
+
     if (!access_token)
       throw new HttpException("Access token is missing", HttpStatus.BAD_REQUEST);
 
@@ -308,18 +310,16 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { refresh_token } = req.body
-    console.log("refresh_token")
-    console.log(refresh_token)
+    const refresh_token = req.body.refresh_token || req.cookies["refresh_token"]
+
 
     if (!refresh_token)
       throw new UnauthorizedException("Refresh token is missing")
 
     try {
-
       const payload = await this.authService.validateToken(refresh_token, process.env.JWT_REFRESH_KEY)
 
-
+      const user = await this.userService.getUserDetails(payload.sub)
       const newAccessToken = this.authService.generateJWTToken(process.env.JWT_SECRET_KEY, {
         sub: payload.sub,
         username: payload.username,
@@ -333,9 +333,13 @@ export class AuthController {
         role: payload.role
       }, "7d")
 
+
+
       res.status(200).json({
         access_token: newAccessToken,
         refresh_token: newRefreshToken,
+        user
+
       });
 
     } catch (error) {

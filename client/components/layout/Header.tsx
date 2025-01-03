@@ -29,11 +29,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/store/userStore";
+import Loading from "@/common/Loader/Loading";
 
 const Header = () => {
   // const { isSignedIn } = useUser();
-  const userInformation=useUserStore()
-  const { user, isSignedIn } = useAuth();
+  const userInformation = useUserStore()
+  const { user, isLoading, isSignedIn } = useAuth();
 
   console.log(user);
   console.log(isSignedIn);
@@ -104,7 +105,7 @@ const Header = () => {
         </div>
         <div className="header__right horizontal_nav text-sm">
           {isSignedIn ? (
-            <Link href={"/dashboard"} className="txt_dasbrd">
+            <Link href={`${user.Role}/${user.UserID}`} className="txt_dasbrd">
               Dashboard
             </Link>
           ) : (

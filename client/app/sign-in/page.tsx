@@ -64,7 +64,7 @@ const LoginPage = () => {
       setVerifyOtp(otpVerify as boolean)
 
       if (user && !otpVerify)
-        router.push(`/${user.Role}`);
+        router.push(`/${user.Role}/${user.UserID}`);
 
 
     } catch (err: any) {
