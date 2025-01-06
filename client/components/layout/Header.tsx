@@ -32,7 +32,6 @@ import useUserStore from "@/store/userStore";
 import Loading from "@/common/Loader/Loading";
 
 const Header = () => {
-  // const { isSignedIn } = useUser();
   const userInformation = useUserStore()
   const { user, isLoading, isSignedIn } = useAuth();
 
@@ -122,13 +121,56 @@ const Header = () => {
           </Link>
           {!isSignedIn ? (
             <div className="header__right text-sm">
-              {" "}
-              <Link href={"/sign-in"} className="hover:underline">
-                Log in
-              </Link>
-              <Link href={"/sign-up"} className="hover:underline">
-                Sign up
-              </Link>{" "}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"empty"}>
+                    <p className="hover:underline ">Log in</p>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Doctor</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                      <Link href={"/sign-in?provider=1"}>
+                        Log in
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuLabel>Patient</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                      <Link href={"/sign-in"}>
+                        Log in
+                      </Link>
+                    </DropdownMenuItem>
+
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"empty"}>
+                    <p className="hover:underline ">Sign up</p>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel> Doctor</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                      <Link href={"/register/doctor"}>
+                        sign up
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuLabel>Patient</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                      <Link href={"/sign-in"}>
+                        sign up
+                      </Link>
+                    </DropdownMenuItem>
+
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <TooltipProvider>

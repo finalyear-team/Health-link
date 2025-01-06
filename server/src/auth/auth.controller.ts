@@ -128,11 +128,13 @@ export class AuthController {
   @Get("google/callback")
   @UseGuards(GoogleOAuthGuard)
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const stateToken = req.query.state as string;
     const user = req.user as any;
+    const validatedToken = stateToken && this.authService.validateToken(stateToken, process.env.JWT_SECRET_KEY)
     try {
-      const response = await this.authService.googleLogin(user);
+      const response = await this.authService.googleLogin(user, validatedToken && UserType.DOCTOR);
       if (response.redirect) {
-        return res.redirect(`${process.env.FRONTEND_URL}/register/patient?patientId=${response.user.UserID}&SocialAccount=true`)
+        return res.redirect(`${process.env.FRONTEND_URL}/register/${response.user.Role}?UID=${response.user.UserID}&SocialAccount=true`)
       }
 
       if (response.user && !response.user.Verified) {

@@ -38,6 +38,7 @@ const LoginPage = () => {
   const router = useRouter();
   const UserID = useSearchParams().get("UID")
   const verify = useSearchParams().get("verify")
+  const provider = useSearchParams().get("provider")
   const [verifyOtp, setVerifyOtp] = useState(verify ? true : false)
   const userInformation = useUserStore((state) => state.user);
   const setUserInformation = useUserStore((state) => state.setUserInformation);
@@ -48,7 +49,7 @@ const LoginPage = () => {
   })
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:4000/auth/google/signin";
+    window.location.href = `http://localhost:4000/auth/google/signin${provider ? "?role=provider" : " "}`;
   };
 
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
@@ -89,6 +90,7 @@ const LoginPage = () => {
               <h2 className="mt-6 text-center  text-slate-800 text-2xl  font-extrabold">
                 Sign in to HealthLink
               </h2>
+              {provider && <p className="text-gray-800 font-medium">For providers</p>}
             </div>
 
             <Form {...form} >
@@ -131,13 +133,13 @@ const LoginPage = () => {
                     ) : (
                       ""
                     )}{" "}
-                    Login
+                    Log in
                   </Button>
 
                   <div className="text-md mt-4 text-center">
                     Don&apos;t have an account?
                     <Link
-                      href="/register"
+                      href={`/register/${provider ? "doctor" : "patient"}`}
                       className="font-medium underline  hover:text-blue-600"
                     >
                       Sign Up

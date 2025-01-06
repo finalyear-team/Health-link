@@ -13,7 +13,7 @@ const publicRoutes= [
     "/security",
     "/terms-of-services",
     "/sign-in",
-    "/sign-up(.*)",
+    "/register",
   ]
 
 
@@ -64,11 +64,11 @@ export default async function middleware(req: NextRequest) {
     const res=NextResponse.next()
     const access_token = req.cookies.get("access_token")?.value;
     const refresh_token = req.cookies.get("refresh_token")?.value;
-    console.log("refresh_token")
-    console.log(refresh_token)
 
-
+    console.log("from middleware",publicRoutes.some((route) => new RegExp(`^${route}$`).test(pathname)))
+    
     if (publicRoutes.some((route) => new RegExp(`^${route}$`).test(pathname))) {
+      console.log(pathname)
         return NextResponse.next();
       }
     

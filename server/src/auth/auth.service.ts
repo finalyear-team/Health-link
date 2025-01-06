@@ -162,7 +162,7 @@ export class AuthService {
 
 
 
-    async googleLogin(profile: googleProfile) {
+    async googleLogin(profile: googleProfile, role?: UserType.DOCTOR | UserType.PATIENT) {
         const { FirstName, LastName, ProfilePicture, Email } = profile
         try {
             let user = await this.userService.getUserByEmail(Email)
@@ -174,7 +174,7 @@ export class AuthService {
 
             })();
 
-            const registeredUser = user ? user : await this.userService.RegisterUser({ FirstName, LastName, ProfilePicture, Email, Role: UserType.PATIENT, isSocialAccount: true })
+            const registeredUser = user ? user : await this.userService.RegisterUser({ FirstName, LastName, ProfilePicture, Email, Role: role || UserType.PATIENT, isSocialAccount: true })
 
 
             return { user: registeredUser, redirect }
